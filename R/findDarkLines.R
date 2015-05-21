@@ -1,14 +1,16 @@
-#' Find horizontal dark lines, typically the space between plate levels.
 #' @export
-#' @param m an image matrix to search for dark lines.
-#' @return A \code{dataframe} of start and end indices for dark lines.
+#' @title Find Horizontal Dark Lines
+#' @param image matrix of image data
+#' @description In Fluidomics apparatus, the space between plate levels often
+#' generates dark lines in phase contrast microscopy.
+#' @return A \code{matrix} of start and end indices for dark lines.
 
-findDarkLines <- function(m) {
+findDarkLines <- function(image) {
   
-  # Iterate through the imagine in 15 pixel rows and find the mean of each row
+  # Iterate through the image matrix in 15 pixel rows and find the mean of each row
   meanValue <- c()
-  for(y in seq(1,(dim(m)[[2]]-5),1)) {
-    sample <- m[ ,y:(y+5)]
+  for(j in seq(1,(dim(image)[[2]]-5),1)) {
+    sample <- image[ ,j:(j+5)]
     meanValue <- c(meanValue, mean(sample))
   }
   

@@ -1,7 +1,8 @@
-#' Searches an image for dark cell colonies and incrementally labels each colony.
 #' @export
+#' @title Identify and Label Cell Colonies
 #' @param image an image matrix to search for cell colonies
 #' @param artifactMask a mask of non biological features to ignore. \link{createArtifactMask}
+#' @description Searches an image for dark cell colonies and incrementally labels each colony.
 #' @return A \code{matrix} of integer labeled blobs.
 
 labelColonies <- function(image, artifactMask) {

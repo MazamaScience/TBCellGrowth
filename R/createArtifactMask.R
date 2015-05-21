@@ -1,9 +1,12 @@
-#' Creates a mask of non biological artifacts, such as pillars and squares.
 #' @export
-#' @param bg a preprocessed background image.
-#' @param maskDarkLines whether or not dark lines should be masked out.
-#' @return A \code{matrix} of boolean values with TRUE values identifying
-#' non biological artifacts. 
+#' @title Create a Mask of non-Biological Artifacts
+#' @param bg preprocessed background image
+#' @param maskDarkLines logical specifying whether or not dark lines should be masked out
+#' @description Fluidomics apparatus used in phase microscopy have a number of physical
+#' features that must be masked out before image processing algorithms to identify bacteria
+#' are applied. This function is tailored to remove *pillars*, *squares* and the dark lines
+#' that appear between different levels in the apparatus.
+#' @return A \code{matrix} of boolean values with TRUE values identifying non biological artifacts. 
 
 createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   

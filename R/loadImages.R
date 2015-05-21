@@ -1,9 +1,9 @@
 #' @export
-#' @title Load Images into a List
+#' @title Load Image Data into a List
 #' @param dir path to the directory containing images
 #' @param ext file extension
 #' @param n number of images to load into memory (defaults to all)
-#' @return A \code{list} of \code{matrices} extracted from the \code{EBImage}
+#' @return A \code{list} of image matrices extracted from the \code{EBImage}
 #' \code{image} object.
 
 loadImages <- function(dir, ext="tiff", n=NA) {

@@ -1,9 +1,14 @@
-Package: TBCellGrowth
 Type: Package
-Title: Cell microscopy feature extraction and growth tracking.
-Version: 1.0
+Package: TBCellGrowth
+Title: Cell Microscopy Feature Extraction and Growth Tracking
+Version: 0.1.0
 Date: 2015-05-20
-Author: Mazama Science
+Authors@R: c(
+    person("Will", "Leahy", email="procterw@gmail.com", role=c("aut","cre")),
+    person("Jonathan", "Callahan", email="jonathan.s.callahan@gmail.com", role=c("aut"))
+    )
+Author: Will Leahy [aut, cre],
+    Jonathan Callahan [aut]
 Maintainer: Will Leahy <procterw@gmail.com>
 Depends: R (>= 3.1.0)
 Imports:
@@ -11,8 +16,7 @@ Imports:
   glcm,
   dplyr
 Suggests:
-  knitr,
-  testthat
+  knitr
 Description: A suite of functions for processing cell microscopy data,
   specifically developed for tuberculosis. Features include GLCM based
   feature extraction and blob labeling as well as tracking of colony growth 
