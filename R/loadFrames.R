@@ -6,10 +6,10 @@
 #' @return A \code{list} of \code{matrices} extracted from the \code{EBImage}
 #' \code{image} object.
 
-loadFrames <- function(dir, ext, n=NA, rotation=0) {
+loadFrames <- function(dir, ext, n=NA) {
   
   readf <- function(im) {
-    return(readImage(im)@.Data)
+    return(EBImage::readImage(im)@.Data)
   }
   
   # List all files
