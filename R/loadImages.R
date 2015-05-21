@@ -1,12 +1,12 @@
-#' Load frames from a directory.
 #' @export
-#' @param dir A path to the directory containing image frames.
-#' @param n The number of frames to load into memory. Loads all by default.
-#' @param ext file extension, "tiff" by default.
+#' @title Load Images into a List
+#' @param dir path to the directory containing images
+#' @param ext file extension
+#' @param n number of images to load into memory (defaults to all)
 #' @return A \code{list} of \code{matrices} extracted from the \code{EBImage}
 #' \code{image} object.
 
-loadFrames <- function(dir, ext, n=NA) {
+loadImages <- function(dir, ext="tiff", n=NA) {
   
   readf <- function(im) {
     return(EBImage::readImage(im)@.Data)
