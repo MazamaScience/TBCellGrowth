@@ -1,13 +1,12 @@
-#' Align, normalize brightness, and crop a list of image matrices.
 #' @export
-#' @param frames a list of matrices.
-#' @param rotation how many degrees to rotate each image.
-#' @param sample which region of the frames to use for alignment.
-#' @param crop amount to crop from each side in format \code{c(bottom, left, top,
-#' right)}.
+#' @title Align, Normalize Brightness, and Crop a List of Image Matrices
+#' @param images a list of image matrices
+#' @param rotation how many degrees to rotate each image
+#' @param sample which region of the images to use for alignment
+#' @param crop amount to crop from each side in format \code{c(bottom, left, top, right)}.
 #' @return A \code{list} of \code{matrices} ready for feature extraction.
 
-preprocessFrames <- function(frames, rotation=0, sample=c(150,450,125), crop=c(150,150,150,150)) {
+preprocessImages <- function(images, rotation=0, sample=c(150,450,125), crop=c(150,150,150,150)) {
 
   normalizeValue <- function(m) {      
     # brighten
@@ -23,18 +22,18 @@ preprocessFrames <- function(frames, rotation=0, sample=c(150,450,125), crop=c(1
   wh <- sample[[3]]
   
   # Adjust image brightness
-  frames <- lapply(frames, normalizeValue)
+  images <- lapply(images, normalizeValue)
   
   # Get background region. Assumes the first image is the background
-  bgSample <- frames[[1]][x1:(x1+wh), y1:(y1+wh)]
+  bgSample <- images[[1]][x1:(x1+wh), y1:(y1+wh)]
   
-  # For non-background frames, align to background frame
-  for (i in 2:length(frames)) {
+  # For non-background images, align to background image
+  for (i in 2:length(images)) {
     
     # Debug
-    print(paste0("Aligning frame ", i))
+    print(paste0("Aligning image ", i))
     
-    image <- frames[[i]]@.Data
+    image <- images[[i]]
     
     # Take a sample 50px larger on each side than the background sample
     subset <- image[(x1-50):(x1+wh+50), (y1-50):(y1+wh+50)]
@@ -59,17 +58,17 @@ preprocessFrames <- function(frames, rotation=0, sample=c(150,450,125), crop=c(1
     height <- dim(image)[[2]]
     
     # Crop image, adjust by offsets
-    frames[[i]] <- image[(crop[[2]] + offset.x):(width + offset.x - crop[[4]]),
+    images[[i]] <- image[(crop[[2]] + offset.x):(width + offset.x - crop[[4]]),
                          (crop[[3]] + offset.y):(height + offset.y - crop[[1]])]
     
   }
   
   # Crop background
-  background <- frames[[1]]
+  background <- images[[1]]
   background <- background[crop[[2]]:(dim(background)[[1]]-crop[[4]]),
                            crop[[3]]:(dim(background)[[2]]-crop[[1]])]
-  frames[[1]] <- background
+  images[[1]] <- background
   
-  return(frames)
+  return(images)
   
 }

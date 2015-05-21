@@ -3,5 +3,5 @@
 export(createArtifactMask)
 export(findDarkLines)
 export(labelColonies)
-export(loadFrames)
-export(preprocessFrames)
+export(loadImages)
+export(preprocessImages)
