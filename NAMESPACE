@@ -2,6 +2,7 @@
 
 export(createArtifactMask)
 export(findDarkLines)
+export(generateBlobTimeseries)
 export(labelColonies)
 export(loadImages)
 export(preprocessImages)

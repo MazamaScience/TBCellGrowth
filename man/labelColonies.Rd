@@ -4,16 +4,12 @@
 \alias{labelColonies}
 \title{Searches an image for dark cell colonies and incrementally labels each colony.}
 \usage{
-labelColonies(frame, artifactMask)
+labelColonies(image, artifactMask)
 }
 \arguments{
-\item{frame}{an image matrix to search for cell colonies}
+\item{image}{an image matrix to search for cell colonies}
 
-<<<<<<< HEAD
-\item{artifactMask}{a mask of non biological features to ignore. \link{createArtifactMask}}
-=======
-\item{artifactMask}{a mask of non biological features to ignore.}
->>>>>>> 00821d6dd8c859a7b3157753f0dcc96ad9a52260
+\item{artifactMask}{a mask of non biological features to ignore. See \link{createArtifactMask}.}
 }
 \value{
 A \code{matrix} of integer labeled blobs.
