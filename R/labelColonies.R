@@ -1,7 +1,7 @@
 #' Searches an image for dark cell colonies and incrementally labels each colony.
 #' @export
 #' @param frame an image matrix to search for cell colonies
-#' @param artifactMask a mask of non biological features to ignore.
+#' @param artifactMask a mask of non biological features to ignore. \link{createArtifactMask}
 #' @return A \code{matrix} of integer labeled blobs.
 
 labelColonies <- function(frame, artifactMask) {
@@ -73,7 +73,8 @@ labelColonies <- function(frame, artifactMask) {
   
 }
 
-# Remove all blobs under a certain size threshold
+# Remove all blobs under a certain size threshold from a matrix.
+# Assumes blobs are incrementally labeled. 
 removeBlobs <- function(m, size) {
   # Label blobs
   m <- bwlabel(m)
