@@ -7,3 +7,7 @@ artifactMask <- createArtifactMask(frames[[1]])
 
 frames.labeled <- lapply(frames, labelColonies, artifactMask)
 
+
+
+display(overlayBlobs(frames[[2]], frames.labeled[[2]]))
+display(overlayGrid(frames[[2]]))

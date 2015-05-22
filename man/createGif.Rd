@@ -4,7 +4,7 @@
 \alias{createGif}
 \title{Creates a gif animation.}
 \usage{
-createGif(frames, filename, delay = 15, resize = 100)
+createGif(frames, filename, delay = 15, rescale = 100)
 }
 \arguments{
 \item{frames}{a sequential \code{list} of images.}
