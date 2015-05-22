@@ -8,7 +8,7 @@
 #' @return none
 
 # Accepts a list of matrices and creates a gif
-createGif <- function(frames, filename, delay=15, resize=100) {
+createGif <- function(frames, filename, delay=15, rescale=100) {
   
   # Temporary directory location. We store frames here
   tempDir <- "temp2234g12hdq5gp/"
@@ -23,8 +23,7 @@ createGif <- function(frames, filename, delay=15, resize=100) {
   }
   
   # Convert frames to gif using a system call to ImageMagick
-  system(paste0('convert -resize "', resize, '%" -delay  ', delay, ' ', tempDir, '*.tiff ',
-                filename))
+  system(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' ', tempDir, '*.tiff ', filename))
   
   # Delete temporary directory
   unlink(tempDir, recursive=TRUE)
