@@ -2,7 +2,7 @@
 % Please edit documentation in R/loadImages.R
 \name{loadImages}
 \alias{loadImages}
-\title{Load Images into a List}
+\title{Load Image Data into a List}
 \usage{
 loadImages(dir, ext = "tiff", n = NA)
 }
@@ -14,10 +14,10 @@ loadImages(dir, ext = "tiff", n = NA)
 \item{n}{number of images to load into memory (defaults to all)}
 }
 \value{
-A \code{list} of \code{matrices} extracted from the \code{EBImage}
+A \code{list} of image matrices extracted from the \code{EBImage}
 \code{image} object.
 }
 \description{
-Load Images into a List
+Load Image Data into a List
 }
 

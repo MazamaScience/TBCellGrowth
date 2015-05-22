@@ -2,20 +2,22 @@
 % Please edit documentation in R/createArtifactMask.R
 \name{createArtifactMask}
 \alias{createArtifactMask}
-\title{Creates a mask of non biological artifacts, such as pillars and squares.}
+\title{Create a Mask of non-Biological Artifacts}
 \usage{
 createArtifactMask(bg, maskDarkLines = FALSE)
 }
 \arguments{
-\item{bg}{a preprocessed background image.}
+\item{bg}{preprocessed background image}
 
-\item{maskDarkLines}{whether or not dark lines should be masked out.}
+\item{maskDarkLines}{logical specifying whether or not dark lines should be masked out}
 }
 \value{
-A \code{matrix} of boolean values with TRUE values identifying
-non biological artifacts.
+A \code{matrix} of boolean values with TRUE values identifying non biological artifacts.
 }
 \description{
-Creates a mask of non biological artifacts, such as pillars and squares.
+Fluidomics apparatus used in phase microscopy have a number of physical
+features that must be masked out before image processing algorithms to identify bacteria
+are applied. This function is tailored to remove *pillars*, *squares* and the dark lines
+that appear between different levels in the apparatus.
 }
 

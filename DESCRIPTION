@@ -11,12 +11,13 @@ Author: Will Leahy [aut, cre],
     Jonathan Callahan [aut]
 Maintainer: Will Leahy <procterw@gmail.com>
 Depends: R (>= 3.1.0)
-Imports:
+Imports: 
   EBImage,
   glcm,
   dplyr
-Suggests:
-  knitr
+Suggests: 
+  knitr,
+    testthat
 Description: A suite of functions for processing cell microscopy data,
   specifically developed for tuberculosis. Features include GLCM based
   feature extraction and blob labeling as well as tracking of colony growth 

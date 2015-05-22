@@ -2,17 +2,18 @@
 % Please edit documentation in R/findDarkLines.R
 \name{findDarkLines}
 \alias{findDarkLines}
-\title{Find horizontal dark lines, typically the space between plate levels.}
+\title{Find Horizontal Dark Lines}
 \usage{
-findDarkLines(m)
+findDarkLines(image)
 }
 \arguments{
-\item{m}{an image matrix to search for dark lines.}
+\item{image}{matrix of image data}
 }
 \value{
-A \code{dataframe} of start and end indices for dark lines.
+A \code{matrix} of start and end indices for dark lines.
 }
 \description{
-Find horizontal dark lines, typically the space between plate levels.
+In Fluidomics apparatus, the space between plate levels often
+generates dark lines in phase contrast microscopy.
 }
 

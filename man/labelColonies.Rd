@@ -2,7 +2,7 @@
 % Please edit documentation in R/labelColonies.R
 \name{labelColonies}
 \alias{labelColonies}
-\title{Searches an image for dark cell colonies and incrementally labels each colony.}
+\title{Identify and Label Cell Colonies}
 \usage{
 labelColonies(image, artifactMask)
 }

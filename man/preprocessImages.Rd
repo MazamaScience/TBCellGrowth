@@ -2,24 +2,29 @@
 % Please edit documentation in R/preprocessImages.R
 \name{preprocessImages}
 \alias{preprocessImages}
-\title{Align, Normalize Brightness, and Crop a List of Image Matrices}
+\title{Align, Normalize Brightness, and Crop a List of Images}
 \usage{
-preprocessImages(images, rotation = 0, sample = c(150, 450, 125),
+preprocessImages(imageList, rotation = 0, sample = c(150, 450, 125),
   crop = c(150, 150, 150, 150))
 }
 \arguments{
-\item{images}{a list of image matrices}
+\item{imageList}{a list of images}
 
 \item{rotation}{how many degrees to rotate each image}
 
-\item{sample}{which region of the images to use for alignment}
+\item{sample}{which region of the imageList to use for alignment in the format \code{c(x, y, size)}}
 
-\item{crop}{amount to crop from each side in format \code{c(bottom, left, top, right)}.}
+\item{crop}{amount to crop from each side in format \code{c(bottom, left, top, right)}}
 }
 \value{
 A \code{list} of \code{matrices} ready for feature extraction.
 }
 \description{
-Align, Normalize Brightness, and Crop a List of Image Matrices
+Align, Normalize Brightness, and Crop a List of Images
+}
+\note{
+The \code{imageList} that are passed are actually just the contents of the \code{@.Data} slot
+of an \code{EBImage::Image} object. We use the term *image* to refer to the matrix of image data
+that has been pulled out of each \code{EBImage::Image} object.
 }
 
