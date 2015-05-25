@@ -23,6 +23,6 @@ loadImages <- function(dir, ext="tiff", n=NA) {
   }
   
   # Read each file and return the resulting list
-  return(list(images=lapply(files, readf), filenames=files))
-  
+  return(list(images=lapply(files, readf), labels=files)
+         
 }
