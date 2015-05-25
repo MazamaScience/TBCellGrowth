@@ -20,7 +20,7 @@ labelColonies <- function(image, artifactMask) {
   homog[artifactMask>0] <- 0
   
   # Close small gaps and invert
-  homog <- 1 - (closingGreyScale(homog, makeBrush(7, shape='disc')) * 1.2)
+  homog <- 1 - (EBImage::closingGreyScale(homog, EBImage::makeBrush(7, shape='disc')) * 1.2)
   
   # Multiplying the edges by the original image darkens only the edges of the bacteria.
   # This reduces the chance of dark regions in the background being captured.
@@ -33,38 +33,38 @@ labelColonies <- function(image, artifactMask) {
   imageEdit[artifactMask>0] <- 0
   
   # Mild dilate/erode to close small gaps
-  imageEdit <- closingGreyScale(imageEdit, makeBrush(7, shape='disc'))
+  imageEdit <- EBImage::closingGreyScale(imageEdit, EBImage::makeBrush(7, shape='disc'))
   
   # Remove very small blobs
   imageEdit <- removeBlobs(imageEdit, 10)
   
   # Larger dilate/erode. This lets groups capture small bits that should
   # count as the same group.
-  imageEdit <- closingGreyScale(imageEdit, makeBrush(11, shape='disc'))
+  imageEdit <- EBImage::closingGreyScale(imageEdit, EBImage::makeBrush(11, shape='disc'))
   
   # Now remove medium blobs.
   imageEdit <- removeBlobs(imageEdit, 25)
   
   # Large dilate to garuntee all of the area around the bacteria is selected.
-  imageEdit <- dilateGreyScale(imageEdit, makeBrush(15, shape='disc'))
+  imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(15, shape='disc'))
   
   # Equalize m, which flattens the value histogram. This greatly increases the
   # contrast around the edges. Then select the lighter areas from that region and
-  imageEdit[(equalize(image)) > 0.5] <- 0
+  imageEdit[(EBImage::equalize(image)) > 0.5] <- 0
   
   # Remove noise
   imageEdit <- removeBlobs(imageEdit, 20)
   
   # Dilate to bring groups together
-  imageEdit <- dilateGreyScale(imageEdit, makeBrush(3, shape='disc'))
+  imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(3, shape='disc'))
   
   # Now label sections. It's important to label while still dilated so that labels
   # Are less sensitive.
-  imageEdit <- bwlabel(imageEdit)
+  imageEdit <- EBImage::bwlabel(imageEdit)
   
   # Since sections are already labeled it's safe to remove a lot of the excess
   # White so we get a more accurate reading
-  imageEdit[(equalize(image)^0.5) > 0.5] <- 0
+  imageEdit[(EBImage::equalize(image)^0.5) > 0.5] <- 0
   
   imageEdit[artifactMask>0] <- 0
   
@@ -78,7 +78,7 @@ labelColonies <- function(image, artifactMask) {
 # Assumes blobs are incrementally labeled. 
 removeBlobs <- function(m, size) {
   # Label blobs
-  m <- bwlabel(m)
+  m <- EBImage::bwlabel(m)
   # Save dimensions
   dims <- dim(m)
   # Unravel matrix and count the occurances of each label

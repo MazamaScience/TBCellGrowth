@@ -27,7 +27,7 @@ plotToOverlay = function(plotf, dimx, dimy) {
   par(oldPar)
   
   # Now load the png as an "image" type
-  labels <- 1 - readImage("temp345s45grf.png")[,,1]
+  labels <- 1 - EBImage::readImage("temp345s45grf.png")[,,1]
   
   # Delete the file
   file.remove("temp123423453456.png")

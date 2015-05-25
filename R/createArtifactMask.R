@@ -112,7 +112,7 @@ createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   c <- EBImage::closingGreyScale(b, EBImage::makeBrush(15, shape='disc'))
 
   # Expand the circles a bit
-  d <- dilateGreyScale(c, makeBrush(5, shape='disc'))
+  d <- EBImage::dilateGreyScale(c, EBImage::makeBrush(5, shape='disc'))
   
   e <- d
   ### REMOVE WHITE LINES ###

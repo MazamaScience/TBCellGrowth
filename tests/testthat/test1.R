@@ -3,11 +3,13 @@ dataDir <- "~/projects/TBTracking/images/full_post_cropped"
 
 frames <- loadImages(dataDir, n=10, ext="tif")
 
-artifactMask <- createArtifactMask(frames[[1]])
 
-frames.labeled <- lapply(frames, labelColonies, artifactMask)
+artifactMask <- createArtifactMask(frames$images[[1]])
+
+frames.labeled <- lapply(frames$images, labelColonies, artifactMask)
 
 
 
-display(overlayBlobs(frames[[2]], frames.labeled[[2]]))
-display(overlayGrid(frames[[2]]))
+EBImage::display(overlayBlobs(frames$images[[2]], frames.labeled[[2]]))
+EBImage::display(overlayGrid(frames$images[[2]]))
+EBImage::display(overlayTimestamp(frames$images[[2]], frames$labels[[2]]))

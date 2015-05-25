@@ -22,7 +22,13 @@ loadImages <- function(dir, ext="tiff", n=NA) {
     files <- files[1:n]
   }
   
+  # Function for extracting filenames
+  parseFilenames <- function(file) {
+    splt <- strsplit(file, "/")[[1]]
+    return(strsplit(splt[length(splt)], "\\.")[[1]][[1]])
+  }
+  
   # Read each file and return the resulting list
-  return(list(images=lapply(files, readf), labels=files)
+  return(list(images=lapply(files, readf), labels=files))
          
 }
