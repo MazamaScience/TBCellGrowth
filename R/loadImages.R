@@ -3,8 +3,10 @@
 #' @param dir path to the directory containing images
 #' @param ext file extension
 #' @param n number of images to load into memory (defaults to all)
-#' @return A \code{list} of image matrices extracted from the \code{EBImage}
-#' \code{image} object.
+#' @return A \code{list} with two attributes, "images" and "filenames".
+#' Images is a \code{list} of image matrices extracted from the \code{EBImage}
+#' \code{image} object. Filenames is a vector of filenames that correponds
+#' to images.
 
 loadImages <- function(dir, ext="tiff", n=NA) {
   
@@ -21,6 +23,6 @@ loadImages <- function(dir, ext="tiff", n=NA) {
   }
   
   # Read each file and return the resulting list
-  return(lapply(files, readf))
+  return(list(images=lapply(files, readf), filenames=files))
   
 }
