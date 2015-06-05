@@ -4,7 +4,7 @@
 \name{TBCellGrowth}
 \alias{TBCellGrowth}
 \alias{TBCellGrowth-package}
-\title{Cell microscopy feature extraction and growth tracking.}
+\title{Cell Microscopy Feature Extraction and Growth Tracking}
 \description{
 A suite of functions for processing cell microscopy data,
 specifically developed for tuberculosis. Features include GLCM based
