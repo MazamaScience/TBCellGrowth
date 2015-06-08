@@ -4,15 +4,19 @@
 \alias{preprocessImages}
 \title{Align, Normalize Brightness, and Crop a List of Images}
 \usage{
-preprocessImages(imageList, rotation = 0, sample = c(150, 450, 125),
-  crop = c(150, 150, 150, 150))
+preprocessImages(phase, green = NA, red = NA, rotation = 0,
+  sample = c(150, 450, 125), crop = c(150, 150, 150, 150))
 }
 \arguments{
-\item{imageList}{a list of images}
+\item{phase}{a list of phase microscopy images}
+
+\item{green}{a list of green dye images}
+
+\item{red}{a list of red dye images}
 
 \item{rotation}{how many degrees to rotate each image}
 
-\item{sample}{which region of the imageList to use for alignment in the format \code{c(x, y, size)}}
+\item{sample}{which region of the phase to use for alignment in the format \code{c(x, y, size)}}
 
 \item{crop}{amount to crop from each side in format \code{c(bottom, left, top, right)}}
 }
@@ -23,7 +27,7 @@ A \code{list} of \code{matrices} ready for feature extraction.
 Align, Normalize Brightness, and Crop a List of Images
 }
 \note{
-The \code{imageList} that are passed are actually just the contents of the \code{@.Data} slot
+The \code{phase} that are passed are actually just the contents of the \code{@.Data} slot
 of an \code{EBImage::Image} object. We use the term *image* to refer to the matrix of image data
 that has been pulled out of each \code{EBImage::Image} object.
 }

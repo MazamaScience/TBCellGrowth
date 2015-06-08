@@ -8,7 +8,7 @@
 #' \code{image} object. Filenames is a vector of filenames that correponds
 #' to images.
 
-loadImages <- function(dir, ext="tiff", n=NA) {
+loadImages <- function(dir, ext="tiff", n=NA, start=1) {
   
   readf <- function(im) {
     return(EBImage::readImage(im)@.Data)
@@ -16,6 +16,9 @@ loadImages <- function(dir, ext="tiff", n=NA) {
   
   # List all files
   files <- list.files(dir, pattern=paste0("\\.",ext,"$"), full.names=TRUE)
+  
+  # Jump to start
+  files <- files[start:length(files)]
   
   # Subset files if necessary
   if (!is.na(n)) {

@@ -1,11 +1,11 @@
 #' @export
-#' @title Identify and Label Cell Colonies
+#' @title Identify and Label Phase Microscopy Groups
 #' @param image an image matrix to search for cell colonies
 #' @param artifactMask a mask of non biological features to ignore. See \link{createArtifactMask}.
 #' @description Searches an image for dark cell colonies and incrementally labels each colony.
 #' @return A \code{matrix} of integer labeled blobs.
 
-labelColonies <- function(image, artifactMask) {
+labelGroupsPhase <- function(image, artifactMask) {
   
   print("Searching new image...")
   ptm <- proc.time()

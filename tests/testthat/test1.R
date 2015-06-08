@@ -1,7 +1,25 @@
 
-dataDir <- "~/projects/TBTracking/images/full_post_cropped"
+dataDirPhase <- "~/Desktop/TBData/xy6/Phase/"
+dataDirGreen <- "~/Desktop/TBData/xy6/Green/"
+dataDirRed <- "~/Desktop/TBData/xy6/Red/"
 
-frames <- loadImages(dataDir, n=10, ext="tif")
+phase <- loadImages(dataDirPhase, n=10, ext="tif")$images
+green <- loadImages(dataDirGreen, n=10, ext="tif")$images
+red   <- loadImages(dataDirRed, n=10, ext="tif")$images
+
+bleh <- preprocessImages(phase, green, red, rotation=-1.5)
+
+phase <- bleh$phase
+green <- bleh$green
+red   <- bleh$red
+
+artifactMask <- createArtifactMask(phase[[1]])
+
+phase.labeled <- lapply(phase, labelGroupsPhase, artifactMask)
+green.labeled <- labelGroupsPhase(green, artifactMask)
+red.labeled   <- labelGroupsPhase(red, artifactMask)
+
+
 
 
 artifactMask <- createArtifactMask(frames$images[[1]])
