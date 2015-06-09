@@ -9,12 +9,12 @@ dataDirGreen <- "~/Desktop/tbtest/xy6/Green/"
 dataDirRed <- "~/Desktop/tbtest/xy6/Red/"
 
 # load images for each channel
-phase <- loadImages(dataDirPhase, n=15, ext="tif")$images
-green <- loadImages(dataDirGreen, n=15, ext="tif")$images
-red   <- loadImages(dataDirRed, n=15, ext="tif")$images
+phase <- loadImages(dataDirPhase, n=25, ext="tif")$images
+green <- loadImages(dataDirGreen, n=25, ext="tif")$images
+red   <- loadImages(dataDirRed, n=25, ext="tif")$images
 
 # preprocess each channel
-processed <- preprocessImages(phase, green, red, rotation=-1.2, crop=c(100,50,185,50))
+processed <- preprocessImages(phase, green, red, rotation=-1.2, crop=c(100,50,185,50), sample=c(600,100,100))
 
 # extract preprocessed channels
 phase <- processed$phase
@@ -90,12 +90,12 @@ colorDyes <- function(phaseT, greenT, redT) {
 
 
 test <- function(p,g,r) {
-  display(colorDyes(p,g,r))
+  return(colorDyes(p,g,r))
 }
 
 ble <- mapply(test, phase,green.labeled, red.labeled, SIMPLIFY=FALSE)
 
-
+createGif(ble, "sample.gif", rescale = 75)
 
 
 
