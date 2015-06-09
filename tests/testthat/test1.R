@@ -9,12 +9,12 @@ dataDirGreen <- "~/Desktop/tbtest/xy6/Green/"
 dataDirRed <- "~/Desktop/tbtest/xy6/Red/"
 
 # load images for each channel
-phase <- loadImages(dataDirPhase, n=10, ext="tif")$images
-green <- loadImages(dataDirGreen, n=10, ext="tif")$images
-red   <- loadImages(dataDirRed, n=10, ext="tif")$images
+phase <- loadImages(dataDirPhase, n=15, ext="tif")$images
+green <- loadImages(dataDirGreen, n=15, ext="tif")$images
+red   <- loadImages(dataDirRed, n=15, ext="tif")$images
 
 # preprocess each channel
-processed <- preprocessImages(phase, green, red, rotation=-1.2, crop=c(50,50,50,50))
+processed <- preprocessImages(phase, green, red, rotation=-1.2, crop=c(100,50,185,50))
 
 # extract preprocessed channels
 phase <- processed$phase
@@ -67,6 +67,33 @@ for (i in 1:dim(tf)[[1]]) {
 }
 
 
+
+
+
+colorDyes <- function(phaseT, greenT, redT) {
+  
+  stack <- simplify2array(list(phaseT,phaseT,phaseT))
+  image <- EBImage::Image(stack, colormode="Color") 
+  rm(stack)
+  
+  # Add red
+  image[,,1] <- phaseT + (redT > 0 )
+  
+  # Add green
+  image[,,2] <- phaseT + (greenT > 0 ) / 2
+  image[,,3] <- phaseT + (greenT > 0 ) / 5
+  
+  return(image)
+  
+}
+
+
+
+test <- function(p,g,r) {
+  display(colorDyes(p,g,r))
+}
+
+ble <- mapply(test, phase,green.labeled, red.labeled, SIMPLIFY=FALSE)
 
 
 

@@ -10,9 +10,6 @@ labelGroupsGreen <- function(image, artifactMask) {
   print("Searching new image...")
   ptm <- proc.time()
   
-  # Correct brightness TODO do this elsewhere? 
-  image <- image * 40
-  
   # Threshold
   imageEdit <- image > 0.3
   
