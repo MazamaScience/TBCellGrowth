@@ -17,7 +17,7 @@ preprocessImages <- function(phase, green=NA, red=NA, rotation=0, sample=c(150,4
     # brighten
     m <- m / max(m)
     # apply rotation
-    m <- rotate(m, rotation)
+    m <- EBImage::rotate(m, rotation)
     return(m)
   }
   
@@ -30,8 +30,8 @@ preprocessImages <- function(phase, green=NA, red=NA, rotation=0, sample=c(150,4
   phase <- lapply(phase, normalizeValue)
   
   # Rotate red and green
-  if (!is.na(green)) green <- lapply(green, rotate, rotation)
-  if (!is.na(red)) red <- lapply(red, rotate, rotation)
+  if (!is.na(green)) green <- lapply(green, EBImage::rotate, rotation)
+  if (!is.na(red)) red <- lapply(red, EBImage::rotate, rotation)
   
   # Get background region. Assumes the first image is the background
   bgSample <- phase[[1]][x1:(x1+wh), y1:(y1+wh)]
