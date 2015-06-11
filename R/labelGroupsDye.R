@@ -1,11 +1,11 @@
 #' @export
-#' @title Identify and label Green Dye Groups
-#' @param image an image matrix to search for green dye
+#' @title Identify and Label Florescent Dye
+#' @param image an image matrix to search for dye
 #' @param artifactMask a mask of non biological features to ignore. See \link{createArtifactMask}.
-#' @description Searches an image for dark cell colonies and incrementally labels each colony.
+#' @description Searches an image for dark cell colonies and incrementally labels each blob.
 #' @return A \code{matrix} of integer labeled blobs.
 
-labelGroupsGreen <- function(image, artifactMask) {
+labelGroupsDye <- function(image, artifactMask) {
 
   print("Searching new image...")
   ptm <- proc.time()

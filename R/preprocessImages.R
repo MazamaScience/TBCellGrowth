@@ -1,8 +1,7 @@
 #' @export
 #' @title Align, Normalize Brightness, and Crop a List of Images
 #' @param phase a list of phase microscopy images
-#' @param green a list of green dye images
-#' @param red a list of red dye images
+#' @param green a list of dye images
 #' @param rotation how many degrees to rotate each image
 #' @param sample which region of the phase to use for alignment in the format \code{c(x, y, size)}
 #' @param crop amount to crop from each side in format \code{c(bottom, left, top, right)}
@@ -11,7 +10,20 @@
 #' that has been pulled out of each \code{EBImage::Image} object.
 #' @return A \code{list} of \code{matrices} ready for feature extraction.
 
-preprocessImages <- function(phase, green=NA, red=NA, rotation=0, sample=c(150,450,125), crop=c(150,150,150,150)) {
+preprocessImages <- function(phase, dyes=list(), rotation=0, sample=c(150,450,125), crop=c(150,150,150,150)) {
+  
+  # Cropping function
+  cropf <- function(x, offset.x, offset.y) { 
+    return(x[(crop[[2]] + offset.x):(width + offset.x - crop[[4]]),
+             (crop[[3]] + offset.y):(height + offset.y - crop[[1]])])
+  }
+  
+  # For a dye object, crop the current parent index
+  # pass additional arguments to cropf
+  dyeIter <- function(x, i, ...) {
+    x[[i]] <- cropf(x[[i]], ...)
+    return(x)
+  }
 
   normalizePhase <- function(m) {      
     # brighten
@@ -34,12 +46,13 @@ preprocessImages <- function(phase, green=NA, red=NA, rotation=0, sample=c(150,4
   y1 <- sample[2]
   wh <- sample[3]
   
-  # Adjust image brightness
+  # Brighten and rotate phase
   phase <- lapply(phase, normalizePhase)
   
-  # Rotate red and green
-  if (!is.na(green)) green <- lapply(green, normalizeDye)
-  if (!is.na(red)) red <- lapply(red, normalizeDye)
+  # Brighten and rotate dyes
+  dyes=lapply(dyes, function(x) lapply(x, normalizeDye))
+#   if (!is.na(green)) green <- lapply(green, normalizeDye)
+#   if (!is.na(red)) red <- lapply(red, normalizeDye)
   
   # Get background region. Assumes the first image is the background
   bgSample <- phase[[1]][x1:(x1+wh), y1:(y1+wh)]
@@ -74,31 +87,18 @@ preprocessImages <- function(phase, green=NA, red=NA, rotation=0, sample=c(150,4
     width <- dim(image)[[1]]
     height <- dim(image)[[2]]
     
-    # Crop image, adjust by offsets
-    phase[[i]] <- image[(crop[[2]] + offset.x):(width + offset.x - crop[[4]]),
-                         (crop[[3]] + offset.y):(height + offset.y - crop[[1]])]
+    # Crop phase
+    phase[[i]] <- cropf(image, offset.x, offset.y)
     
-    if (!is.na(green)) green[[i]] <- green[[i]][(crop[[2]] + offset.x):(width + offset.x - crop[[4]]),
-                   (crop[[3]] + offset.y):(height + offset.y - crop[[1]])]
-    
-    if (!is.na(red)) red[[i]] <- red[[i]][(crop[[2]] + offset.x):(width + offset.x - crop[[4]]),
-                    (crop[[3]] + offset.y):(height + offset.y - crop[[1]])]
+    # Crop dyes
+    dyes <- lapply(dyes, dyeIter, i, offset.x, offset.y)
     
   }
   
-  # Crop background
-  background <- phase[[1]]
-  background <- background[crop[[2]]:(dim(background)[[1]]-crop[[4]]),
-                           crop[[3]]:(dim(background)[[2]]-crop[[1]])]
-  phase[[1]] <- background
+  phase[[1]] <- cropf(phase[[1]], 0, 0)
+
+  dyes <- lapply(dyes, dyeIter, 1, 0, 0)
   
-  # Crop backgrounds of red and green
-  if (!is.na(green)) green[[1]] <- green[[1]][crop[[2]]:(dim(green[[1]])[[1]]-crop[[4]]),
-                                              crop[[3]]:(dim(green[[1]])[[2]]-crop[[1]])]
-  
-  if (!is.na(red)) red[[1]] <- red[[1]][crop[[2]]:(dim(red[[1]])[[1]]-crop[[4]]),
-                                        crop[[3]]:(dim(red[[1]])[[2]]-crop[[1]])]
-  
-  return(list(phase=phase, green=green, red=red))
+  return(list(phase=phase, dyes=dyes))
   
 }
