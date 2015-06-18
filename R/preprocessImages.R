@@ -49,6 +49,9 @@ preprocessImages <- function(phase, dyes=list(), rotation=0, sample=c(150,450,12
   # Brighten and rotate phase
   phase <- lapply(phase, normalizePhase)
   
+  # Get dye names
+  dyeNames <- names(dyes)
+  
   # Brighten and rotate dyes
   dyes=lapply(dyes, function(x) lapply(x, normalizeDye))
 #   if (!is.na(green)) green <- lapply(green, normalizeDye)
@@ -97,8 +100,10 @@ preprocessImages <- function(phase, dyes=list(), rotation=0, sample=c(150,450,12
   
   phase[[1]] <- cropf(phase[[1]], 0, 0)
 
-  dyes <- lapply(dyes, dyeIter, 1, 0, 0)
   
+  dyes <- lapply(dyes, dyeIter, 1, 0, 0)
+  names(dyes) <- dyeNames  
+
   return(list(phase=phase, dyes=dyes))
   
 }
