@@ -9,9 +9,9 @@ dataDirGreen <- "~/Desktop/tbtest/xy6/Green/"
 dataDirRed <- "~/Desktop/tbtest/xy6/Red/"
 
 # load images for each channel
-phase <- loadImages(dataDirPhase, n=7, ext="tif")$images
-green <- loadImages(dataDirGreen, n=7, ext="tif")$images
-red   <- loadImages(dataDirRed, n=7, ext="tif")$images
+phase <- loadImages(dataDirPhase, n=10, ext="tif")$images
+green <- loadImages(dataDirGreen, n=10, ext="tif")$images
+red   <- loadImages(dataDirRed, n=10, ext="tif")$images
 
 # preprocess each channel
 processed <- preprocessImages(phase, dyes=list(green=green, red=red), rotation=-1.2, crop=c(100,50,185,50), sample=c(600,100,100))
@@ -110,11 +110,53 @@ meany <- min(meany, dimy - height)
 # Crop the area
 cropbg <- phase[[5+1]][(meanx-width):(meanx+width), (meany-height):(meany+height)]
 labelbg <- phase.labeled[[5+1]][(meanx-width):(meanx+width), (meany-height):(meany+height)]
-cropbg[labelbg == cx[[5]]$index] <- 1
+labelbg <- labelbg == cx[[5]]$index
+
+test <- colorDyes("green", cropbg, labelbg)
+test <- colorDyes("red", cropbg, labelbg)
+test <- colorDyes("grey", cropbg, labelbg)
+test <- colorDyes("orange", cropbg, labelbg)
 
 ######### TEST ##################
 ######### TEST ##################
 ######### TEST ##################
+
+# COLORING FUNCTION
+
+
+colorDyes <- function(color, bg, label) {
+  
+  colors <- list(green = c(0,0.5,0.1),
+                 red = c(0.5,0,0),
+                 orange = c(0.5,0.25,0),
+                 grey = c(0.7,0.7,0.7))
+  
+  color <- colors[color][[1]]
+  
+  # Stack three layers of phase to make a 3d matrix
+  stack <- simplify2array(list(bg,bg,bg))
+  
+  # With colormode=Color, the 3 matrix layers are interpreted as RBG channels
+  image <- EBImage::Image(stack, colormode="Color") 
+  
+  # red, green, blue channels
+  image[,,1] <- bg + (label > 0 ) * color[[1]]
+  image[,,2] <- bg + (label > 0 ) * color[[2]]
+  image[,,3] <- bg + (label > 0 ) * color[[3]]
+  
+  return(image)
+}
+
+
+
+
+######### TEST ##################
+######### TEST ##################
+######### TEST ##################
+
+
+
+
 
 
 test <- function(p,g,r) {
