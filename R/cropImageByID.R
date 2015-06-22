@@ -4,7 +4,8 @@
 #' @param bg a background image
 #' @param label a binary image label
 #' @description Given a blob ID string, crops an image around that id.
-#' @return a color Image object
+#' @return a list with elements bg, the cropped background, and label, the cropped
+#' label
 
 id <- "x1112y476z68"
 
@@ -17,9 +18,8 @@ cropImageByID <- function(id, output, bg, label) {
   # Ignore the first index here, it's empty (bg frame)
   centroids[[1]] <- NULL
   
-  # 
-  dimx <- dim(bg)[[1]]
-  dimy <- dim(bg)[[2]]
+  dimx <- dim(bg[[1]])[[1]]
+  dimy <- dim(bg[[1]])[[2]]
   
   # The width and height of the cropped image
   width <- 100
@@ -41,13 +41,23 @@ cropImageByID <- function(id, output, bg, label) {
   meany <- max(meany, height+1)
   meany <- min(meany, dimy - height)
   
-  # Crop the area
-  cropbg <- bg[(meanx-width):(meanx+width), (meany-height):(meany+height)]
+  bgRet <- vector("list",length(bg)-1)
+  labelRet <- vector("list",length(bg)-1)
   
-  # Get labeled subsection
-  labelbg <- label[(meanx-width):(meanx+width), (meany-height):(meany+height)]
-  labelbg <- labelbg == cx[[5]]$index
+  for (ii in 2:length(bg)) {
+    
+    # Crop the area
+    bgRet[[ii-1]] <- bg[[ii]][(meanx-width):(meanx+width), (meany-height):(meany+height)]
+    
+    # Get labeled subsection
+    labelbg <- label[[ii]][(meanx-width):(meanx+width), (meany-height):(meany+height)]
+    isIndex <- labelbg == cId[[ii-1]]$index
+    if (length(isIndex) < 1)  isIndex <- labelbg < -1
+    labelRet[[ii-1]] <- isIndex
+    
   
-  return(list(bg=cropbg, label=labelbg))
+  }
+    
+  return(list(bg=bgRet, label=labelRet))
   
 }

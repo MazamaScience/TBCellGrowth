@@ -9,12 +9,22 @@ dataDirGreen <- "~/Desktop/tbtest/xy6/Green/"
 dataDirRed <- "~/Desktop/tbtest/xy6/Red/"
 
 # load images for each channel
-phase <- loadImages(dataDirPhase, n=10, ext="tif")$images
-green <- loadImages(dataDirGreen, n=10, ext="tif")$images
-red   <- loadImages(dataDirRed, n=10, ext="tif")$images
+phase <- loadImages(dataDirPhase, n=10, ext="tif")
+green <- loadImages(dataDirGreen, n=10, ext="tif")
+red   <- loadImages(dataDirRed, n=10, ext="tif")
+
+# Get filenames except for background
+filenames <- phase$filenames[-1]
+stripFileNames <- function(f) {
+  split1 <- strsplit(f, "/")[[1]] 
+  split1 <- split1[length(split1)]
+  split2 <- strsplit(split1, "_")[[1]][1]
+  return(split2)
+}
+filenames <- unlist(lapply(filenames, stripFileNames))
 
 # preprocess each channel
-processed <- preprocessImages(phase, dyes=list(green=green, red=red), rotation=-1.2, crop=c(100,50,185,50), sample=c(600,100,100))
+processed <- preprocessImages(phase$images, dyes=list(green=green$images, red=red$images), rotation=-1.2, crop=c(100,50,185,50), sample=c(600,100,100))
 
 # extract preprocessed channels
 phase <- processed$phase
@@ -71,37 +81,22 @@ for (id in names(output$timeseries)) {
 
 
 
-cropped <- cropImageByID(id, output, phase[[5]], phase.labeled[[5]])
-colored <- colorDyes("grey", cropped[[1]], cropped[[2]])
 
 
-
-
-######### TEST ##################
-######### TEST ##################
-######### TEST ##################
-
-
-
-######### TEST ##################
-######### TEST ##################
-######### TEST ##################
+buildDirectoryStructure(output, phase, phase.labeled, dyes.labeled, filenames)
 
 
 
 
 
 
-test <- function(p,g,r) {
-  return(colorDyes(p,g,r))
-}
 
-ble <- mapply(test, phase,green.labeled, red.labeled, SIMPLIFY=FALSE)
+
+
+
+
 
 createGif(ble, "sample.gif", rescale = 75)
-
-
-
 
 EBImage::display(overlayBlobs(frames$images[[2]], frames.labeled[[2]]))
 EBImage::display(overlayGrid(frames$images[[2]]))

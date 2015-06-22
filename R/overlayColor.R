@@ -12,7 +12,7 @@ overlayColor <- function(color, bg, label) {
   colors <- list(green = c(0,0.5,0.1),
                  red = c(0.5,0,0),
                  orange = c(0.5,0.25,0),
-                 grey = c(0.7,0.7,0.7))
+                 phase = c(0.7,0.7,0.7))
   
   color <- colors[color][[1]]
   
@@ -23,9 +23,9 @@ overlayColor <- function(color, bg, label) {
   image <- EBImage::Image(stack, colormode="Color") 
   
   # red, green, blue channels
-  image[,,1] <- bg + (label > 0 ) * color[[1]]
-  image[,,2] <- bg + (label > 0 ) * color[[2]]
-  image[,,3] <- bg + (label > 0 ) * color[[3]]
+  image[,,1] <- bg + (label) * color[[1]]
+  image[,,2] <- bg + (label) * color[[2]]
+  image[,,3] <- bg + (label) * color[[3]]
   
   return(image)
   

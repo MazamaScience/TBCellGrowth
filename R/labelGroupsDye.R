@@ -14,14 +14,14 @@ labelGroupsDye <- function(image, artifactMask) {
   imageEdit <- image > 0.3
   
   # Dilate groups slightly too large for more inclusive labeling
-  imageEdit <- dilateGreyScale(imageEdit, makeBrush(9, shape="disc"))
-  imageEdit <- erodeGreyScale(imageEdit, makeBrush(5, shape="disc"))
+  imageEdit <- EBImage::dilateGreyScale(imageEdit, makeBrush(9, shape="disc"))
+  imageEdit <- EBImage::erodeGreyScale(imageEdit, makeBrush(5, shape="disc"))
   
   # Mask out artifacts
   imageEdit[artifactMask>0] <- 0
   
   # Label blobs
-  imageEdit <- bwlabel(imageEdit)
+  imageEdit <- EBImage::bwlabel(imageEdit)
   
   # Shrink blobs to a more accurage size
   imageEdit[image < 0.3] <- 0
