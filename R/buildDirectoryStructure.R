@@ -9,9 +9,12 @@
 #' to images.
 
 buildDirectoryStructure <- function(output, phase, phase.labeled, 
-                                    dyes.labeled, filenames, outputDir="output") {
+                                    dyes.labeled,  dyeOverlap, filenames, outputDir="output") {
   
   dir.create(outputDir)
+  
+  excel <- lapply(dyeOverlap, function(x) x)
+  excel$phase <- output$timeseries
   
   for (id in names(output$timeseries)) {
     
@@ -28,6 +31,9 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
       dir.create(paste0(outputDir, "/", id, "/", dye))
     }
     
+    
+  
+    
     # Crop and color phase images
     cropped <- cropImageByID(id, output, phase, phase.labeled)
     colored <- mapply(overlayColor, "phase", cropped$bg, cropped$label, SIMPLIFY=FALSE)
@@ -36,6 +42,9 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
     for (i in 1:length(colored)) {
       writeImage(colored[[i]], file=paste0(outputDir, "/", id, "/phase/", filenames[[i]], ".jpg"))
     }
+    
+    
+    
     
     
     for (dye in names(dyes.labeled)) {
@@ -54,5 +63,40 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
     
   }
   
-}
+  writeExcel(excel$phase, outputDir, "phase", filenames)
+  for (dye in names(dyes.labeled)) {
+    writeExcel(excel[[dye]], outputDir, dye, filenames)
+  }
   
+}
+
+excelHyperlink <- function(url, text) {
+  return(paste0('=HYPERLINK("',url,'","',text,'")'))
+}
+
+writeExcel <- function(df, outputBase, color, filenames) {
+  
+  cellHyperlinks <- function(id) {
+    oDir <- paste0(id, "/", color)
+    cols <- df[id]
+    for (i in 1:length(cols[[1]])) {
+      filename <- paste0(oDir, "/", filenames[[i]], ".jpg")
+      cols[id][[1]][[i]] <- excelHyperlink(filename, cols[id][[1]][[i]])
+    }
+    return(cols)
+  }
+  
+  colHyperlinks <- function(id) {
+    oDir <- paste0(id, "/", color)
+    return(excelHyperlink(paste0(id, "/", color),id))
+  }
+  
+  
+  df <- data.frame(lapply(names(df), cellHyperlinks))
+  
+  names(df) <- lapply(names(df), colHyperlinks)
+  
+  write.csv(df, paste0(outputBase, "/", color, ".csv"))
+  
+}
+

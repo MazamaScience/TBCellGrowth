@@ -53,37 +53,8 @@ dyeOverlap <- lapply(dyes.labeled, findDyeOverlap, phase.labeled, output)
 
 
 
-######### TEST ##################
-######### TEST ##################
-######### TEST ##################
-# Experiments with directory layout and image saving
 
-
-outputDir <- "output"
-
-dir.create(outputDir)
-
-# Create subdirectories named for IDs 
-for (id in names(output$timeseries)) {
-  # Blob directory
-  dir.create(paste0(outputDir, "/", id))  
-  # Phase directory
-  dir.create(paste0(outputDir, "/", id, "/phase"))
-  # If there are dyes, make a directory for all colors
-  if (length(names(dyeOverlap)) > 0) {
-    dir.create(paste0(outputDir, "/", id, "/", "all"))
-  }
-  # Make a directory for each dye
-  for (dye in names(dyeOverlap)) {
-    dir.create(paste0(outputDir, "/", id, "/", dye))
-  }
-}
-
-
-
-
-
-buildDirectoryStructure(output, phase, phase.labeled, dyes.labeled, filenames)
+buildDirectoryStructure(output, phase, phase.labeled, dyes.labeled, dyeOverlap, filenames)
 
 
 

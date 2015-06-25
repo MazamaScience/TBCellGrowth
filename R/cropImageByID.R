@@ -7,8 +7,6 @@
 #' @return a list with elements bg, the cropped background, and label, the cropped
 #' label
 
-id <- "x1112y476z68"
-
 cropImageByID <- function(id, output, bg, label) {
   
   # Extract timeseries and centroids for reference
