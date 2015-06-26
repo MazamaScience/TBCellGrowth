@@ -38,10 +38,7 @@ artifactMask <- createArtifactMask(phase[[1]])
 
 
 phase.labeled <- lapply(phase, labelGroupsPhase, artifactMask)
-dyes.labeled <- lapply(dyes, function(x) lapply(x, labelGroupsDye, artifactMask))
-
-
-
+dyes.labeled <- lapply(dyes, function(x) mapply(labelGroupsDye, x, phase.labeled, list(artifactMask), SIMPLIFY=FALSE))
 
 
 output <- generateBlobTimeseries(phase.labeled, minTimespan=1)

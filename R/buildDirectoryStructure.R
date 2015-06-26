@@ -80,7 +80,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
     colored_phase <- mapply(overlayColor, "phase", cropped_phase$bg, cropped_phase$label, SIMPLIFY=FALSE)
     
     # Write phase images to directory
-    for (i in 1:length(colored)) {
+    for (i in 1:length(colored_phase)) {
       writeImage(colored_phase[[i]], file=paste0(outputDir, "/", id, "/phase/", filenames[[i]], ".jpg"))
     }
     
@@ -96,7 +96,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
       colored_dye <- mapply(overlayColor, dye, cropped_dye$bg, cropped_dye$label, colored_phase, SIMPLIFY=FALSE)
       
       # Write images 
-      for (i in 1:length(colored)) {
+      for (i in 1:length(colored_dye)) {
         writeImage(colored_dye[[i]], file=paste0(outputDir, "/", id, "/", dye, "/", filenames[[i]], ".jpg"))
       }
       

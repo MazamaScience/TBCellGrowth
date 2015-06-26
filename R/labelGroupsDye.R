@@ -5,7 +5,7 @@
 #' @description Searches an image for dark cell colonies and incrementally labels each blob.
 #' @return A \code{matrix} of integer labeled blobs.
 
-labelGroupsDye <- function(image, artifactMask) {
+labelGroupsDye <- function(image, phase.labeled, artifactMask) {
 
   print("Searching new image...")
   ptm <- proc.time()
@@ -26,6 +26,19 @@ labelGroupsDye <- function(image, artifactMask) {
   # Shrink blobs to a more accurage size
   imageEdit[image < 0.3] <- 0
   
-  return(imageEdit)
+  dcp <- imageEdit
+  for (i in 1:max(imageEdit)) {
+    overlap <- phase.labeled[imageEdit == i]
+    dcp[imageEdit == i] <- 0
+    # If at least 20% overlap
+    if (sum(overlap>0) > length(overlap)/5) {
+      overlap <- overlap[overlap>0]
+      unq <- unique(overlap)
+      index <- unq[which.max(tabulate(match(overlap, unq)))]
+      dcp[imageEdit == i] <- index
+    }
+  }
+  
+  return(dcp)
    
 }
