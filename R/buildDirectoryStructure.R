@@ -16,6 +16,9 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
   excel <- lapply(dyeOverlap, function(x) x)
   excel$phase <- output$timeseries
   
+  dir.create(paste0(outputDir, "/all"))
+  dir.create(paste0(outputDir, "/all/phase"))
+  
   for (id in names(output$timeseries)) {
     
     # Blob directory
@@ -35,12 +38,12 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
   
     
     # Crop and color phase images
-    cropped <- cropImageByID(id, output, phase, phase.labeled)
-    colored <- mapply(overlayColor, "phase", cropped$bg, cropped$label, SIMPLIFY=FALSE)
+    cropped_phase <- cropImageByID(id, output, phase, phase.labeled)
+    colored_phase <- mapply(overlayColor, "phase", cropped_phase$bg, cropped_phase$label, SIMPLIFY=FALSE)
     
     # Write images 
     for (i in 1:length(colored)) {
-      writeImage(colored[[i]], file=paste0(outputDir, "/", id, "/phase/", filenames[[i]], ".jpg"))
+      writeImage(colored_phase[[i]], file=paste0(outputDir, "/", id, "/phase/", filenames[[i]], ".jpg"))
     }
     
     
@@ -51,8 +54,8 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
       dyes <- dyes.labeled[dye][[1]]
       
       # Crop and color phase images
-      cropped <- cropImageByID(id, output, phase, dyes)
-      colored <- mapply(overlayColor, dye, cropped$bg, cropped$label, SIMPLIFY=FALSE)
+      cropped_dye <- cropImageByID(id, output, phase, dyes)
+      colored_dye <- mapply(overlayColor, dye, cropped_dye$bg, cropped_dye$label, colored_phase, SIMPLIFY=FALSE)
       
       # Write images 
       for (i in 1:length(colored)) {
