@@ -4,7 +4,7 @@
 \alias{labelGroupsDye}
 \title{Identify and Label Florescent Dye}
 \usage{
-labelGroupsDye(image, artifactMask)
+labelGroupsDye(image, phase.labeled, artifactMask)
 }
 \arguments{
 \item{image}{an image matrix to search for dye}

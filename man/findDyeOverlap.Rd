@@ -4,14 +4,14 @@
 \alias{findDyeOverlap}
 \title{Find the Amount of Overlap Between Dye and Phase Blobs}
 \usage{
-findDyeOverlap(dye, phase, output)
+findDyeOverlap(dye, phase.labeled, output)
 }
 \arguments{
 \item{dye}{a list of labeled dye images.}
 
-\item{phase}{a list of labeled phase images.}
-
 \item{output}{}
+
+\item{phase}{a list of labeled phase images.}
 }
 \value{
 A \code{matrix} of integer labeled blobs.

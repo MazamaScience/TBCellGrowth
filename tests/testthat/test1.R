@@ -9,9 +9,9 @@ dataDirGreen <- "~/Desktop/tbtest/xy6/Green/"
 dataDirRed <- "~/Desktop/tbtest/xy6/Red/"
 
 # load images for each channel
-phase <- loadImages(dataDirPhase, n=10, ext="tif")
-green <- loadImages(dataDirGreen, n=10, ext="tif")
-red   <- loadImages(dataDirRed, n=10, ext="tif")
+phase <- loadImages(dataDirPhase, n=30, ext="tif")
+green <- loadImages(dataDirGreen, n=30, ext="tif")
+red   <- loadImages(dataDirRed, n=30, ext="tif")
 
 # Get filenames except for background
 filenames <- phase$filenames[-1]
