@@ -31,7 +31,9 @@ overlayColor <- function(color, bg, label, mergeWith=NULL) {
     image <- EBImage::Image(stack, colormode="Color") 
   }
   
-
+  # Some labels are in 0 to n  instead of TRUE/FALSE.
+  # They need to be in TF
+  if (typeof(label) == "double") label <- label>0
   
   # red, green, blue channels
   image[,,1] <- (image[,,1] * !label) + (bg + color[[1]]) * label
