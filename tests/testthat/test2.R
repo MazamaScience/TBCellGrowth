@@ -72,4 +72,6 @@ labelGroups <- function(image) {
 
 test <- lapply(images[[1]], labelGroups)
 
-output <- generateBlobTimeseries(test, minTimespan=3)
+output <- generateBlobTimeseries(test, minTimespan=3, maxDistance=60)
+
+buildDirectoryStructure(output, images[[1]], test, list(),list(), c(1:14))

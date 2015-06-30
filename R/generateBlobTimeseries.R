@@ -10,7 +10,7 @@
 #' of dataframes with centroids, blob ID's and original integer labels for mapping
 #' output column names back to the original images.
 
-generateBlobTimeseries <- function(frames, ignore=list(), minTimespan=5) {
+generateBlobTimeseries <- function(frames, ignore=list(), minTimespan=5, maxDistance=20) {
   
   # Get centroids for first frame (assuming empty background frame is in frames[[1]])
   centroidsBefore <- getCentroids(frames[[2]])
@@ -42,7 +42,7 @@ generateBlobTimeseries <- function(frames, ignore=list(), minTimespan=5) {
     }
     
     # Find groups that are determined to be the same between the two frames
-    groups <- findSimilarGroups(centroidsBefore,centroidsAfter)
+    groups <- findSimilarGroups(centroidsBefore,centroidsAfter,maxDistance)
     
     # For those continued group, give them the ID's from the previous frame
     centroidsAfter <- updateCentroidIDs(centroidsAfter, groups)
@@ -119,7 +119,7 @@ getCentroids <- function(m) {
 
 # Find the best fit between two frames of centroids based on 
 # distance and size. Returns a best guess of which blobs became which
-findSimilarGroups <- function(c1, c2) {
+findSimilarGroups <- function(c1, c2, maxDistance) {
   
   # Initialize dataframe with each combination of the two indices
   df <- expand.grid(index1=seq(1,dim(c1)[[1]]), index2=seq(1,dim(c2)[[1]]))
@@ -152,7 +152,7 @@ findSimilarGroups <- function(c1, c2) {
   df <- df[df$growthPer < 1.5 & df$growthPer > 0.75,]
   
   # Remove unrealistic distance travelled
-  df <- df[df$dist < 20,]
+  df <- df[df$dist < maxDistance,]
   
   # Sort scores
   df <- df[order(-df$score),]
