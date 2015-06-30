@@ -33,7 +33,7 @@ loadImageByXY <- function(dataDir, xy, channels, cnames, ext="tif", start=1, n=N
   
 }
 
-images <- loadImageByXY(dataDir, "xy2", c("c1"), c("phase"), n=15)
+images <- loadImageByXY(dataDir, "xy2", c("c1"), c("phase"))
 
 
 
@@ -75,3 +75,15 @@ test <- lapply(images[[1]], labelGroups)
 output <- generateBlobTimeseries(test, minTimespan=3, maxDistance=60)
 
 buildDirectoryStructure(output, images[[1]], test, list(),list(), c(1:14))
+
+t1 <- new("Image",images[[1]][[1]])
+test2 <- mapply(overlayColor, "phase", images[[1]], test, SIMPLIFY=FALSE)
+
+
+
+x <- paintObjects(test[[1]],t1,col='white')
+
+f1 <- function(image, mask) {
+  return(paintObjects(new("Image",image),mask,col="white",thick=TRUE))
+}
+outlined <- mapply(f1, test, images[[1]], SIMPLIFY=FALSE)
