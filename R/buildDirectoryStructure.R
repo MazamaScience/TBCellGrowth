@@ -24,13 +24,18 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
     writeImage(full_phase[[i]], file=paste0(outputDir, "/fullFrame/phase/", filenames[[i]], ".jpg"))
   }
   
+  makeGif(paste0(outputDir,"/fullFrame/phase"), "series.gif")
+  
   for (dye in names(dyes.labeled)) {
     dir.create(paste0(outputDir, "/fullFrame/", dye))
     full_dye <- mapply(overlayColor, dye, phase[-1], dyes.labeled[[dye]][-1], full_phase, SIMPLIFY=FALSE)
     for (i in 1:length(full_dye)) {
       writeImage(full_dye[[i]], file=paste0(outputDir, "/fullFrame/", dye, "/", filenames[[i]], ".jpg"))
     }
+    makeGif(paste0(outputDir,"/fullFrame/",dye), "series.gif")
   }
+  
+  
   
   # MULTIPLE dyes
   if (length(names(dyeOverlap)) > 0) {
@@ -45,6 +50,8 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
       writeImage(full_dye[[i]], file=paste0(outputDir, "/fullFrame/all/", filenames[[i]], ".jpg"))
     }
   }
+  
+  makeGif(paste0(outputDir,"/fullFrame/all/"), "series.gif")
   
   remove(full_phase)
   remove(full_dye)
@@ -84,6 +91,8 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
       writeImage(colored_phase[[i]], file=paste0(outputDir, "/", id, "/phase/", filenames[[i]], ".jpg"))
     }
     
+    makeGif(paste0(outputDir,"/",id,"/phase/"), "series.gif")
+    
     ####################################################
     ############## SINGLE DYE + PHASE
     ####################################################
@@ -100,8 +109,10 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
         writeImage(colored_dye[[i]], file=paste0(outputDir, "/", id, "/", dye, "/", filenames[[i]], ".jpg"))
       }
       
+      makeGif(paste0(outputDir,"/",id,"/",dye,"/"), "series.gif")
+      
     }
-    
+
     ####################################################
     ############## ALL DYE + PHASE
     ####################################################
@@ -121,6 +132,8 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
       for (i in 1:length(mergeWith)) {
         writeImage(mergeWith[[i]], file=paste0(outputDir, "/", id, "/all/", filenames[[i]], ".jpg"))
       }
+      
+      makeGif(paste0(outputDir,"/",id,"/all/"), "series.gif")
     }
     
   }
@@ -177,5 +190,10 @@ writeExcel <- function(df, outputBase, color, filenames) {
   
   write.csv(df, paste0(outputBase, "/", color, ".csv"))
   
+}
+
+# Create a gif in a directory from all of the images in that directory
+makeGif <- function(dir, filename, ext="jpg", delay=15, rescale=80) {
+  system(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' ', dir, '*.', ext, " ", dir, filename))
 }
 
