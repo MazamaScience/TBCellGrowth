@@ -60,7 +60,7 @@ buildDirectoryStructure(output, phase, phase.labeled, dyes.labeled, dyeOverlap, 
 
 
 # LAPTOP 1ST EXPERIMENT
-dataDirPhase <- "~/Desktop/tbTest/tbdata/Phase 1/"
+dataDirPhase <- "~/Desktop/TBData/Phase 1/"
 
 # load images for each channel
 phase <- loadImages(dataDirPhase, n=40, ext="tif")
@@ -97,6 +97,8 @@ phase.labeled <- lapply(phase.labeled, function(x) )
 
 
 output <- generateBlobTimeseries(phase.labeled, minTimespan=1, ignore=list(c(700,800),c(1600,1700)))
+output$timeseries <- output$timeseries[,apply(output$timeseries, 2, function(x) sum(!is.na(x)) > 15)]
+
 
 dyeOverlap <- lapply(dyes.labeled, findDyeOverlap, phase.labeled, output)
 
