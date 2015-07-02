@@ -1,6 +1,9 @@
 # WORK COMPUTER
 dataDir <- "~/Desktop/TBData/solid/Time course"
 
+# LAPTOP
+dataDir <- "~/Desktop/tbtest/solid/Time course"
+
 xy <- "xy2"             # Single section to look at
 channels <- c("c1")     # One or more channels to look at, c1 required
 cnames <- c("phase")    # Names of channels, 'phase' is required
@@ -34,9 +37,17 @@ loadImageByXY <- function(dataDir, xy, channels, cnames, ext="tif", start=1, n=N
 }
 
 images <- loadImageByXY(dataDir, "xy2", c("c1"), c("phase"))
+filenames <- images[[2]]
+images <- images[[1]]
+
+images <- lapply(images, function(x) x * (0.45 / mean(x)))
 
 
+equalizeImage <- function(im) {
+  return(7.5 * (im - (mean(im)-0.02)))
+}
 
+t1 <- lapply(images, equalizeImage)
 
 
 #########################################
@@ -47,43 +58,45 @@ labelGroups <- function(image) {
   
   print("Searching new image...")
 
-  homog <- glcm::glcm(image, statistics=c("mean", "contrast"), n_grey=16, window=c(5,5), shift=c(2,2))
+  homog <- glcm::glcm(image, statistics=c("contrast"), n_grey=30, window=c(3,3), shift=c(2,2), min_x=0.3)
   
-  mask <- homog[,,1]*2 < 0.3
+  test1 <- image * homog[,,1]
   
-  test1 <- homog[,,2]
-  test1[mask] <- 0
+  test2 <- test1 > 0.7
   
-  test2 <- EBImage::closingGreyScale(test1, EBImage::makeBrush(7, shape='disc'))
+  test3 <- EBImage::closingGreyScale(test2, EBImage::makeBrush(7, shape='disc'))
   
-  test3 <- test2 > 0.65
+  test4 <- removeBlobs(test3, 40)
   
-  test4 <- removeBlobs(test3, 25)
+  test5 <- EBImage::bwlabel(test4)
   
-  test5 <- EBImage::dilateGreyScale(test4, EBImage::makeBrush(5, shape='disc'))
+  test5[image < 0.4] <- 0
   
-  test6 <- bwlabel(test5)
-  
-  test6[mask] <- 0
+  test6 <- fillHull(test5)
   
   return(test6)
 
 }
 
-test <- lapply(images[[1]], labelGroups)
+test <- lapply(images, labelGroups)
 
 output <- generateBlobTimeseries(test, minTimespan=3, maxDistance=60)
 
 buildDirectoryStructure(output, images[[1]], test, list(),list(), c(1:14))
 
-t1 <- new("Image",images[[1]][[1]])
-test2 <- mapply(overlayColor, "phase", images[[1]], test, SIMPLIFY=FALSE)
 
 
 
 x <- paintObjects(test[[1]],t1,col='white')
 
-f1 <- function(image, mask) {
-  return(paintObjects(new("Image",image),mask,col="white",thick=TRUE))
+f1 <- function(mask, image) {
+  im = channel(Image(image), 'rgb')
+  nuch1 = paintObjects(mask, im, thick=TRUE)
 }
-outlined <- mapply(f1, test, images[[1]], SIMPLIFY=FALSE)
+outlined <- mapply(f1, test, images, SIMPLIFY=FALSE)
+
+image <- images[[1]]
+mask <- test[[1]]
+
+nucgray = channel(Image(image), 'rgb')
+nuch1 = paintObjects(mask, nucgray, thick=TRUE)
