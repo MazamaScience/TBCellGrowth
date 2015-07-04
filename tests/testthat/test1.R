@@ -100,6 +100,7 @@ output <- generateBlobTimeseries(phase.labeled, minTimespan=1, ignore=list(c(700
 
 dyeOverlap <- lapply(dyes.labeled, findDyeOverlap, phase.labeled, output)
 
+output$timeseries <- output$timeseries[,apply(output$timeseries, 2, function(x) sum(!is.na(x)) > 14)]
 
 
 

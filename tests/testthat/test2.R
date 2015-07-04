@@ -40,14 +40,16 @@ images <- loadImageByXY(dataDir, "xy2", c("c1"), c("phase"))
 filenames <- images[[2]]
 images <- images[[1]]
 
-images <- lapply(images, function(x) x * (0.45 / mean(x)))
 
+
+brightnessScalar <- 7
 
 equalizeImage <- function(im) {
-  return(7.5 * (im - (mean(im)-0.02)))
+  eq <- im * (0.45 / median(im))
+  return(brightnessScalar * (eq - (0.45-sd(eq)*2)))
 }
 
-t1 <- lapply(images, equalizeImage)
+imagesPost <- lapply(images, equalizeImage)
 
 
 #########################################
@@ -58,13 +60,26 @@ labelGroups <- function(image) {
   
   print("Searching new image...")
 
-  homog <- glcm::glcm(image, statistics=c("contrast"), n_grey=30, window=c(3,3), shift=c(2,2), min_x=0.3)
+  homog <- glcm::glcm(image, statistics=c("contrast"), n_grey=20, window=c(3,3), shift=c(2,2), min_x=0.3)
   
-  test1 <- image * homog[,,1]
+  test1 <- EBImage::dilateGreyScale(homog[,,1], EBImage::makeBrush(9, shape='disc'))
+  test2 <- EBImage::closingGreyScale(test1, EBImage::makeBrush(7, shape='disc'))
   
-  test2 <- test1 > 0.7
+  test3 <- test2 > 0.75
   
-  test3 <- EBImage::closingGreyScale(test2, EBImage::makeBrush(7, shape='disc'))
+  test4 <- removeBlobs(test3, 50)
+  
+  test5 <- test5 <- EBImage::bwlabel(test4)
+  
+  test6 <- test5
+  test6[image < 0.3] <- 0
+  
+  
+  test2 <- test1
+  
+  test3 <- EBImage::closingGreyScale(test2, EBImage::makeBrush(9, shape='disc'))
+  
+  test3 <- test3 > 0.6
   
   test4 <- removeBlobs(test3, 40)
   
@@ -75,6 +90,19 @@ labelGroups <- function(image) {
   test6 <- fillHull(test5)
   
   return(test6)
+  
+  
+  ### METHOD 2
+  
+  test1 <- blur(image)
+  
+  homog <- glcm::glcm(test1, statistics=c("contrast"), n_grey=30, window=c(3,3), shift=c(1,1))
+  
+  test2 <- sobel(test1)
+  
+  test2 <- test1 > 0.6
+  
+  test3 <- EBImage::closingGreyScale(test2, EBImage::makeBrush(5, shape='disc'))
 
 }
 
@@ -100,3 +128,23 @@ mask <- test[[1]]
 
 nucgray = channel(Image(image), 'rgb')
 nuch1 = paintObjects(mask, nucgray, thick=TRUE)
+
+
+
+sobel <- function(im) {
+  
+  Gx = matrix(c(-1,0,1,-2,0,2,-1,0,1), nc=3, nr=3)
+  Gy = matrix(c(1,2,1,0,0,0,-1,-2,-1), nc=3, nr=3)
+  xx = filter2(im, Gx)
+  yy = filter2(im, Gy)
+  test <- (xx + yy)
+  
+}
+
+
+
+blur <- function(im) {
+  flo = makeBrush(11, shape='disc', step=FALSE)^2
+  flo = flo/sum(flo)
+  return(filter2(im,flo))
+}

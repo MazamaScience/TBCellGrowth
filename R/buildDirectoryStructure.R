@@ -24,7 +24,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
     writeImage(full_phase[[i]], file=paste0(outputDir, "/fullFrame/phase/", filenames[[i]], ".jpg"))
   }
   
-  makeGif(paste0(outputDir,"/fullFrame/phase"), "series.gif")
+  makeGif(paste0(outputDir,"/fullFrame/phase/"), "series.gif")
   
   for (dye in names(dyes.labeled)) {
     dir.create(paste0(outputDir, "/fullFrame/", dye))
