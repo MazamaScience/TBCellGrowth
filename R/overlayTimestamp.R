@@ -19,7 +19,7 @@ overlayTimestamp <- function(image, timeString) {
   
   # Call plotToOverlay which returns an equal sized image with the lines
   # and text as a mask
-  labels <- TBCellGrowth:::plotToOverlay(plotf, dimx, dimy)
+  labels <- plotToOverlay(plotf, dimx, dimy)
   
   # Mask the image with white
   image[labels > 0] <- 1

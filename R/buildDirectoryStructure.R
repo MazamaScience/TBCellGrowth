@@ -21,7 +21,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
   full_phase <- mapply(overlayColor, "phase", phase[-1], phase.labeled[-1], SIMPLIFY=FALSE)
   dir.create(paste0(outputDir, "/fullFrame/phase"))
   for (i in 1:length(full_phase)) {
-    writeImage(full_phase[[i]], file=paste0(outputDir, "/fullFrame/phase/", filenames[[i]], ".jpg"))
+    EBImage::writeImage(full_phase[[i]], file=paste0(outputDir, "/fullFrame/phase/", filenames[[i]], ".jpg"))
   }
   
   makeGif(paste0(outputDir,"/fullFrame/phase/"), "series.gif")
@@ -30,7 +30,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
     dir.create(paste0(outputDir, "/fullFrame/", dye))
     full_dye <- mapply(overlayColor, dye, phase[-1], dyes.labeled[[dye]][-1], full_phase, SIMPLIFY=FALSE)
     for (i in 1:length(full_dye)) {
-      writeImage(full_dye[[i]], file=paste0(outputDir, "/fullFrame/", dye, "/", filenames[[i]], ".jpg"))
+      EBImage::writeImage(full_dye[[i]], file=paste0(outputDir, "/fullFrame/", dye, "/", filenames[[i]], ".jpg"))
     }
     makeGif(paste0(outputDir,"/fullFrame/",dye), "series.gif")
   }
@@ -47,7 +47,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
       full_dye <- mapply(overlayColor, dye, phase[-1], dyes.labeled[[dye]][-1], full_dye, SIMPLIFY=FALSE)
     }
     for (i in 1:length(full_dye)) {
-      writeImage(full_dye[[i]], file=paste0(outputDir, "/fullFrame/all/", filenames[[i]], ".jpg"))
+      EBImage::writeImage(full_dye[[i]], file=paste0(outputDir, "/fullFrame/all/", filenames[[i]], ".jpg"))
     }
   }
   
@@ -88,7 +88,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
     
     # Write phase images to directory
     for (i in 1:length(colored_phase)) {
-      writeImage(colored_phase[[i]], file=paste0(outputDir, "/", id, "/phase/", filenames[[i]], ".jpg"))
+      EBImage::writeImage(colored_phase[[i]], file=paste0(outputDir, "/", id, "/phase/", filenames[[i]], ".jpg"))
     }
     
     makeGif(paste0(outputDir,"/",id,"/phase/"), "series.gif")
@@ -106,7 +106,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
       
       # Write images 
       for (i in 1:length(colored_dye)) {
-        writeImage(colored_dye[[i]], file=paste0(outputDir, "/", id, "/", dye, "/", filenames[[i]], ".jpg"))
+        EBImage::writeImage(colored_dye[[i]], file=paste0(outputDir, "/", id, "/", dye, "/", filenames[[i]], ".jpg"))
       }
       
       makeGif(paste0(outputDir,"/",id,"/",dye,"/"), "series.gif")
@@ -130,7 +130,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
         mergeWith <- mapply(overlayColor, dye, cropped_dye$bg, cropped_dye$label, mergeWith, SIMPLIFY=FALSE) 
       }
       for (i in 1:length(mergeWith)) {
-        writeImage(mergeWith[[i]], file=paste0(outputDir, "/", id, "/all/", filenames[[i]], ".jpg"))
+        EBImage::writeImage(mergeWith[[i]], file=paste0(outputDir, "/", id, "/all/", filenames[[i]], ".jpg"))
       }
       
       makeGif(paste0(outputDir,"/",id,"/all/"), "series.gif")

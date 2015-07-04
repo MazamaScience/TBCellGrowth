@@ -8,6 +8,14 @@ dataDirPhase <- "~/Desktop/tbtest/xy6/Phase/"
 dataDirGreen <- "~/Desktop/tbtest/xy6/Green/"
 dataDirRed <- "~/Desktop/tbtest/xy6/Red/"
 
+# Jon's desktop
+if (FALSE) {
+  dataDir <- '/Users/jonathancallahan/Projects/CIDR/ShermanData/Rif-INH_Drug_Tolerance_5-14-14_Chamber_C/'
+  dataDirPhase <- paste0(dataDir,'xy6/Phase/')
+  dataDirGreen <- paste0(dataDir,'xy6/Green/')
+  dataDirRed <- paste0(dataDir,'xy6/Red/')
+}
+
 # load images for each channel
 phase <- loadImages(dataDirPhase, n=30, ext="tif")
 green <- loadImages(dataDirGreen, n=30, ext="tif")
