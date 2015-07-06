@@ -36,7 +36,7 @@ loadImageByXY <- function(dataDir, xy, channels, cnames, ext="tif", start=1, n=N
   
 }
 
-images <- loadImageByXY(dataDir, "xy2", c("c1"), c("phase"), n=15)
+images <- loadImageByXY(dataDir, "xy2", c("c1"), c("phase"))
 filenames <- images[[2]]
 images <- images[[1]]
 
@@ -46,7 +46,7 @@ brightnessScalar <- 7
 
 equalizeImage <- function(im) {
   eq <- im * (0.45 / median(im))
-  return(brightnessScalar * (eq - (0.45-sd(eq)*2)))
+  return(brightnessScalar * (eq - (0.45-0.02)))
 }
 
 imagesPost <- lapply(images, equalizeImage)
@@ -60,21 +60,20 @@ labelGroups <- function(image) {
   
   print("Searching new image...")
   
-  im1 <- blur(imagesPost[[12]])
-  im2 <- im1
+  im1 <- blur(image)
   test <- sobel2(im1)
   test2 <- test > 0.4
-  test3 <- EBImage::closingGreyScale(test2, EBImage::makeBrush(7, shape='disc'))
-  test4 <- EBImage::dilateGreyScale(test3, EBImage::makeBrush(3, shape='disc'))
-  test5 <- fillHull(test4)
-  test6 <- removeBlobs(test5, 40)
-  test6 <- bwlabel(test5)
-  test6[im1 < 0.35] <- 0
-  
+  test3 <- EBImage::closingGreyScale(test2, EBImage::makeBrush(9, shape='disc'))
+  test3[image < 0.4] <- 0
+  test4 <- EBImage::dilateGreyScale(test3, EBImage::makeBrush(5, shape='disc'))
+  test5 <- EBImage::fillHull(test4)
+  test6 <- removeBlobs(test5, 50)
+  test6 <- EBImage::bwlabel(test5)
+
   return(test6)
 }
 
-test <- lapply(images, labelGroups)
+imagesLabeled <- lapply(imagesPost, labelGroups)
 
 output <- generateBlobTimeseries(test, minTimespan=3, maxDistance=60)
 
@@ -83,19 +82,11 @@ buildDirectoryStructure(output, images[[1]], test, list(),list(), c(1:14))
 
 
 
-x <- paintObjects(test[[1]],t1,col='white')
-
 f1 <- function(mask, image) {
   im = channel(Image(image), 'rgb')
   nuch1 = paintObjects(mask, im, thick=TRUE)
 }
-outlined <- mapply(f1, test, images, SIMPLIFY=FALSE)
-
-image <- images[[1]]
-mask <- test[[1]]
-
-nucgray = channel(Image(image), 'rgb')
-nuch1 = paintObjects(mask, nucgray, thick=TRUE)
+outlined <- mapply(f1, imagesLabeled, imagesPost, SIMPLIFY=FALSE)
 
 
 
