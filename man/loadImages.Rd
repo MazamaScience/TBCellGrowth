@@ -12,14 +12,29 @@ loadImages(dir, ext = "tiff", n = NA, start = 1)
 \item{ext}{file extension}
 
 \item{n}{number of images to load into memory (defaults to all)}
+
+\item{start}{index at which to start loading files}
 }
 \value{
 A \code{list} with two attributes, "images" and "filenames".
-Images is a \code{list} of image matrices extracted from the \code{EBImage}
-\code{image} object. Filenames is a vector of filenames that correponds
-to images.
 }
 \description{
-Load Image Data into a List
+This function uses the \pkg{EBImage::readimage} function
+to read in a series of images. Filenames for images are assumed to be
+ordered (e.g. with numeric indices). The return list contains
+two attributes:
+\itemize{
+\item{images -- a \code{list} of image matrices extracted from the \code{EBImage}
+\code{image} object.}
+\item{filenames -- a vector of filenames that correponds
+to the images.}
+}
+
+The individual images are simple 2D matrices.
+}
+\examples{
+\dontrun{
+phase <- loadImages(dataDirPhase, n=30, ext="tif")
+}
 }
 

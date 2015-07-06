@@ -3,25 +3,25 @@
 #' @param phase a list of phase microscopy images
 #' @param green a list of dye images
 #' @param rotation how many degrees to rotate each image
-#' @param sample which region of the phase to use for alignment in the format \code{c(x, y, size)}
-#' @param crop amount to crop from each side in format \code{c(bottom, left, top, right)}
+#' @param sampleBox which region of the phase to use for alignment in the format \code{c(x, y, size)}
+#' @param cropBoundaries amount to crop from each side in format \code{c(bottom, left, top, right)}
 #' @note The \code{phase} that are passed are actually just the contents of the \code{@@.Data} slot
 #' of an \code{EBImage::Image} object. We use the term *image* to refer to the matrix of image data
 #' that has been pulled out of each \code{EBImage::Image} object.
 #' @return A \code{list} of \code{matrices} ready for feature extraction.
 
-preprocessImages <- function(phase, dyes=list(), rotation=0, sample=c(150,450,125), crop=c(150,150,150,150)) {
+preprocessImages <- function(phase, dyes=list(), rotation=0, sampleBox=c(150,450,125), cropBoundaries=c(150,150,150,150)) {
   
   # Cropping function
-  cropf <- function(x, offset.x, offset.y) { 
-    return(x[(crop[[2]] + offset.x):(width + offset.x - crop[[4]]),
-             (crop[[3]] + offset.y):(height + offset.y - crop[[1]])])
+  crop <- function(x, offset.x, offset.y) { 
+    return(x[(cropBoundaries[[2]] + offset.x):(width + offset.x - cropBoundaries[[4]]),
+             (cropBoundaries[[3]] + offset.y):(height + offset.y - cropBoundaries[[1]])])
   }
   
   # For a dye object, crop the current parent index
-  # pass additional arguments to cropf
+  # pass additional arguments to crop
   dyeIter <- function(x, i, ...) {
-    x[[i]] <- cropf(x[[i]], ...)
+    x[[i]] <- crop(x[[i]], ...)
     return(x)
   }
 
@@ -42,12 +42,17 @@ preprocessImages <- function(phase, dyes=list(), rotation=0, sample=c(150,450,12
   }
   
   # Sampe values
-  x1 <- sample[1]
-  y1 <- sample[2]
-  wh <- sample[3]
+  x1 <- sampleBox[1]
+  y1 <- sampleBox[2]
+  wh <- sampleBox[3]
   
   # Brighten and rotate phase
   phase <- lapply(phase, normalizePhase)
+  
+#   for (i in seq_along(phase)) {
+#     phase[[i]] <- phase[[i]]/max(phase[[i]],na.rm=TRUE)
+#     phase[[i]] <- EBImage::rotate(phase[[i]], rotation)
+#   }
   
   # Get dye names
   dyeNames <- names(dyes)
@@ -91,14 +96,14 @@ preprocessImages <- function(phase, dyes=list(), rotation=0, sample=c(150,450,12
     height <- dim(image)[[2]]
     
     # Crop phase
-    phase[[i]] <- cropf(image, offset.x, offset.y)
+    phase[[i]] <- crop(image, offset.x, offset.y)
     
     # Crop dyes
     dyes <- lapply(dyes, dyeIter, i, offset.x, offset.y)
     
   }
   
-  phase[[1]] <- cropf(phase[[1]], 0, 0)
+  phase[[1]] <- crop(phase[[1]], 0, 0)
 
   
   dyes <- lapply(dyes, dyeIter, 1, 0, 0)
