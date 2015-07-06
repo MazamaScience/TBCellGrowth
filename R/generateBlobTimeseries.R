@@ -1,5 +1,5 @@
-#' Searches an image for dark cell colonies and incrementally labels each colony.
 #' @export
+#' @title Searches an image for dark cell colonies and incrementally labels each colony.
 #' @param frames a sequence of labeled frames. See  \link{labelColonies}.
 #' @param ignore a list of y index pairs to ignore. Typically used to remove 
 #' centroids near dark lines.

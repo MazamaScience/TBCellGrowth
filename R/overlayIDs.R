@@ -1,13 +1,12 @@
 #' @export
-#' @title Adds colony ID text labels to a given image.
-#' @param image the image to modify.
-#' @param centroids a \code{dataframe} corresponding to this image.
-#' See \link{generateBobTimeseries}.
-#' @param labelbg if TRUE adds a transparent background to make the labels
-#' stand out more.
+#' @title Add Colony ID Text Labels to an Image
+#' @param image the image to modify
+#' @param centroids a \code{dataframe} corresponding to this image
+#' See \link{generateBlobTimeseries}.
+#' @param labelbg if TRUE, adds a transparent background to make the labels stand out more
 #' @description Uses the centroids data for a given image to label blob IDs directly
 #' above blobs.
-#' @return an image of equal dimensions.
+#' @return An image with dimensions equal to the incoming image.
 
 overlayIDs <- function(image, centroids, labelbg=FALSE) {
   
