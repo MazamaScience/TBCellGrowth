@@ -60,18 +60,18 @@ labelGroups <- function(image) {
   
   print("Searching new image...")
   
-  ### METHOD 2
+  im1 <- blur(imagesPost[[12]])
+  im2 <- im1
+  test <- sobel2(im1)
+  test2 <- test > 0.4
+  test3 <- EBImage::closingGreyScale(test2, EBImage::makeBrush(7, shape='disc'))
+  test4 <- EBImage::dilateGreyScale(test3, EBImage::makeBrush(3, shape='disc'))
+  test5 <- fillHull(test4)
+  test6 <- removeBlobs(test5, 40)
+  test6 <- bwlabel(test5)
+  test6[im1 < 0.35] <- 0
   
-  test1 <- blur(image)
-  
-  homog <- glcm::glcm(test1, statistics=c("contrast"), n_grey=30, window=c(3,3), shift=c(1,1))
-  
-  test2 <- sobel(test1)
-  
-  test2 <- test1 > 0.6
-  
-  test3 <- EBImage::closingGreyScale(test2, EBImage::makeBrush(5, shape='disc'))
-
+  return(test6)
 }
 
 test <- lapply(images, labelGroups)
@@ -132,16 +132,16 @@ sobel2 <- function(im1) {
   sum1 <- p1 + 2*p2 + p3 - p7 - 2*p8 - p9
   sum2 <- p1  + 2*p4 + p7 - p3 - 2*p6 - p9
   
-  return(sqrt(sum1*sum1 + sum2*sum2))
+  sum <- sqrt(sum1*sum1 + sum2*sum2)[c(-1, -dim(sum1)[[1]]),c(-1, -dim(sum1)[[2]])]
+  sum[1:3,] <- 0
+  sum[,1:3] <- 0
+  sum[(dim(sum)[[1]]-3):(dim(sum)[[1]]),] <- 0
+  sum[,(dim(sum)[[2]]-3):(dim(sum)[[2]])] <- 0
+  
+  return(sum)
   
 }
 
-im1 <- blur(imagesPost[[1]])
-test <- sobel2(im1)
-test2 <- test > 0.5
-test3 <- EBImage::closingGreyScale(test2, EBImage::makeBrush(7, shape='disc'))
-test4 <- EBImage::dilateGreyScale(test3, EBImage::makeBrush(3, shape='disc'))
-test5 <- fillHull(test4)
 
 
 fx <- matrix(c(-1,-2,-1,0,0,0,1,2,1), ncol=3, byrow=TRUE)

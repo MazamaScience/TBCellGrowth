@@ -5,7 +5,7 @@
 #' generates dark lines in phase contrast microscopy.
 #' @return A \code{matrix} of start and end indices for dark lines.
 
-findDarkLines <- function(image) {
+flow_findDarkLines <- function(image) {
   
   # Iterate through the image matrix in 15 pixel rows and find the mean of each row
   meanValue <- c()

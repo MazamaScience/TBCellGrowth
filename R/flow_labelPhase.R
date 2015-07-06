@@ -5,7 +5,7 @@
 #' @description Searches an image for dark cell colonies and incrementally labels each colony.
 #' @return A \code{matrix} of integer labeled blobs.
 
-labelGroupsPhase <- function(image, artifactMask) {
+flow_labelPhase <- function(image, artifactMask) {
   
   print("Searching new image...")
   ptm <- proc.time()

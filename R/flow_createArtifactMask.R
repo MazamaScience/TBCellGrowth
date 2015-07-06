@@ -8,7 +8,7 @@
 #' that appear between different levels in the apparatus.
 #' @return A \code{matrix} of boolean values with TRUE values identifying non biological artifacts. 
 
-createArtifactMask <- function(bg, maskDarkLines=FALSE) {
+flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   
   # size of raster
   dimX <- dim(bg)[[1]]
