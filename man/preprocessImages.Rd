@@ -4,17 +4,17 @@
 \alias{preprocessImages}
 \title{Align, Normalize Brightness, and Crop a List of Images}
 \usage{
-preprocessImages(phase, dyes = list(), rotation = 0, sample = c(150, 450,
-  125), crop = c(150, 150, 150, 150))
+preprocessImages(phase, dyes = list(), rotation = 0, sampleBox = c(150,
+  450, 125), cropBoundaries = c(150, 150, 150, 150))
 }
 \arguments{
 \item{phase}{a list of phase microscopy images}
 
 \item{rotation}{how many degrees to rotate each image}
 
-\item{sample}{which region of the phase to use for alignment in the format \code{c(x, y, size)}}
+\item{sampleBox}{which region of the phase to use for alignment in the format \code{c(x, y, size)}}
 
-\item{crop}{amount to crop from each side in format \code{c(bottom, left, top, right)}}
+\item{cropBoundaries}{amount to crop from each side in format \code{c(bottom, left, top, right)}}
 
 \item{green}{a list of dye images}
 }

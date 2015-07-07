@@ -17,9 +17,9 @@ if (FALSE) {
 }
 
 # load images for each channel
-phase <- loadImages(dataDirPhase, n=30, ext="tif")
-green <- loadImages(dataDirGreen, n=30, ext="tif")
-red   <- loadImages(dataDirRed, n=30, ext="tif")
+phase <- flow_loadImages(dataDirPhase, n=8, ext="tif")
+green <- flow_loadImages(dataDirGreen, n=8, ext="tif")
+red   <- flow_loadImages(dataDirRed, n=8, ext="tif")
 
 # Get filenames except for background
 filenames <- phase$filenames[-1]
@@ -121,16 +121,26 @@ buildDirectoryStructure(output, phase, phase.labeled, list(), list(), filenames)
 
 
 
+phase <- flow_loadImages("~/Desktop/TBData/Phase 1/", n=20, ext="tif", start=1)[[1]]
 
 
+### AUTO NORMALIZATION TESTING
+g <- green[[5]]
+r <- red[[5]]
+p <- phase[[5]]
+
+# Reset median
+g1 <- normalizeValues(green[[5]], 0.2)
+r1 <- normalizeValues(red[[5]], 0.2)
+p1 <- normalizeValues(phase[[5]], 0.5)
+
+test <- lapply(phase, normalizeValues, 0.5)
+
+normalizeValues <- function(m, med) {
+  m <- m - min(m)
+  m <- m * (med / median(m))
+  return(m)
+}
 
 
-
-
-
-createGif(ble, "sample.gif", rescale = 75)
-
-EBImage::display(overlayBlobs(frames$images[[2]], frames.labeled[[2]]))
-EBImage::display(overlayGrid(frames$images[[2]]))
-EBImage::display(overlayTimestamp(frames$images[[2]], frames$labels[[2]]))
 

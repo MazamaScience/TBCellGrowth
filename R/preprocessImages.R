@@ -9,27 +9,6 @@
 #' of an \code{EBImage::Image} object. We use the term *image* to refer to the matrix of image data
 #' that has been pulled out of each \code{EBImage::Image} object.
 #' @return A \code{list} of \code{matrices} ready for feature extraction.
-# 
-# alignAndCrop <- function(phase, dyes, alignmentSample=c(200,200,100), cropSizes=c(0,0,0,0)) {
-#   
-#   # Cropping function
-#   crop <- function(x, offset.x, offset.y) { 
-#     return(x[(cropBoundaries[[2]] + offset.x):(width + offset.x - cropBoundaries[[4]]),
-#              (cropBoundaries[[3]] + offset.y):(height + offset.y - cropBoundaries[[1]])])
-#   }
-#   
-# }
-# 
-# 
-# 
-# normalizeImageValues <- function(images, dyes=list(), experimentType="phase") {
-#   
-# }
-
-
-for (i in 1:length(outlined)) {
-  writeImage(outlined[[i]], files=paste0("~/desktop/", filenames[[i]], ".jpg"), type="jpeg", quality=50)
-}
 
 
 preprocessImages <- function(phase, dyes=list(), rotation=0, sampleBox=c(150,450,125), cropBoundaries=c(150,150,150,150)) {
@@ -134,3 +113,20 @@ preprocessImages <- function(phase, dyes=list(), rotation=0, sampleBox=c(150,450
   return(list(phase=phase, dyes=dyes))
   
 }
+
+
+# alignAndCrop <- function(phase, dyes, alignmentSample=c(200,200,100), cropSizes=c(0,0,0,0)) {
+#   
+#   # Cropping function
+#   crop <- function(x, offset.x, offset.y) { 
+#     return(x[(cropBoundaries[[2]] + offset.x):(width + offset.x - cropBoundaries[[4]]),
+#              (cropBoundaries[[3]] + offset.y):(height + offset.y - cropBoundaries[[1]])])
+#   }
+#   
+# }
+# 
+# 
+# 
+# normalizeImageValues <- function(images, dyes=list(), experimentType="phase") {
+#   
+# }
