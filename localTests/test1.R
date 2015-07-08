@@ -18,8 +18,8 @@ if (FALSE) {
 
 # load images for each channel
 phase <- flow_loadImages(dataDirPhase, n=8, ext="tif")
-green <- flow_loadImages(dataDirGreen, n=8, ext="tif")
-red   <- flow_loadImages(dataDirRed, n=8, ext="tif")
+green <- flow_loadImages(dataDirGreen, n=8, ext="tif")[[1]]
+red   <- flow_loadImages(dataDirRed, n=8, ext="tif")[[1]]
 
 # Get filenames except for background
 filenames <- phase$filenames[-1]
