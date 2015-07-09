@@ -10,7 +10,7 @@
 
 flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   
-  edges <- sobel2(bg) > 0.8
+  edges <- sobelFilter(bg) > 0.8
   edges <- EBImage::dilateGreyScale(edges, makeBrush(3, 'disc'))
   edges <- EBImage::fillHull(edges)
   edges <- EBImage::erodeGreyScale(edges, makeBrush(3, 'disc'))
