@@ -60,5 +60,7 @@ rm(processed)
 # Create artifactMask
 artifactMask <- flow_createArtifactMask(phase[[1]])
 
+# 
+
 # Because of all of the non biological artifacts, flow experiments
 # require an artifact mask.
