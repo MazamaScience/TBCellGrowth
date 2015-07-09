@@ -15,7 +15,7 @@
 #' which will be the same lengths as the input.
 
 alignAndCropImages <- function(phase, dyes, alignmentSample=c(200,200,100), 
-                               cropBoundaries=c(50,50,50,50), rotation) {
+                               cropBoundaries=c(50,50,50,50), rotation=0) {
   
   dyeNames <- names(dyes)
   
@@ -68,9 +68,9 @@ alignAndCropImages <- function(phase, dyes, alignmentSample=c(200,200,100),
     offset.y <- which(diffs == min(diffs),arr.ind=T)[[2]] - searchBounds
     
     # Image dimensions
-#     width <- dim(image)[[1]]
-#     height <- dim(image)[[2]]
-
+    #     width <- dim(image)[[1]]
+    #     height <- dim(image)[[2]]
+    
     image <- phase[[i]]
     
     # Crop phase
@@ -79,15 +79,15 @@ alignAndCropImages <- function(phase, dyes, alignmentSample=c(200,200,100),
     lapply(dyes, my_dyeCrop, i, offset.x, offset.y, dim(image)[[1]], dim(image)[[2]])
     
     # Benchmarking apply vs for 
-    benchmark({
-      for (j in 1:length(dyes)) {
-        test[[j]][[i]] <- my_crop(dyes[[j]][[i]], offset.x, offset.y, dim(image)[[1]], dim(image)[[2]])
-      }
-    })
-    benchmark(lapply(dyes, my_dyeCrop, i, offset.x, offset.y, dim(image)[[1]], dim(image)[[2]]))
+    #     benchmark({
+    #       for (j in 1:length(dyes)) {
+    #         test[[j]][[i]] <- my_crop(dyes[[j]][[i]], offset.x, offset.y, dim(image)[[1]], dim(image)[[2]])
+    #       }
+    #     })
+    #     benchmark(lapply(dyes, my_dyeCrop, i, offset.x, offset.y, dim(image)[[1]], dim(image)[[2]]))
     
   }
-
+  
   # Crop background image
   phase[[1]] <- my_crop(phase[[1]], 0, 0, dim(phase[[1]])[[1]], dim(phase[[1]])[[2]])
   
@@ -95,7 +95,7 @@ alignAndCropImages <- function(phase, dyes, alignmentSample=c(200,200,100),
   dyes <- lapply(dyes, my_dyeCrop, 1, 0, 0, dim(phase[[1]])[[1]], dim(phase[[1]])[[2]])
   names(dyes) <- dyeNames
   
-
+  
   return(list(phase=phase, dyes=dyes))
   
 }

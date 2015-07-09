@@ -10,6 +10,15 @@
 
 flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   
+  edges <- sobel2(bg) > 0.8
+  edges <- EBImage::dilateGreyScale(edges, makeBrush(3, 'disc'))
+  edges <- EBImage::fillHull(edges)
+  edges <- EBImage::erodeGreyScale(edges, makeBrush(3, 'disc'))
+  
+  return (edges)
+  
+  bg1[edges > 0] <- 0
+  
   # size of raster
   dimX <- dim(bg)[[1]]
   dimY <- dim(bg)[[2]]
@@ -110,7 +119,7 @@ flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   
   # close gaps between partial circles and squares
   c <- EBImage::closingGreyScale(b, EBImage::makeBrush(15, shape='disc'))
-
+  
   # Expand the circles a bit
   d <- EBImage::dilateGreyScale(c, EBImage::makeBrush(7, shape='disc'))
   
