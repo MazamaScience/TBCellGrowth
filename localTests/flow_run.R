@@ -52,7 +52,7 @@ phase <- lapply(phase, normalizeImages, params$phaseMedian)
 dyes <- lapply(dyes, function(x) lapply(x, normalizeImages, params$dyeMedian))
 
 # Apply image transformations
-processed <- alignAndCropImages(phase=phase, dyes=dyes, 
+processed <- flow_alignImages(phase=phase, dyes=dyes, 
                                 alignmentTargets=params$alignmentTargets, 
                                 targetWidth=params$targetWidth, 
                                 searchSpace=params$searchSpace, 

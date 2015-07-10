@@ -1,12 +1,12 @@
 #' @export
-#' @title Crop and Align A Series of Images
+#' @title Align A Series of Flow Images
 #' @param phase a list of phase images
 #' @param dyes a list of lists dye images of equal length to phase
-#' @param alignmentSample region of background image to align with (in order:
-#' starting x position, starting y position, square width)
-#' @param cropBoundaries how many pixels to crop from each side (in order:
-#' bottom, left, top, right
-#' @param rotation degrees to rotate images
+#' @param alignmentTargets a list of x y coordinates to use for alignment
+#' comparisons
+#' @param targetWidth the radius of alignment targets
+#' @param searchSpace how far to search for best alignment. A smaller
+#' value here yeilds faster searches.
 #' @description Given a list of phase images and a list of zero or
 #' more lists of dye images, aligns these images to the first image
 #' of phase (assumed to be a background). Will also crop and rotate
@@ -14,9 +14,8 @@
 #' @return a \code{list} of two lists, \code{phase} and \code{dyes},
 #' which will be the same lengths as the input.
 
-alignAndCropImages <- function(phase, dyes, alignmentTargets, targetWidth=25, 
-                               searchSpace=25,
-                               cropBoundaries=c(50,50,50,50)) {
+flow_alignImages <- function(phase, dyes, alignmentTargets, targetWidth=25, 
+                               searchSpace=25) {
   
   dyeNames <- names(dyes)
   
@@ -40,7 +39,11 @@ alignAndCropImages <- function(phase, dyes, alignmentTargets, targetWidth=25,
   bgSamples <- lapply(alignmentTargets, function(x) phase[[1]][(x[[1]]-targetWidth):(x[[1]]+targetWidth),
                                                   (x[[2]]-targetWidth):(x[[2]]+targetWidth)])
   
-  
+
+  # Vectors detailing how much to shift images
+  offset.x <- numeric(length(phase))
+  offset.y <- numeric(length(phase))  
+
   for (i in 2:length(phase)) {
     
     image <- phase[[i]]
@@ -62,33 +65,59 @@ alignAndCropImages <- function(phase, dyes, alignmentTargets, targetWidth=25,
         # Find the total difference between samples
         diffs <- unlist(mapply(function(x,x1) sum(abs(x-x1)), bgSamples, phaseSubset, SIMPLIFY=FALSE))
         
-        sampleDiffs[ii,jj] <- min(diffs)
+        sampleDiffs[ii,jj] <- sum(diffs)
         
       }
     }
     
     bestFit <- which(sampleDiffs == min(sampleDiffs, na.rm=T),arr.ind=T)
     
-    print(bestFit)
-    
-    offset.x <- bestFit[[1]] - searchSpace
-    offset.y <- bestFit[[2]] - searchSpace
-    
-
-    # Crop phase
-    phase[[i]] <- my_crop(image, offset.x, offset.y, dim(image)[[1]], dim(image)[[2]])
-    # Crop Dyes
-    lapply(dyes, my_dyeCrop, i, offset.x, offset.y, dim(image)[[1]], dim(image)[[2]])
+    offset.x[[i]] <- bestFit[[1]] - searchSpace - 1
+    offset.y[[i]] <- bestFit[[2]] - searchSpace - 1
     
   }
+
+  # Crop images based on offset
+  cropY <- max(abs(offset.y))
+  cropX <- max(abs(offset.x))
   
-  # Crop background image
-  phase[[1]] <- my_crop(phase[[1]], 0, 0, dim(phase[[1]])[[1]], dim(phase[[1]])[[2]])
+  for (i in 1:length(phase)) {
+    
+    print(i)
+    
+    im <- phase[[i]]
+    
+    dimx <- dim(im)[[1]]
+    dimy <- dim(im)[[2]]
+    
+    
+    
+    phase[[i]] <- im[(cropX + offset.x[[i]]):(dimx - cropX + offset.x[[i]]),
+             (cropY + offset.y[[i]]):(dimy - cropY + offset.y[[i]])]
+    
+    for (dye in names(dyes)) {
+      im <- dyes[[dye]][[i]]
+      dyes[[dye]][[i]] <- im[(cropX - offset.x[[i]]):(dimx - cropX - offset.x[[i]]),
+                             (cropY - offset.y[[i]]):(dimy - cropY - offset.y[[i]])]
+    }
+    
+  }
+    
+# 
+#     # Crop phase
+#     phase[[i]] <- my_crop(image, offset.x, offset.y, dim(image)[[1]], dim(image)[[2]])
+#     # Crop Dyes
+#     lapply(dyes, my_dyeCrop, i, offset.x, offset.y, dim(image)[[1]], dim(image)[[2]])
+#     
   
-  # Crop dye backgrounds
-  dyes <- lapply(dyes, my_dyeCrop, 1, 0, 0, dim(phase[[1]])[[1]], dim(phase[[1]])[[2]])
-  names(dyes) <- dyeNames
-  
+#   
+#   # Crop background image
+#   phase[[1]] <- my_crop(phase[[1]], 0, 0, dim(phase[[1]])[[1]], dim(phase[[1]])[[2]])
+#   
+#   # Crop dye backgrounds
+#   dyes <- lapply(dyes, my_dyeCrop, 1, 0, 0, dim(phase[[1]])[[1]], dim(phase[[1]])[[2]])
+#   names(dyes) <- dyeNames
+#   
   
   return(list(phase=phase, dyes=dyes))
   
