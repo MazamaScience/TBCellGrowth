@@ -144,3 +144,42 @@ normalizeValues <- function(m, med) {
 
 
 
+
+### IMAGE ALIGNMENT TESTING
+image1 <- phase[[1]]
+image2 <- phase[[3]]
+image3 <- phase[[15]]
+
+targets <- list(c(728,301), c(909,118), c(548,110))
+tWidth <- 25
+searchSpace <- 25
+
+bgSamples <- lapply(targets, function(x) image1[(x[[1]]-tWidth):(x[[1]]+tWidth),
+                                               (x[[2]]-tWidth):(x[[2]]+tWidth)])
+
+
+
+phaseSamples <- lapply(targets, function(x) image2[(x[[1]]-tWidth-searchSpace):(x[[1]]+tWidth+searchSpace),
+                                                   (x[[2]]-tWidth-searchSpace):(x[[2]]+tWidth+searchSpace)])
+
+sampleDiffs <- matrix(NA,nrow=1 + searchSpace*2,ncol=1 + searchSpace*2)
+
+for (ii in 1:(searchSpace*2)) {
+  for (jj in 1:(searchSpace*2)) { 
+  
+    x1 <- ii
+    x2 <- ii + searchSpace*2
+    y1 <- jj
+    y2 <- jj + searchSpace*2
+    phaseSubset <- lapply(phaseSamples, function(x) x[x1:x2,y1:y2])
+    
+    # Find the total difference between samples
+    diffs <- unlist(mapply(function(x,x1) sum(abs(x-x1)), bgSamples, phaseSubset, SIMPLIFY=FALSE))
+    
+    sampleDiffs[ii,jj] <- min(diffs)
+    
+  }
+}
+
+bestFit <- which(sampleDiffs == min(sampleDiffs, na.rm=T),arr.ind=T)
+

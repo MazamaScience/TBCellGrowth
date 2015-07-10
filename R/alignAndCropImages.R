@@ -14,19 +14,16 @@
 #' @return a \code{list} of two lists, \code{phase} and \code{dyes},
 #' which will be the same lengths as the input.
 
-alignAndCropImages <- function(phase, dyes, alignmentSample=c(200,200,100), 
-                               cropBoundaries=c(50,50,50,50), rotation=0) {
+alignAndCropImages <- function(phase, dyes, alignmentTargets, targetWidth=25, 
+                               searchSpace=25,
+                               cropBoundaries=c(50,50,50,50)) {
   
   dyeNames <- names(dyes)
   
-  phase <- lapply(phase, EBImage::rotate, rotation)
-  dyes <- lapply(dyes, function(dye) lapply(dye, EBImage::rotate, rotation))
-  
-  # Extract information from alignmentSample
-  xx <- alignmentSample[[1]]
-  yy <- alignmentSample[[2]]
-  width <- alignmentSample[[3]]
-  
+#   # Rotate images
+#   phase <- lapply(phase, EBImage::rotate, rotation)
+#   dyes <- lapply(dyes, function(dye) lapply(dye, EBImage::rotate, rotation))
+#   
   # Cropping helper function
   my_crop <- function(x, offset.x, offset.y, width, height) { 
     return(x[(cropBoundaries[[2]] + offset.x):(width + offset.x - cropBoundaries[[4]]),
@@ -39,52 +36,49 @@ alignAndCropImages <- function(phase, dyes, alignmentSample=c(200,200,100),
     return(dye)
   }
   
-  bgSample <- phase[[1]][xx:(xx+width), yy:(yy+width)]
+  # Sample the background image with alignment targets
+  bgSamples <- lapply(alignmentTargets, function(x) phase[[1]][(x[[1]]-targetWidth):(x[[1]]+targetWidth),
+                                                  (x[[2]]-targetWidth):(x[[2]]+targetWidth)])
   
   
   for (i in 2:length(phase)) {
     
-    searchBounds <- 50
+    image <- phase[[i]]
     
-    print(paste0("Aligning image ", i-1, " of ", length(phase)-1))
+    phaseSamples <- lapply(alignmentTargets, function(x) image[(x[[1]]-targetWidth-searchSpace):(x[[1]]+targetWidth+searchSpace),
+                                                       (x[[2]]-targetWidth-searchSpace):(x[[2]]+targetWidth+searchSpace)])
     
-    # Take a sample 50px larger on each side than the background sample
-    phaseSample <- phase[[i]][(xx-searchBounds):(xx+width+searchBounds), 
-                              (yy-searchBounds):(yy+width+searchBounds)]
+    sampleDiffs <- matrix(NA,nrow=1 + searchSpace*2,ncol=1 + searchSpace*2)
     
-    # Initialize matrix for recording differences
-    diffs <- matrix(NA,nrow=searchBounds*2,ncol=searchBounds*2)
-    
-    # Search the subset space for the least different region
-    for (x in 1:100) {
-      for (y in 1:100) {
-        subs <- phaseSample[x:(x+width),y:(y+width)]
-        diffs[x,y] <- mean(abs(subs-bgSample))
+    for (ii in 1:(searchSpace*2)) {
+      for (jj in 1:(searchSpace*2)) { 
+        
+        x1 <- ii
+        x2 <- ii + searchSpace*2
+        y1 <- jj
+        y2 <- jj + searchSpace*2
+        phaseSubset <- lapply(phaseSamples, function(x) x[x1:x2,y1:y2])
+        
+        # Find the total difference between samples
+        diffs <- unlist(mapply(function(x,x1) sum(abs(x-x1)), bgSamples, phaseSubset, SIMPLIFY=FALSE))
+        
+        sampleDiffs[ii,jj] <- min(diffs)
+        
       }
     }
     
-    # Find the x and y offsets
-    offset.x <- which(diffs == min(diffs),arr.ind=T)[[1]] - searchBounds
-    offset.y <- which(diffs == min(diffs),arr.ind=T)[[2]] - searchBounds
+    bestFit <- which(sampleDiffs == min(sampleDiffs, na.rm=T),arr.ind=T)
     
-    # Image dimensions
-    #     width <- dim(image)[[1]]
-    #     height <- dim(image)[[2]]
+    print(bestFit)
     
-    image <- phase[[i]]
+    offset.x <- bestFit[[1]] - searchSpace
+    offset.y <- bestFit[[2]] - searchSpace
     
+
     # Crop phase
     phase[[i]] <- my_crop(image, offset.x, offset.y, dim(image)[[1]], dim(image)[[2]])
     # Crop Dyes
     lapply(dyes, my_dyeCrop, i, offset.x, offset.y, dim(image)[[1]], dim(image)[[2]])
-    
-    # Benchmarking apply vs for 
-    #     benchmark({
-    #       for (j in 1:length(dyes)) {
-    #         test[[j]][[i]] <- my_crop(dyes[[j]][[i]], offset.x, offset.y, dim(image)[[1]], dim(image)[[2]])
-    #       }
-    #     })
-    #     benchmark(lapply(dyes, my_dyeCrop, i, offset.x, offset.y, dim(image)[[1]], dim(image)[[2]]))
     
   }
   

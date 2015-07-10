@@ -22,8 +22,11 @@ params$dyeMedian <- 0.02
 
 # Transformation parameters
 params$rotate <- -1
+
+params$alignmentTargets <- list(c(728,301), c(909,118), c(548,110))
+params$targetWidth <- 25
+params$searchSpace <- 25
 params$cropBoundaries <- c(50,50,50,50)
-params$alignmentSample <- c(200,200,100)
 
 
 ### TODO Separate script for testing alignment and normalization?
@@ -49,8 +52,11 @@ phase <- lapply(phase, normalizeImages, params$phaseMedian)
 dyes <- lapply(dyes, function(x) lapply(x, normalizeImages, params$dyeMedian))
 
 # Apply image transformations
-processed <- alignAndCropImages(phase, dyes, params$alignmentSample, 
-                                params$cropBoundaries, params$rotate)
+processed <- alignAndCropImages(phase=phase, dyes=dyes, 
+                                alignmentTargets=params$alignmentTargets, 
+                                targetWidth=params$targetWidth, 
+                                searchSpace=params$searchSpace, 
+                                cropBoundaries=params$cropBoundaries)
 
 # Pull out phase and dyes, then removed process to save memory
 phase <- processed$phase
