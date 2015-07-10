@@ -7,6 +7,25 @@
 
 flow_labelPhase <- function(image, artifactMask) {
   
+  imageEdit <- sobelFilter(image)
+  
+  imageEdit[artifactMask] <- 0
+  
+#   imageEdit[image < 0.5] <- 0
+  
+  imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(5, 'disc'))
+  
+  imageEdit <- imageEdit > 0.8
+  
+  imageEdit <- EBImage::fillHull(imageEdit)
+  
+  imageEdit[image > 0.4] <- 0
+  
+  
+  
+  
+  
+  
   print("Searching new image...")
   ptm <- proc.time()
   
@@ -50,7 +69,7 @@ flow_labelPhase <- function(image, artifactMask) {
   
   # Equalize m, which flattens the value histogram. This greatly increases the
   # contrast around the edges. Then select the lighter areas from that region and
-  imageEdit[(EBImage::equalize(image)) > 0.5] <- 0
+  imageEdit[(EBImage::equalize(image, range=range(image))) > 0.5] <- 0
   
   # Remove noise
   imageEdit <- removeBlobs(imageEdit, 20)
@@ -64,7 +83,7 @@ flow_labelPhase <- function(image, artifactMask) {
   
   # Since sections are already labeled it's safe to remove a lot of the excess
   # White so we get a more accurate reading
-  imageEdit[(EBImage::equalize(image)^0.5) > 0.5] <- 0
+  imageEdit[(EBImage::equalize(image, range=range(image))^0.5) > 0.5] <- 0
   
   imageEdit[artifactMask>0] <- 0
   

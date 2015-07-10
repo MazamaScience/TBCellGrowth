@@ -11,7 +11,7 @@ params$dyeChannels <- c("c2","c3")
 params$channelNames <- c("green","red")
 
 # How many frames to load
-params$nFrames <- 40
+params$nFrames <-30
 
 # What file extension to read
 params$extension <- "tif"
@@ -57,10 +57,10 @@ phase <- processed$phase
 dyes <- processed$dyes
 rm(processed)
 
-# Create artifactMask
-artifactMask <- flow_createArtifactMask(phase[[1]])
-
-# 
-
 # Because of all of the non biological artifacts, flow experiments
 # require an artifact mask.
+artifactMask <- flow_createArtifactMask(phase[[1]])
+
+# Label phase
+phase.labeled <- lapply(phase, flow_labelPhase, artifactMask)
+
