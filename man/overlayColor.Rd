@@ -13,7 +13,7 @@ overlayColor(color, bg, label, mergeWith = NULL)
 
 \item{label}{a binary image label}
 
-\item{merge}{an equally sized color image to overlay the new color on. Uses background
+\item{mergeWith}{an equally sized color image to overlay the new color on. Uses background
 image as default}
 }
 \value{

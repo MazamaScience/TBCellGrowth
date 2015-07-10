@@ -1,12 +1,19 @@
 #' @export
-#' @title Builds and fills
-#' @param dir path to the directory containing images
-#' @param ext file extension
-#' @param n number of images to load into memory (defaults to all)
-#' @return A \code{list} with two attributes, "images" and "filenames".
-#' Images is a \code{list} of image matrices extracted from the \code{EBImage}
-#' \code{image} object. Filenames is a vector of filenames that correponds
-#' to images.
+#' @title Builds A Directory of Image With Excel UI
+#' @param output an output object with timeseries and centroids from
+#' \link{generateBlobTimeseries}
+#' @param phase a list of phase contrast image matrices
+#' @param phase.labeled a list of labeled phase images from
+#' \link{flow_labelPhase}
+#' @param dyes.labeled a list of labeled dye images from
+#' \link{flow_labelDye}
+#' @param dyeOverlap a \code{dataframe} of dye overlap values from
+#' \link{findDyeOverlap}
+#' @param filenames a vector of names equal to the length of the 
+#' image lists. Usually timesteps.
+#' @param outputDir the directory to build the file structure
+#' @description write a lot more here TODO
+#' @return none
 
 buildDirectoryStructure <- function(output, phase, phase.labeled, 
                                     dyes.labeled,  dyeOverlap, filenames, outputDir="output") {

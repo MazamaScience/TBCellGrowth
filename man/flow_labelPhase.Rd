@@ -9,7 +9,7 @@ flow_labelPhase(image, artifactMask)
 \arguments{
 \item{image}{an image matrix to search for cell colonies}
 
-\item{artifactMask}{a mask of non biological features to ignore. See \link{createArtifactMask}.}
+\item{artifactMask}{a mask of non biological features to ignore. See \link{flow_createArtifactMask}.}
 }
 \value{
 A \code{matrix} of integer labeled blobs.

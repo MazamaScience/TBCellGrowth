@@ -1,7 +1,9 @@
 #' @export
 #' @title Identify and Label Florescent Dye
 #' @param image an image matrix to search for dye
-#' @param artifactMask a mask of non biological features to ignore. See \link{createArtifactMask}.
+#' @param phase.labeled a list of labeled phase images from
+#' \link{flow_labelPhase}
+#' @param artifactMask a mask of non biological features to ignore. See \link{flow_createArtifactMask}.
 #' @description Searches an image for dark cell colonies and incrementally labels each blob.
 #' @return A \code{matrix} of integer labeled blobs.
 

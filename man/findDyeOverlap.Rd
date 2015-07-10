@@ -9,9 +9,10 @@ findDyeOverlap(dye, phase.labeled, output)
 \arguments{
 \item{dye}{a list of labeled dye images.}
 
-\item{output}{}
+\item{phase.labeled}{a list of labeled phase images.}
 
-\item{phase}{a list of labeled phase images.}
+\item{output}{an output object with timeseries and centroids from
+\link{generateBlobTimeseries}}
 }
 \value{
 A \code{matrix} of integer labeled blobs.

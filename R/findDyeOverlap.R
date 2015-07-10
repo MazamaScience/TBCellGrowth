@@ -1,8 +1,9 @@
 #' @export
 #' @title Find the Amount of Overlap Between Dye and Phase Blobs
 #' @param dye a list of labeled dye images.
-#' @param phase a list of labeled phase images.
-#' @param output
+#' @param phase.labeled a list of labeled phase images.
+#' @param output an output object with timeseries and centroids from
+#' \link{generateBlobTimeseries}
 #' @description Searches an image for dark cell colonies and incrementally labels each blob.
 #' @return A \code{matrix} of integer labeled blobs.
 

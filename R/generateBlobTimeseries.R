@@ -1,10 +1,11 @@
 #' @export
 #' @title Searches an image for dark cell colonies and incrementally labels each colony.
-#' @param frames a sequence of labeled frames. See  \link{labelColonies}.
+#' @param frames a sequence of labeled frames. See \link{flow_labelPhase}.
 #' @param ignore a list of y index pairs to ignore. Typically used to remove 
 #' centroids near dark lines.
 #' @param minTimespan remove blobs from output which aren't found in at least
 #' n sequential frames.
+#' @param maxDistance the cutoff for distance between two blobs
 #' @return A \code{list} with elements \code{timeseries}, a dataframe of blob IDs 
 #' and blob sizes at each timestep (in pixels) and \code{centroids}, a \code{list}
 #' of dataframes with centroids, blob ID's and original integer labels for mapping

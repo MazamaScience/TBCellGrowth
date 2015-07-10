@@ -1,11 +1,17 @@
 #' @export
 #' @title Identify and Label Phase Microscopy Groups
 #' @param image an image matrix to search for cell colonies
-#' @param artifactMask a mask of non biological features to ignore. See \link{createArtifactMask}.
 #' @description Searches an image for dark cell colonies and incrementally labels each colony.
 #' @return A \code{matrix} of integer labeled blobs.
 
-solid_labelPhase <- function(image, artifactMask) {
+solid_labelPhase <- function(image) {
+  
+  # Wrapper for EBImage blur using filter2
+  blur <- function(im) {
+    flo = EBImage::makeBrush(3, shape='disc', step=FALSE)^2
+    flo = flo/sum(flo)
+    return(EBImage::filter2(im,flo))
+  }
   
   print("Searching new image...")
   ptm <- proc.time()
@@ -16,7 +22,7 @@ solid_labelPhase <- function(image, artifactMask) {
   imageEdit <- blur(image)
   
   # Sobel edge finding implementation
-  imageEdit <- sobel2(imageEdit)
+  imageEdit <- sobelFilter(imageEdit)
   
   # Threshold sharp edges
   imageEdit <- imageEdit > 0.4

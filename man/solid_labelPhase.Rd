@@ -4,12 +4,10 @@
 \alias{solid_labelPhase}
 \title{Identify and Label Phase Microscopy Groups}
 \usage{
-solid_labelPhase(image, artifactMask)
+solid_labelPhase(image)
 }
 \arguments{
 \item{image}{an image matrix to search for cell colonies}
-
-\item{artifactMask}{a mask of non biological features to ignore. See \link{createArtifactMask}.}
 }
 \value{
 A \code{matrix} of integer labeled blobs.

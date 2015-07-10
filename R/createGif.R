@@ -3,7 +3,7 @@
 #' @param frames a sequential \code{list} of images.
 #' @param filename name of output gif.
 #' @param delay delay between each frame in milliseconds.
-#' @param resize dimensions of gif frames as a percent of original image size.
+#' @param rescale dimensions of gif frames as a percent of original image size.
 #' @description Creates an animated .gif file from a list of images using ImageMagick.
 #' @return none
 

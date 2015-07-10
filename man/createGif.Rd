@@ -13,7 +13,7 @@ createGif(frames, filename, delay = 15, rescale = 100)
 
 \item{delay}{delay between each frame in milliseconds.}
 
-\item{resize}{dimensions of gif frames as a percent of original image size.}
+\item{rescale}{dimensions of gif frames as a percent of original image size.}
 }
 \value{
 none

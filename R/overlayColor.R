@@ -3,7 +3,7 @@
 #' @param color a color string, i.e. "green" or "phase"
 #' @param bg a background image
 #' @param label a binary image label
-#' @param merge an equally sized color image to overlay the new color on. Uses background
+#' @param mergeWith an equally sized color image to overlay the new color on. Uses background
 #' image as default
 #' @description Adds a colored overlay to a background image. When passed "phase" 
 #' for color uses grey by default

@@ -9,7 +9,10 @@ flow_labelDye(image, phase.labeled, artifactMask)
 \arguments{
 \item{image}{an image matrix to search for dye}
 
-\item{artifactMask}{a mask of non biological features to ignore. See \link{createArtifactMask}.}
+\item{phase.labeled}{a list of labeled phase images from
+\link{flow_labelPhase}}
+
+\item{artifactMask}{a mask of non biological features to ignore. See \link{flow_createArtifactMask}.}
 }
 \value{
 A \code{matrix} of integer labeled blobs.

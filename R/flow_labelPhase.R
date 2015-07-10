@@ -1,7 +1,7 @@
 #' @export
 #' @title Identify and Label Phase Microscopy Groups
 #' @param image an image matrix to search for cell colonies
-#' @param artifactMask a mask of non biological features to ignore. See \link{createArtifactMask}.
+#' @param artifactMask a mask of non biological features to ignore. See \link{flow_createArtifactMask}.
 #' @description Searches an image for dark cell colonies and incrementally labels each colony.
 #' @return A \code{matrix} of integer labeled blobs.
 

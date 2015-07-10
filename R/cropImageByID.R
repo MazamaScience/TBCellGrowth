@@ -1,7 +1,9 @@
 #' @export
 #' @title Crops an Image Around a Given Blob ID
-#' @param color a color string, i.e. "green" or "phase"
-#' @param bg a background image
+#' @param id the blob id to crop image around
+#' @param output an output object with timeseries and centroids from
+#' \link{generateBlobTimeseries}
+#' @param bg a phase image matrix
 #' @param label a binary image label
 #' @description Given a blob ID string, crops an image around that id.
 #' @return a list with elements bg, the cropped background, and label, the cropped

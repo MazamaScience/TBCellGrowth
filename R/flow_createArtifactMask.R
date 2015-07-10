@@ -13,14 +13,14 @@ flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   # Find harshest edges
   edges <- sobelFilter(bg) > 0.8
   # Expand to close circles
-  edges <- EBImage::dilateGreyScale(edges, makeBrush(3, 'disc'))
+  edges <- EBImage::dilateGreyScale(edges, EBImage::makeBrush(3, 'disc'))
   # Fill holes
   edges <- EBImage::fillHull(edges)
   # Erode to only slightly cover artifacts
-  edges <- EBImage::erodeGreyScale(edges, makeBrush(3, 'disc'))
+  edges <- EBImage::erodeGreyScale(edges, EBImage::makeBrush(3, 'disc'))
   
   # Label blobs
-  labeled <- bwlabel(eFinal)
+  labeled <- EBImage::bwlabel(edges)
 
   # Remove dark / bright lines
   for (i in 1:max(labeled)) {

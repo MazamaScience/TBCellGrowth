@@ -7,11 +7,14 @@
 cropImageByID(id, output, bg, label)
 }
 \arguments{
-\item{bg}{a background image}
+\item{id}{the blob id to crop image around}
+
+\item{output}{an output object with timeseries and centroids from
+\link{generateBlobTimeseries}}
+
+\item{bg}{a phase image matrix}
 
 \item{label}{a binary image label}
-
-\item{color}{a color string, i.e. "green" or "phase"}
 }
 \value{
 a list with elements bg, the cropped background, and label, the cropped

@@ -8,13 +8,15 @@ generateBlobTimeseries(frames, ignore = list(), minTimespan = 5,
   maxDistance = 20)
 }
 \arguments{
-\item{frames}{a sequence of labeled frames. See  \link{labelColonies}.}
+\item{frames}{a sequence of labeled frames. See \link{flow_labelPhase}.}
 
 \item{ignore}{a list of y index pairs to ignore. Typically used to remove
 centroids near dark lines.}
 
 \item{minTimespan}{remove blobs from output which aren't found in at least
 n sequential frames.}
+
+\item{maxDistance}{the cutoff for distance between two blobs}
 }
 \value{
 A \code{list} with elements \code{timeseries}, a dataframe of blob IDs

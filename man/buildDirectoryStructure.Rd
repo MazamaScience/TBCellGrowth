@@ -2,25 +2,35 @@
 % Please edit documentation in R/buildDirectoryStructure.R
 \name{buildDirectoryStructure}
 \alias{buildDirectoryStructure}
-\title{Builds and fills}
+\title{Builds A Directory of Image With Excel UI}
 \usage{
 buildDirectoryStructure(output, phase, phase.labeled, dyes.labeled, dyeOverlap,
   filenames, outputDir = "output")
 }
 \arguments{
-\item{dir}{path to the directory containing images}
+\item{output}{an output object with timeseries and centroids from
+\link{generateBlobTimeseries}}
 
-\item{ext}{file extension}
+\item{phase}{a list of phase contrast image matrices}
 
-\item{n}{number of images to load into memory (defaults to all)}
+\item{phase.labeled}{a list of labeled phase images from
+\link{flow_labelPhase}}
+
+\item{dyes.labeled}{a list of labeled dye images from
+\link{flow_labelDye}}
+
+\item{dyeOverlap}{a \code{dataframe} of dye overlap values from
+\link{findDyeOverlap}}
+
+\item{filenames}{a vector of names equal to the length of the
+image lists. Usually timesteps.}
+
+\item{outputDir}{the directory to build the file structure}
 }
 \value{
-A \code{list} with two attributes, "images" and "filenames".
-Images is a \code{list} of image matrices extracted from the \code{EBImage}
-\code{image} object. Filenames is a vector of filenames that correponds
-to images.
+none
 }
 \description{
-Builds and fills
+write a lot more here TODO
 }
 
