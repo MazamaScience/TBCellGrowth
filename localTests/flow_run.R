@@ -2,8 +2,15 @@
 
 params <- list()
 
+## WORK COMPUTER
 params$inputDir <- "~/Desktop/TBData/xy6/"
 params$outputDir <- "~/Desktop/output/"
+
+## LAPTOP
+params$inputDir <- "~/Desktop/tbTest/xy6/"
+params$outputDir <- "~/Desktop/output/"
+
+
 
 # Configure which dyes to use,
 params$phaseChannel <- "c1"
@@ -26,7 +33,10 @@ params$rotate <- -1
 params$alignmentTargets <- list(c(728,301), c(909,118), c(548,110))
 params$targetWidth <- 25
 params$searchSpace <- 25
-params$cropBoundaries <- c(50,50,50,50)
+
+
+
+
 
 
 ### TODO Separate script for testing alignment and normalization?
@@ -55,8 +65,7 @@ dyes <- lapply(dyes, function(x) lapply(x, normalizeImages, params$dyeMedian))
 processed <- flow_alignImages(phase=phase, dyes=dyes, 
                                 alignmentTargets=params$alignmentTargets, 
                                 targetWidth=params$targetWidth, 
-                                searchSpace=params$searchSpace, 
-                                cropBoundaries=params$cropBoundaries)
+                                searchSpace=params$searchSpace)
 
 # Pull out phase and dyes, then removed process to save memory
 phase <- processed$phase

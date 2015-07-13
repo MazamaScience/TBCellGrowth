@@ -47,7 +47,7 @@ flow_alignImages <- function(phase, dyes, alignmentTargets, targetWidth=25,
         # Find the total difference between samples
         diffs <- unlist(mapply(function(x,x1) sum(abs(x-x1)), bgSamples, phaseSubset, SIMPLIFY=FALSE))
         
-        sampleDiffs[ii,jj] <- sum(diffs)
+        sampleDiffs[ii,jj] <- min(diffs)
         
       }
     }
@@ -60,27 +60,23 @@ flow_alignImages <- function(phase, dyes, alignmentTargets, targetWidth=25,
   }
 
   # Crop images based on offset
-  cropY <- max(abs(offset.y))
-  cropX <- max(abs(offset.x))
+  cropY <- max(abs(offset.y)) + 1
+  cropX <- max(abs(offset.x)) + 1
+  
+  dimx <- dim(phase[[1]])[[1]]
+  dimy <- dim(phase[[1]])[[2]]
   
   for (i in 1:length(phase)) {
     
-    print(i)
-    
     im <- phase[[i]]
     
-    dimx <- dim(im)[[1]]
-    dimy <- dim(im)[[2]]
-    
-    
-    
     phase[[i]] <- im[(cropX + offset.x[[i]]):(dimx - cropX + offset.x[[i]]),
-             (cropY + offset.y[[i]]):(dimy - cropY + offset.y[[i]])]
+                     (cropY + offset.y[[i]]):(dimy - cropY + offset.y[[i]])]
     
     for (dye in names(dyes)) {
       im <- dyes[[dye]][[i]]
-      dyes[[dye]][[i]] <- im[(cropX - offset.x[[i]]):(dimx - cropX - offset.x[[i]]),
-                             (cropY - offset.y[[i]]):(dimy - cropY - offset.y[[i]])]
+      dyes[[dye]][[i]] <- im[(cropX + offset.x[[i]]):(dimx - cropX + offset.x[[i]]),
+                             (cropY + offset.y[[i]]):(dimy - cropY + offset.y[[i]])]
     }
     
   }
