@@ -7,19 +7,50 @@
 
 flow_labelPhase <- function(image, artifactMask) {
   
+  # Use edge detection filter
   imageEdit <- sobelFilter(image)
   
+  # Apply weak threshold
+  imageEdit[image > 0.5] <- 0
+  
+  # Apply artifact mask
   imageEdit[artifactMask] <- 0
   
-#   imageEdit[image < 0.5] <- 0
+  # Dilate to gather groups
+  imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(7, 'disc'))
   
-  imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(5, 'disc'))
-  
+  # Remove soft edges
   imageEdit <- imageEdit > 0.8
   
+  # Remove small groups (usually artifacts)
+  imageEdit <- removeBlobs(imageEdit, 75)
+  
+  # Apply medium threshold
+  imageEdit[image > 0.5] <- 0
+  
+  # Smaller dilate
+  imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(5, 'disc'))
+  
+  # Remove small groups
+  imageEdit <- removeBlobs(imageEdit, 75)
+  
+  # Fill holes
   imageEdit <- EBImage::fillHull(imageEdit)
   
-  imageEdit[image > 0.4] <- 0
+  # Label groups
+  imageEdit <- EBImage::bwlabel(imageEdit)
+  
+  # Final strong threshold
+  imageEdit[image > 0.35] <- 0
+  
+  return(imageEdit)
+  
+
+  
+
+  
+  
+  
   
   
   

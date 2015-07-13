@@ -61,6 +61,11 @@ if (length(params$dyeChannels) > 0) {
 phase <- lapply(phase, normalizeImages, params$phaseMedian)
 dyes <- lapply(dyes, function(x) lapply(x, normalizeImages, params$dyeMedian))
 
+# Apply image rotation
+rotated <- flow_rotateImages(phase=phase, dyes=dyes)
+phase <- rotated$phase
+dyes <- rotates$dyes
+
 # Apply image transformations
 processed <- flow_alignImages(phase=phase, dyes=dyes, 
                                 alignmentTargets=params$alignmentTargets, 
