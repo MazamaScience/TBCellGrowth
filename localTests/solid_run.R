@@ -20,3 +20,11 @@ params$extension <- "tif"
 
 images <- solid_loadImages(params$inputDir, params$xy, params$channels,
                            params$channelNames, params$extension, n=params$nFrames)
+
+brightnessScalar <- 7
+
+equalizeImage <- function(im) {
+  im <- im - min(im)
+  im <- im / max(im)
+  return(im)
+}
