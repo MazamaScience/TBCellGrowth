@@ -27,8 +27,7 @@ findDyeOverlap <- function(dye, phase.labeled, output) {
       if (sum(d==j)) {
         overlap <- p[d==j]
         id <- as.character(c[c$index == j,]$id)
-        print(i)
-        if (id %in% names(tsCopy)) tsCopy[[id]][[i]] <- sum(overlap > 0)
+        if (length(id) > 0 && id %in% names(tsCopy)) tsCopy[[id]][[i]] <- sum(overlap > 0)
       }
       
     }

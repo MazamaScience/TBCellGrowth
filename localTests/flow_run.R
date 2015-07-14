@@ -97,7 +97,7 @@ output <- generateBlobTimeseries(phase.labeled, ignore=darkLines)
 dyeOverlap <- lapply(dyes.labeled, findDyeOverlap, phase.labeled, output)
 
 ## Filenames TODO how should this work
-params$filenames <- unlist(lapply(seq(1,length(phase)), function(x) if (x < 10) paste0(0,x) else x))
+params$filenames <- unlist(lapply(1:6, function(x) if (x < 10) paste0(0,x) else x))
 
 
 buildDirectoryStructure(output, phase, phase.labeled, dyes.labeled, dyeOverlap, params$filenames,

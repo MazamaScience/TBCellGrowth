@@ -1,8 +1,8 @@
 #' @export
 #' @title Searches an image for dark cell colonies and incrementally labels each colony.
 #' @param frames a sequence of labeled frames. See \link{flow_labelPhase}.
-#' @param ignore a list of y index pairs to ignore. Typically used to remove 
-#' centroids near dark lines.
+#' @param ignore a vector of row numbers to ignore. Blobs which have centroids
+#' in this range are removed.
 #' @param minTimespan remove blobs from output which aren't found in at least
 #' n sequential frames.
 #' @param maxDistance the cutoff for distance between two blobs
@@ -11,20 +11,13 @@
 #' of dataframes with centroids, blob ID's and original integer labels for mapping
 #' output column names back to the original images.
 
-generateBlobTimeseries <- function(frames, ignore=data.frame(), minTimespan=5, maxDistance=20) {
+generateBlobTimeseries <- function(frames, ignore=c(), minTimespan=5, maxDistance=20) {
   
   # Get centroids for first frame (assuming empty background frame is in frames[[1]])
   centroidsBefore <- getCentroids(frames[[2]])
-#   
-#   # Remove ignored y indices
-#   for (row in dim(ignore)[[1]]) {
-#     centroidsBefore <- centroidsBefore[!(round(centroidsBefore$y) %in% seq(ig[[1]],ig[[2]])),]
-#   }
-  test1 <- function(ig) {
-    centroidsBefore <- centroidsBefore[!(round(centroidsBefore$y) %in% seq(ig[[1]],ig[[2]])),]
-  }
-  
-apply(ignore, 1, test1)
+
+  # Remove ignored indices
+  centroidsBefore <- centroidsBefore[!(round(centroidsBefore$y) %in% ignore),]
   
   # Initialize return timeseries output
   output <- data.frame(t(data.frame(centroidsBefore$size,row.names=centroidsBefore$id)))
@@ -42,8 +35,9 @@ apply(ignore, 1, test1)
     print(paste0("Processing frame ", i, " of ", length(frames)))
     
     centroidsAfter <- getCentroids(frames[[i]])
+    
     # Remove ignored y indices
-    apply(ignore, 1, test1)
+    centroidsBefore <- centroidsBefore[!(round(centroidsBefore$y) %in% ignore),]
     
     # Find groups that are determined to be the same between the two frames
     groups <- findSimilarGroups(centroidsBefore,centroidsAfter,maxDistance)
