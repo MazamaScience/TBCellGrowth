@@ -13,7 +13,7 @@
 #' ordered (e.g. with numeric indices). The return list contains
 #' two attributes:
 
-solid_loadImages <- function(dataDir, xy, channels, channelNames, ext="tif", start=1, n=NA) {
+solid_loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), ext="tif", start=1, n=NA) {
   
   readf <- function(im) {
     return(EBImage::readImage(im)@.Data)
@@ -33,11 +33,13 @@ solid_loadImages <- function(dataDir, xy, channels, channelNames, ext="tif", sta
   # Initialize images
   images <- list()
   
-  for (channel in channels) {
-    images[[channel]] <- lapply(times, function(t) readf(paste0(dataDir,"/",t,"/",xy,channel,".",ext)))
+  for (xyn in xy) {
+    images[[xyn]] <- list()
+    for (channel in channels) {
+      images[[xyn]][[channel]] <- lapply(times, function(t) readf(paste0(dataDir,"/",t,"/",xy,channel,".",ext)))
+    }
+    names(images[[xyn]]) <- channelNames
   }
-  
-  names(images) <- channelNames
   
   return(images)
   
