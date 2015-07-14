@@ -11,15 +11,20 @@
 #' of dataframes with centroids, blob ID's and original integer labels for mapping
 #' output column names back to the original images.
 
-generateBlobTimeseries <- function(frames, ignore=list(), minTimespan=5, maxDistance=20) {
+generateBlobTimeseries <- function(frames, ignore=data.frame(), minTimespan=5, maxDistance=20) {
   
   # Get centroids for first frame (assuming empty background frame is in frames[[1]])
   centroidsBefore <- getCentroids(frames[[2]])
-  
-  # Remove ignored y indices
-  for (ig in ignore) {
+#   
+#   # Remove ignored y indices
+#   for (row in dim(ignore)[[1]]) {
+#     centroidsBefore <- centroidsBefore[!(round(centroidsBefore$y) %in% seq(ig[[1]],ig[[2]])),]
+#   }
+  test1 <- function(ig) {
     centroidsBefore <- centroidsBefore[!(round(centroidsBefore$y) %in% seq(ig[[1]],ig[[2]])),]
   }
+  
+apply(ignore, 1, test1)
   
   # Initialize return timeseries output
   output <- data.frame(t(data.frame(centroidsBefore$size,row.names=centroidsBefore$id)))
@@ -38,9 +43,7 @@ generateBlobTimeseries <- function(frames, ignore=list(), minTimespan=5, maxDist
     
     centroidsAfter <- getCentroids(frames[[i]])
     # Remove ignored y indices
-    for (ig in ignore) {
-      centroidsAfter <- centroidsAfter[!(round(centroidsAfter$y) %in% seq(ig[[1]],ig[[2]])),]
-    }
+    apply(ignore, 1, test1)
     
     # Find groups that are determined to be the same between the two frames
     groups <- findSimilarGroups(centroidsBefore,centroidsAfter,maxDistance)

@@ -39,7 +39,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
     for (i in 1:length(full_dye)) {
       EBImage::writeImage(full_dye[[i]], file=paste0(outputDir, "/fullFrame/", dye, "/", filenames[[i]], ".jpg"))
     }
-    makeGif(paste0(outputDir,"/fullFrame/",dye), "series.gif")
+    makeGif(paste0(outputDir,"/fullFrame/",dye,"/"), "series.gif")
     remove(full_dye)
   }
   
@@ -170,6 +170,8 @@ excelHyperlink <- function(url, text) {
 # and a vector of times / filenames
 writeExcel <- function(df, outputBase, color, filenames) {
   
+  write.csv(df, paste0(outputBase, "/", color, "_noLinks.csv"))
+  
   # Creates hyperlinks to specific images
   cellHyperlinks <- function(id) {
     oDir <- paste0(id, "/", color)
@@ -200,6 +202,8 @@ writeExcel <- function(df, outputBase, color, filenames) {
   rownames(df) <- lapply(filenames, timeHyperlinks)
   
   write.csv(df, paste0(outputBase, "/", color, ".csv"))
+  
+ 
   
 }
 

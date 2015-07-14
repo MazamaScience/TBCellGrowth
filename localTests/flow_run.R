@@ -3,12 +3,16 @@
 params <- list()
 
 ## WORK COMPUTER
-params$inputDir <- "~/Desktop/TBData/xy6/"
-params$outputDir <- "~/Desktop/output/"
+if (FALSE) {
+  params$inputDir <- "~/Desktop/TBData/xy6/"
+  params$outputDir <- "~/Desktop/output/"
+}
 
 ## LAPTOP
-params$inputDir <- "~/Desktop/tbTest/xy6/"
-params$outputDir <- "~/Desktop/output/"
+if (FALSE) {
+  params$inputDir <- "~/Desktop/tbTest/xy6/"
+  params$outputDir <- "~/Desktop/output/"
+}
 
 
 
@@ -18,7 +22,7 @@ params$dyeChannels <- c("c2","c3")
 params$channelNames <- c("green","red")
 
 # How many frames to load
-params$nFrames <-30
+params$nFrames <- 7
 
 # What file extension to read
 params$extension <- "tif"
@@ -64,7 +68,7 @@ dyes <- lapply(dyes, function(x) lapply(x, normalizeImages, params$dyeMedian))
 # Apply image rotation
 rotated <- flow_rotateImages(phase=phase, dyes=dyes)
 phase <- rotated$phase
-dyes <- rotates$dyes
+dyes <- rotated$dyes
 
 # Apply image transformations
 processed <- flow_alignImages(phase=phase, dyes=dyes, 
@@ -83,4 +87,18 @@ artifactMask <- flow_createArtifactMask(phase[[1]])
 
 # Label phase
 phase.labeled <- lapply(phase, flow_labelPhase, artifactMask)
+dyes.labeled <- lapply(dyes, function(x) mapply(flow_labelDye, x, phase.labeled, list(artifactMask), SIMPLIFY=FALSE))
 
+# Find dark lines
+darkLines <- flow_findDarkLines(phase[[1]])
+
+output <- generateBlobTimeseries(phase.labeled, ignore=darkLines)
+
+dyeOverlap <- lapply(dyes.labeled, findDyeOverlap, phase.labeled, output)
+
+## Filenames TODO how should this work
+params$filenames <- unlist(lapply(seq(1,length(phase)), function(x) if (x < 10) paste0(0,x) else x))
+
+
+buildDirectoryStructure(output, phase, phase.labeled, dyes.labeled, dyeOverlap, params$filenames,
+                        outputDir=params$outputDir)
