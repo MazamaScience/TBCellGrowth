@@ -27,6 +27,21 @@ params$extension <- "tif"
 images <- solid_loadImages(params$inputDir, params$xy, params$channels,
                            params$channelNames, params$extension, n=params$nFrames)
 
+phase <- images$xy2$phase
+
+equalizeImage <- function(im) {
+
+  im <- im - quantile(im, probs=seq(0,1,0.1))[[6]]
+  im <- im / max(im)
+  im[im<0] <- 0
+  im <- im / ( 7 * quantile(im)[[4]] )
+  return(im)
+#   test <- test / (quantile(test)[[4]]^0.5)
+}
+
+test <- lapply(phase, equalizeImage)
+
+
 brightnessScalar <- 7
 
 equalizeImage <- function(im) {
