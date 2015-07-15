@@ -2,8 +2,8 @@
 #' @title Load Image Data into a List
 #' @param dir path to the directory containing images
 #' @param ext file extension
-#' @param n number of images to load into memory (defaults to all)
 #' @param start index at which to start loading files
+#' @param n number of images to load into memory (defaults to all)
 #' @description This function uses the \pkg{EBImage::readimage} function
 #' to read in a series of images. Filenames for images are assumed to be
 #' ordered (e.g. with numeric indices). The return list contains
@@ -22,7 +22,7 @@
 #' phase <- loadImages(dataDirPhase, n=30, ext="tif")
 #' }
 
-flow_loadImages <- function(dir, ext="tiff", n=NA, start=1) {
+flow_loadImages <- function(dir, ext="tiff", start=1, n=NA,) {
   
   readf <- function(filename) {
     return(EBImage::readImage(filename)@.Data)

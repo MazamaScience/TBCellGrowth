@@ -10,10 +10,10 @@
 #' @param n number of images to load into memory (defaults to all)
 #' @description This function uses the \pkg{EBImage::readimage} function
 #' to read in a series of images. Filenames for images are assumed to be
-#' ordered (e.g. with numeric indices). The return list contains
-#' two attributes:
+#' ordered (e.g. with numeric indices). The return is a list of image
+#' matrices from the \code{@.Data} slot of the EBImage Image object.
 
-solid_loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), ext="tif", start=1, n=NA) {
+solid_loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), ext="tiff", start=1, n=NA) {
   
   readf <- function(im) {
     return(EBImage::readImage(im)@.Data)
