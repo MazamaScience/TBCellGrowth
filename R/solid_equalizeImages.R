@@ -1,0 +1,38 @@
+#' @export
+#' @title Normalize Image Values
+#' @param image the image matrix to modify.
+#' @description Normalize a given solid image. This function attempts to 
+#' replicate the auto levels function in Photoshop. It shifts the peak of
+#' the histogram to 0 and scales the values so the histogram is between 
+#' 0 and ~0.5
+#' @return an image of the same dimensions.
+
+solid_equalizeImages <- function(image) {
+  
+  # Make histogram of values
+  valueHist <- hist(image, breaks=40)
+  
+  # Which index of histogram is highest
+  index <- which.max(valueHist$counts) - 1
+  
+  # What value corresponds to that
+  minVal <- valueHist$breaks[index]
+  
+  # Shift and stretch the image so the new minimum is this 
+  # minVal and the max is 1
+  im <- im - minVal
+  im[im < 0] <- NA
+  im <- im / max(im, na.rm=TRUE)
+  
+  # Make a new histogram
+  valueHist <- hist(im, breaks=40)
+  
+  # Find the area after the histogram peak to expand
+  index <- which(valueHist$counts/max(valueHist$counts) < 0.1 & c(FALSE,diff(valueHist$counts) < 0))[[1]]
+  midVal <- valueHist$breaks[index]
+  im <- im / (midVal * 2)
+  im[im > 1] <- 1
+  
+  return(im)
+  
+}
