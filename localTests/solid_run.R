@@ -29,23 +29,27 @@ images <- solid_loadImages(params$inputDir, params$xy, params$channels,
 
 phase <- images$xy2$phase
 
-equalizeImage <- function(im) {
+### Trying to replicate the "auto tone" function in 
+### Photoshop CS6
 
-  im <- im - quantile(im, probs=seq(0,1,0.1))[[6]]
-  im <- im / max(im)
-  im[im<0] <- 0
-  im <- im / ( 7 * quantile(im)[[4]] )
-  return(im)
+# PS Level adjustments           #   closest quantile
+# phase[[1]]   0.3529 - 0.4980   #   50% - 2 * 25%
+# phase[[2]]   0.4275 - 0.5647   #   20% - 2 * 
+# phase[[4]]   0.4627 - 0.5765
+# phase[[10]]  0.4667 - 0.5882
+equalizeImage <- function(im) {
+  im <- im - median(im)
+#   im <- im - quantile(im, probs=seq(0,1,0.1))[[6]]
+#   im <- im / max(im)
+#   im[im<0] <- 0
+#   im <- im / ( 7 * quantile(im)[[4]] )
+#   return(im)
 #   test <- test / (quantile(test)[[4]]^0.5)
 }
 
-test <- lapply(phase, equalizeImage)
+im <- phase[[2]]
+im <- im - median(im)
+im[im < 0] <- NA
+im <- im / max(im, na.rm=TRUE)
+im <- im / (quantile(im, probs=seq(0,1,0.05), na.rm=TRUE)[[19]] * 2)
 
-
-brightnessScalar <- 7
-
-equalizeImage <- function(im) {
-  im <- im - min(im)
-  im <- im / max(im)
-  return(im)
-}
