@@ -22,7 +22,7 @@
 #' phase <- loadImages(dataDirPhase, n=30, ext="tif")
 #' }
 
-flow_loadImages <- function(dir, ext="tiff", start=1, n=NA,) {
+flow_loadImages <- function(dir, ext="tiff", start=1, n=NA) {
   
   readf <- function(filename) {
     return(EBImage::readImage(filename)@.Data)

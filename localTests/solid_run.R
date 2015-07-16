@@ -31,25 +31,28 @@ phase <- images$xy2$phase
 
 ### Trying to replicate the "auto tone" function in 
 ### Photoshop CS6
-
-# PS Level adjustments           #   closest quantile
-# phase[[1]]   0.3529 - 0.4980   #   50% - 2 * 25%
-# phase[[2]]   0.4275 - 0.5647   #   20% - 2 * 
-# phase[[4]]   0.4627 - 0.5765
-# phase[[10]]  0.4667 - 0.5882
 equalizeImage <- function(im) {
-  im <- im - median(im)
-#   im <- im - quantile(im, probs=seq(0,1,0.1))[[6]]
-#   im <- im / max(im)
-#   im[im<0] <- 0
-#   im <- im / ( 7 * quantile(im)[[4]] )
-#   return(im)
-#   test <- test / (quantile(test)[[4]]^0.5)
+  
+  # Make histogram of values
+  valueHist <- hist(im, breaks=40)
+  # Which index of histogram is highest
+  index <- which.max(valueHist$counts) - 1
+  # What value corresponds to that
+  minVal <- valueHist$breaks[index]
+  # Shift and stretch the image so the new minimum is this 
+  # minVal and the max is 1
+  im <- im - minVal
+  im[im < 0] <- NA
+  im <- im / max(im, na.rm=TRUE)
+  # Make another histogram
+  valueHist <- hist(im, breaks=40)
+  index <- which(valueHist$counts/max(valueHist$counts) < 0.1 & c(FALSE,diff(valueHist$counts) < 0))[[1]]
+  medianVal <- valueHist$breaks[index]
+  # medianVal <- valueHist$breaks[which.min(diff(valueHist$counts)) + 1]
+  im <- im / (medianVal * 2)
+  im[im > 1] <- 1
+  return(im)
+  
 }
 
-im <- phase[[2]]
-im <- im - median(im)
-im[im < 0] <- NA
-im <- im / max(im, na.rm=TRUE)
-im <- im / (quantile(im, probs=seq(0,1,0.05), na.rm=TRUE)[[19]] * 2)
-
+test <- lapply(phase, equalizeImage)
