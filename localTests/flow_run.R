@@ -17,12 +17,12 @@ if (FALSE) {
 
 
 # Configure which dyes to use,
-params$xy <- c("xy01","xy02","xy03","xy04","xy05","xy06","xy07","xy08","xy09")             # Single section to look at
+params$xy <- c("xy01","xy02")             # Single section to look at
 params$channels <- c("c1")         # One or more channels to look at, c1 required
 params$channelNames <- c("phase")    # Names of channels, 'phase' is required
 
 # How many frames to load
-params$nFrames <- 3
+params$nFrames <- 10
 
 # What file extension to read
 params$extension <- "tif"
@@ -50,6 +50,7 @@ images <- solid_loadImages(params$inputDir, params$xy, params$channels,
 backgrounds <- solid_loadImages(params$backgroundDir, params$xy, params$channels,
                                 params$channelNames, params$extension)
 
+
 ### Merge backgrounds into images list
 for (xy in names(images)) {
   for (dye in names(images[[xy]])) {
@@ -61,9 +62,36 @@ rm(backgrounds)
 
 
 
+# for output, handle each xy region at a time
+### If we need to merge the xy output, make this a function and use lapply
+for (xy in images) {
+  
+  xy <- lapply(xy, function(dye) lapply(dye, flow_equalizeImages, params$phaseMedian))
+  test <- flow_rotateImages(xy)
+  
+  
+}
 
 
-# Normalize Images
+
+
+
+
+
+
+
+
+
+
+
+### Equalize Images
+
+test <- lapply(images, )
+
+
+
+
+ # Normalize Images
 phase <- lapply(phase, normalizeImages, params$phaseMedian)
 dyes <- lapply(dyes, function(x) lapply(x, normalizeImages, params$dyeMedian))
 
