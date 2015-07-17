@@ -4,8 +4,7 @@ params <- list()
 
 ## WORK COMPUTER
 if (FALSE) {
-  params$inputDir <- "~/Desktop/TBData/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course/"
-  params$backgroundDir <- "~/Desktop/TBData/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background/"
+  params$inputDir <- "~/Desktop/TBData/xy6/"
   params$outputDir <- "~/Desktop/output/"
 }
 
@@ -16,13 +15,14 @@ if (FALSE) {
 }
 
 
+
 # Configure which dyes to use,
-params$xy <- c("xy01","xy02","xy03","xy04","xy05","xy06","xy07","xy08","xy09")             # Single section to look at
-params$channels <- c("c1")         # One or more channels to look at, c1 required
-params$channelNames <- c("phase")    # Names of channels, 'phase' is required
+params$phaseChannel <- "c1"
+params$dyeChannels <- c("c2","c3")
+params$channelNames <- c("green","red")
 
 # How many frames to load
-params$nFrames <- 3
+params$nFrames <- 7
 
 # What file extension to read
 params$extension <- "tif"
@@ -30,6 +30,9 @@ params$extension <- "tif"
 # How to scale phase and dye
 params$phaseMedian <- 0.4
 params$dyeMedian <- 0.02
+
+# Transformation parameters
+params$rotate <- -1
 
 params$alignmentTargets <- list(c(728,301), c(909,118), c(548,110))
 params$targetWidth <- 25
@@ -44,24 +47,19 @@ params$searchSpace <- 25
 ### TODO Ask Kyle about filenaming
 ### TODO the file loading sequence will change, my example
 ### file structure isn't in the final form
-images <- solid_loadImages(params$inputDir, params$xy, params$channels,
-                           params$channelNames, params$extension, n=params$nFrames)
+phase <- flow_loadImages(paste0(params$inputDir,"phase"), n=params$nFrames, ext=params$extension)[[1]]
 
-backgrounds <- solid_loadImages(params$backgroundDir, params$xy, params$channels,
-                                params$channelNames, params$extension)
-
-### Merge backgrounds into images list
-for (xy in names(images)) {
-  for (dye in names(images[[xy]])) {
-    print(dye)
-    images[[xy]][[dye]] <- c(backgrounds[[xy]][[dye]], images[[xy]][[dye]]) 
+dyes <- list()
+if (length(params$dyeChannels) > 0) {
+  
+  for (i in 1:length(params$channelNames)) {
+    channel <- params$channelNames[[i]]
+    dyes[[channel]] <- flow_loadImages(paste0(params$inputDir,channel), 
+                                       n=params$nFrames, 
+                                       ext=params$extension)[[1]]
   }
+  
 }
-rm(backgrounds)
-
-
-
-
 
 # Normalize Images
 phase <- lapply(phase, normalizeImages, params$phaseMedian)

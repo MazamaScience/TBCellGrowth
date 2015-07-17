@@ -36,7 +36,9 @@ solid_loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phas
   for (xyn in xy) {
     images[[xyn]] <- list()
     for (channel in channels) {
-      images[[xyn]][[channel]] <- lapply(times, function(t) readf(paste0(dataDir,"/",t,"/",xy,channel,".",ext)))
+      for (time in times) {
+        images[[xyn]][[channel]][[time]] <- readf(paste0(dataDir,"/",time,"/",xyn,channel,".",ext))
+      }
     }
     names(images[[xyn]]) <- channelNames
   }
