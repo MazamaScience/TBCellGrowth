@@ -1,7 +1,6 @@
 #' @export
 #' @title Align A Series of Flow Images
-#' @param phase a list of phase images
-#' @param dyes a list of lists dye images of equal length to phase
+#' @param images a list of lists of images with channel names as keys.
 #' @param alignmentTargets a list of x y coordinates to use for alignment
 #' comparisons
 #' @param targetWidth the radius of alignment targets
@@ -14,21 +13,21 @@
 #' @return a \code{list} of two lists, \code{phase} and \code{dyes},
 #' which will be the same lengths as the input.
 
-flow_alignImages <- function(phase, dyes, alignmentTargets, targetWidth=25, 
+flow_alignImages <- function(images, alignmentTargets, targetWidth=25, 
                                searchSpace=25) {
  
   
   # Sample the background image with alignment targets
-  bgSamples <- lapply(alignmentTargets, function(x) phase[[1]][(x[[1]]-targetWidth):(x[[1]]+targetWidth),
+  bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[[1]]-targetWidth):(x[[1]]+targetWidth),
                                                   (x[[2]]-targetWidth):(x[[2]]+targetWidth)])
   
   # Vectors detailing how much to shift images
-  offset.x <- numeric(length(phase))
-  offset.y <- numeric(length(phase))  
+  offset.x <- numeric(length(images$phase))
+  offset.y <- numeric(length(images$phase))  
 
-  for (i in 2:length(phase)) {
+  for (i in 2:length(images$phase)) {
     
-    image <- phase[[i]]
+    image <- images$phase[[i]]
     
     phaseSamples <- lapply(alignmentTargets, function(x) image[(x[[1]]-targetWidth-searchSpace):(x[[1]]+targetWidth+searchSpace),
                                                        (x[[2]]-targetWidth-searchSpace):(x[[2]]+targetWidth+searchSpace)])
@@ -63,20 +62,16 @@ flow_alignImages <- function(phase, dyes, alignmentTargets, targetWidth=25,
   cropY <- max(abs(offset.y)) + 1
   cropX <- max(abs(offset.x)) + 1
   
-  dimx <- dim(phase[[1]])[[1]]
-  dimy <- dim(phase[[1]])[[2]]
+  dimx <- dim(images$phase[[1]])[[1]]
+  dimy <- dim(images$phase[[1]])[[2]]
   
-  for (i in 1:length(phase)) {
+  for (ii in 1:length(images)) {
     
-    im <- phase[[i]]
-    
-    phase[[i]] <- im[(cropX + offset.x[[i]]):(dimx - cropX + offset.x[[i]]),
-                     (cropY + offset.y[[i]]):(dimy - cropY + offset.y[[i]])]
-    
-    for (dye in names(dyes)) {
-      im <- dyes[[dye]][[i]]
-      dyes[[dye]][[i]] <- im[(cropX + offset.x[[i]]):(dimx - cropX + offset.x[[i]]),
-                             (cropY + offset.y[[i]]):(dimy - cropY + offset.y[[i]])]
+    for (jj in 1:length(images[[ii]])) {
+      print(jj)
+      im <- images[[ii]][[jj]]
+      images[[ii]][[jj]] <- im[(cropX + offset.x[jj]):(dimx - cropX + offset.x[jj]),
+                             (cropY + offset.y[jj]):(dimy - cropY + offset.y[jj])]
     }
     
   }

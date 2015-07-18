@@ -11,7 +11,8 @@ if (FALSE) {
 
 ## LAPTOP
 if (FALSE) {
-  params$inputDir <- "~/Desktop/tbTest/xy6/"
+  params$inputDir <- "/Volumes/MazamaDataMobile/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course/"
+  params$backgroundDir <- "/Volumes/MazamaDataMobile/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background/"
   params$outputDir <- "~/Desktop/output/"
 }
 
@@ -31,7 +32,7 @@ params$extension <- "tif"
 params$phaseMedian <- 0.4
 params$dyeMedian <- 0.02
 
-params$alignmentTargets <- list(c(728,301), c(909,118), c(548,110))
+params$alignmentTargets <- list(c(526,480), c(659,944), c(3130,2130))
 params$targetWidth <- 25
 params$searchSpace <- 25
 
@@ -52,13 +53,15 @@ backgrounds <- solid_loadImages(params$backgroundDir, params$xy, params$channels
 
 
 ### Merge backgrounds into images list
+
 for (xy in names(images)) {
   for (dye in names(images[[xy]])) {
-    print(dye)
     images[[xy]][[dye]] <- c(backgrounds[[xy]][[dye]], images[[xy]][[dye]]) 
   }
 }
 rm(backgrounds)
+rm(dye)
+rm(xy)
 
 
 
@@ -67,7 +70,13 @@ rm(backgrounds)
 for (xy in images) {
   
   xy <- lapply(xy, function(dye) lapply(dye, flow_equalizeImages, params$phaseMedian))
-  test <- flow_rotateImages(xy)
+  xy <- flow_rotateImages(xy)
+  xy <- flow_alignImages(xy, 
+                         alignmentTargets=params$alignmentTargets, 
+                         targetWidth=params$targetWidth, 
+                         searchSpace=params$searchSpace)
+  
+  artifactMask <- flow_createArtifactMask(xy$phase[[1]], TRUE)
   
   
 }
