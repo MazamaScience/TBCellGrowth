@@ -25,21 +25,16 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
   
   dir.create(paste0(outputDir, "/fullFrame"))
   
+  # Add overlays to phase
   full_phase <- mapply(overlayColor, "phase", phase[-1], phase.labeled[-1], SIMPLIFY=FALSE)
-  dir.create(paste0(outputDir, "/fullFrame/phase"))
-  for (i in 1:length(full_phase)) {
-    EBImage::writeImage(full_phase[[i]], file=paste0(outputDir, "/fullFrame/phase/", filenames[[i]], ".jpg"))
-  }
+  # Create all phase
+  writeImages(full_phase, outputDir, "fullFrame", "phase", filenames)
   
-  makeGif(paste0(outputDir,"/fullFrame/phase/"), "series.gif")
   
   for (dye in names(dyes.labeled)) {
     dir.create(paste0(outputDir, "/fullFrame/", dye))
     full_dye <- mapply(overlayColor, dye, phase[-1], dyes.labeled[[dye]][-1], full_phase, SIMPLIFY=FALSE)
-    for (i in 1:length(full_dye)) {
-      EBImage::writeImage(full_dye[[i]], file=paste0(outputDir, "/fullFrame/", dye, "/", filenames[[i]], ".jpg"))
-    }
-    makeGif(paste0(outputDir,"/fullFrame/",dye,"/"), "series.gif")
+    writeImages(full_dye, outputDir, "fullFrame", dye, filenames)
     remove(full_dye)
   }
   
@@ -58,7 +53,6 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
     for (i in 1:length(full_dye)) {
       EBImage::writeImage(full_dye[[i]], file=paste0(outputDir, "/fullFrame/all/", filenames[[i]], ".jpg"))
     }
-    makeGif(paste0(outputDir,"/fullFrame/all/"), "series.gif")
     
   }
   
@@ -102,7 +96,6 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
       EBImage::writeImage(colored_phase[[i]], file=paste0(outputDir, "/", id, "/phase/", filenames[[i]], ".jpg"))
     }
     
-    makeGif(paste0(outputDir,"/",id,"/phase/"), "series.gif")
     
     ####################################################
     ############## SINGLE DYE + PHASE
@@ -120,7 +113,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
         EBImage::writeImage(colored_dye[[i]], file=paste0(outputDir, "/", id, "/", dye, "/", filenames[[i]], ".jpg"))
       }
       
-      makeGif(paste0(outputDir,"/",id,"/",dye,"/"), "series.gif")
+    
       
     }
 
@@ -144,7 +137,7 @@ buildDirectoryStructure <- function(output, phase, phase.labeled,
         EBImage::writeImage(mergeWith[[i]], file=paste0(outputDir, "/", id, "/all/", filenames[[i]], ".jpg"))
       }
       
-      makeGif(paste0(outputDir,"/",id,"/all/"), "series.gif")
+    
     }
     
   }
@@ -207,8 +200,12 @@ writeExcel <- function(df, outputBase, color, filenames) {
   
 }
 
-# Create a gif in a directory from all of the images in that directory
-makeGif <- function(dir, filename, ext="jpg", delay=15, rescale=80) {
-  system(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' ', dir, '*.', ext, " ", dir, filename))
-}
 
+
+writeImages <- function(images, outputDir, id, channel, filenames, ) {
+  dir.create(paste0(outputDir, "/", id, "/", channel))
+  for (1 in 1:length(images)) {
+    file <- paste0(outputDir, "/", id, "/", channel, "/", filenames[[i]], ".jpg")
+    EBImage::writeImage(imagges[[i]], file=file)
+  }
+}
