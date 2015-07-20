@@ -8,7 +8,7 @@
 #' @return An image \code{matrix} of size equal to the input image
 #' 
 
-removeBlobs <- function(image, size) {
+removeBlobs <- function(image, minSize=0, maxSize=Inf) {
   # Label blobs
   image <- EBImage::bwlabel(image)
   # Save dimensions
@@ -16,9 +16,11 @@ removeBlobs <- function(image, size) {
   # Unravel matrix and count the occurances of each label
   sorted <- sort(table(as.numeric(image)))
   # Labels which are under the threshold
-  small <- as.numeric(names(sorted[sorted<size]))
+  small <- as.numeric(names(sorted[sorted<minSize]))
+  large <- as.numeric(names(sorted[sorted>maxSize]))
   # Remove pixels that fall into undersized labels
   image[image %in% small] <- 0
+  image[image %in% large] <- 0
   # Turn back into matrix
   image <- matrix(image, nrow=dims[[1]], ncol=dims[[2]])
   return(image)

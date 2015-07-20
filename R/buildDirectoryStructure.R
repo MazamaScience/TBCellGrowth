@@ -202,9 +202,9 @@ writeExcel <- function(df, outputBase, color, filenames) {
 
 
 
-writeImages <- function(images, outputDir, id, channel, filenames, ) {
+writeImages <- function(images, outputDir, id, channel, filenames) {
   dir.create(paste0(outputDir, "/", id, "/", channel))
-  for (1 in 1:length(images)) {
+  for (i in 1:length(images)) {
     file <- paste0(outputDir, "/", id, "/", channel, "/", filenames[[i]], ".jpg")
     EBImage::writeImage(imagges[[i]], file=file)
   }

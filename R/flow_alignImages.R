@@ -13,17 +13,35 @@
 #' @return a \code{list} of two lists, \code{phase} and \code{dyes},
 #' which will be the same lengths as the input.
 
-flow_alignImages <- function(images, alignmentTargets, targetWidth=25, 
-                               searchSpace=25) {
- 
+flow_alignImages <- function(images, alignmentTargets, targetWidth=30, 
+                               searchSpace=30) {
+  
+  print("Finding alignment targets...")
+  
+  # First find some aligment targets
+  edges <- sobelFilter(images$phase[[1]])
+  edges <- edges > 0.5
+  edges <- EBImage::dilateGreyScale(edges, EBImage::makeBrush(7, 'disc'))
+  edges <- EBImage::fillHull(edges)
+  edges <- removeBlobs(edges, 500, 1000)
+  edges <- EBImage::bwlabel(edges)
+  
+  # Pick seven random features to track
+  alignmentTargets <- sample(1:max(edges), 7, replace=TRUE)
+  
+  # Find centroids of alignment targets
+  alignmentTargets <- lapply(alignmentTargets, function(x) data.frame(which(edges==x, arr.ind=TRUE)))
+  alignmentTargets <- lapply(alignmentTargets, function(x) round(c(mean(x$row), mean(x$col))))
   
   # Sample the background image with alignment targets
-  bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[[1]]-targetWidth):(x[[1]]+targetWidth),
-                                                  (x[[2]]-targetWidth):(x[[2]]+targetWidth)])
+  bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth):(x[1]+targetWidth),
+                                                  (x[2]-targetWidth):(x[2]+targetWidth)])
   
   # Vectors detailing how much to shift images
   offset.x <- numeric(length(images$phase))
   offset.y <- numeric(length(images$phase))  
+  
+  print("Finding alignment offsets...")
 
   for (i in 2:length(images$phase)) {
     
@@ -64,6 +82,8 @@ flow_alignImages <- function(images, alignmentTargets, targetWidth=25,
   
   dimx <- dim(images$phase[[1]])[[1]]
   dimy <- dim(images$phase[[1]])[[2]]
+  
+  print("Aligning and cropping images...")
   
   for (ii in 1:length(images)) {
     

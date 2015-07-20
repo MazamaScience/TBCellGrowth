@@ -53,7 +53,6 @@ backgrounds <- solid_loadImages(params$backgroundDir, params$xy, params$channels
 
 
 ### Merge backgrounds into images list
-
 for (xy in names(images)) {
   for (dye in names(images[[xy]])) {
     images[[xy]][[dye]] <- c(backgrounds[[xy]][[dye]], images[[xy]][[dye]]) 
