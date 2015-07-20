@@ -32,9 +32,11 @@ params$extension <- "tif"
 params$phaseMedian <- 0.4
 params$dyeMedian <- 0.02
 
-params$alignmentTargets <- list(c(526,480), c(659,944), c(3130,2130))
-params$targetWidth <- 25
-params$searchSpace <- 25
+params$targetWidth <- 30
+params$searchSpace <- 30
+
+# Which regions to ignore for various reasons
+params$ignoreSections <- list(xy01=c("topRight","bottomLeft"))
 
 
 
@@ -70,13 +72,14 @@ for (xy in images) {
   
   xy <- lapply(xy, function(dye) lapply(dye, flow_equalizeImages, params$phaseMedian))
   xy <- flow_rotateImages(xy)
-  xy <- flow_alignImages(xy, 
-                         alignmentTargets=params$alignmentTargets, 
+  xy <- flow_alignImages(xy,
                          targetWidth=params$targetWidth, 
                          searchSpace=params$searchSpace)
   
   artifactMask <- flow_createArtifactMask(xy$phase[[1]], TRUE)
   
+  xy.labeled <- list()
+  xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask)
   
 }
 

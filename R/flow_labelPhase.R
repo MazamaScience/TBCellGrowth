@@ -7,41 +7,57 @@
 
 flow_labelPhase <- function(image, artifactMask) {
   
+  ptm <- proc.time()
+  print("Searching new image...")
+  
   # Use edge detection filter
   imageEdit <- sobelFilter(image)
   
+  imageEdit <- imageEdit > 0.5
+  
+  imageEdit <- closingGreyScale(imageEdit, EBImage::makeBrush(9))
+  
+  imageEdit <- EBImage::fillHull(imageEdit)
+  
+  imageEdit[artifactMask] <- 0
+  
+#   imageEdit <- erodeGreyScale(imageEdit, EBImage::makeBrush(3))
+  
+#   imageEdit[EBImage::dilateGreyScale(artifactMask, EBImage::makeBrush(3)) > 0] <- 0
+  
   # Apply weak threshold
   imageEdit[image > 0.5] <- 0
-  
-  # Apply artifact mask
-  imageEdit[artifactMask] <- 0
   
   # Dilate to gather groups
   imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(7, 'disc'))
   
   # Remove soft edges
-  imageEdit <- imageEdit > 0.8
+#   imageEdit <- imageEdit > 0.8
   
   # Remove small groups (usually artifacts)
-  imageEdit <- removeBlobs(imageEdit, 75)
+  imageEdit <- removeBlobs(imageEdit, 100)
   
   # Apply medium threshold
-  imageEdit[image > 0.5] <- 0
+  imageEdit[image > 0.4] <- 0
   
   # Smaller dilate
   imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(5, 'disc'))
   
   # Remove small groups
   imageEdit <- removeBlobs(imageEdit, 75)
-  
-  # Fill holes
-  imageEdit <- EBImage::fillHull(imageEdit)
-  
+#   
+#   # Fill holes
+#   imageEdit <- EBImage::fillHull(imageEdit)
+#   
   # Label groups
   imageEdit <- EBImage::bwlabel(imageEdit)
   
   # Final strong threshold
   imageEdit[image > 0.35] <- 0
+
+  imageEdit <- removeBlobs(imageEdit, 25)
+  
+  print(proc.time() - ptm)
   
   return(imageEdit)
   
@@ -61,7 +77,7 @@ flow_labelPhase <- function(image, artifactMask) {
   ptm <- proc.time()
   
   # Calculate homogeneity
-  homog <- glcm::glcm(image, n_grey=25, window=c(3,3), statistics=c("homogeneity"))[,,1]
+  homog <- glcm::glcm(image, n_grey=25, window=c(3,3))
   
   # This essentially finds edges
   homog <- (1-homog)^3

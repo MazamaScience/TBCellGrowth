@@ -11,9 +11,10 @@
 
 overlayOutlines <- function(image, mask, color="red") {
   # paintObjects needs a logical matrix, so convert if need be
-  if (typeof(image) == "double") image <- image > 0
+  if (typeof(mask) == "double") mask <- mask > 0
+  image[image > 1] <- 1
   # Convert image to an EBImage Image object and set chanel to color
   im = EBImage::channel(EBImage::Image(image), 'rgb')
   # Paint outlines
-  return(EBImage::paintObjects(mask, im, thick=TRUE, color))
+  return(EBImage::paintObjects(mask, im, thick=TRUE, col=color))
 }

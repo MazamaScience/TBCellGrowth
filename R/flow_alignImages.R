@@ -1,8 +1,7 @@
 #' @export
 #' @title Align A Series of Flow Images
 #' @param images a list of lists of images with channel names as keys.
-#' @param alignmentTargets a list of x y coordinates to use for alignment
-#' comparisons
+#' @param numTargets how many target features to compare
 #' @param targetWidth the radius of alignment targets
 #' @param searchSpace how far to search for best alignment. A smaller
 #' value here yeilds faster searches.
@@ -13,8 +12,7 @@
 #' @return a \code{list} of two lists, \code{phase} and \code{dyes},
 #' which will be the same lengths as the input.
 
-flow_alignImages <- function(images, alignmentTargets, targetWidth=30, 
-                               searchSpace=30) {
+flow_alignImages <- function(images, numTargets, targetWidth=30, searchSpace=30) {
   
   print("Finding alignment targets...")
   
@@ -33,7 +31,7 @@ flow_alignImages <- function(images, alignmentTargets, targetWidth=30,
   edges <- EBImage::bwlabel(edges)
   
   # Pick seven random features to track
-  alignmentTargets <- sample(1:max(edges), 7, replace=TRUE)
+  alignmentTargets <- sample(1:max(edges), numTargets, replace=TRUE)
   
   # Find centroids of alignment targets
   alignmentTargets <- lapply(alignmentTargets, function(x) data.frame(which(edges==x, arr.ind=TRUE)))
@@ -100,7 +98,6 @@ flow_alignImages <- function(images, alignmentTargets, targetWidth=30,
   for (ii in 1:length(images)) {
     
     for (jj in 1:length(images[[ii]])) {
-      print(jj)
       im <- images[[ii]][[jj]]
       images[[ii]][[jj]] <- im[(cropX + offset.x[jj]):(dimx - cropX + offset.x[jj]),
                              (cropY + offset.y[jj]):(dimy - cropY + offset.y[jj])]
@@ -108,7 +105,7 @@ flow_alignImages <- function(images, alignmentTargets, targetWidth=30,
     
   }
   
-  return(list(phase=phase, dyes=dyes))
+  return(images)
   
 }
 
