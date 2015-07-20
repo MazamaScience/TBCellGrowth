@@ -18,6 +18,12 @@ flow_alignImages <- function(images, alignmentTargets, targetWidth=30,
   
   print("Finding alignment targets...")
   
+  # Is the xy pair in the given bounds?
+  isInBounds <- function(bounds, xy) {
+    if (is.null(xy) | length(xy) < 1) return(FALSE)
+    return((xy[1] > 0) & (xy[1] < bounds[[1]]) & (xy[2] > 0) & (xy[2] < bounds[[2]]))
+  }
+  
   # First find some aligment targets
   edges <- sobelFilter(images$phase[[1]])
   edges <- edges > 0.5
@@ -32,6 +38,12 @@ flow_alignImages <- function(images, alignmentTargets, targetWidth=30,
   # Find centroids of alignment targets
   alignmentTargets <- lapply(alignmentTargets, function(x) data.frame(which(edges==x, arr.ind=TRUE)))
   alignmentTargets <- lapply(alignmentTargets, function(x) round(c(mean(x$row), mean(x$col))))
+  
+  # Remove targets whose search space falls out of bounds
+  alignmentTargets <- 
+    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x-(targetWidth + searchSpace)))))]
+  alignmentTargets <- 
+    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x+(targetWidth + searchSpace)))))]
   
   # Sample the background image with alignment targets
   bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth):(x[1]+targetWidth),
