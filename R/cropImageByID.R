@@ -32,10 +32,10 @@ cropImageByID <- function(id, output, bg, label) {
   cId <- lapply(centroids, function(x) x[x$id == id,])
   
   # Find the mean center of this blob
-  x1 <- min(unlist(lapply(cId, function(x) x$x))))
-  x2 <- max(unlist(lapply(cId, function(x) x$x))))
-  y1 <- min(unlist(lapply(cId, function(x) x$y))))
-  y2 <- max(unlist(lapply(cId, function(x) x$y))))
+  x1 <- min(unlist(lapply(cId, function(x) x$x)))
+  x2 <- max(unlist(lapply(cId, function(x) x$x)))
+  y1 <- min(unlist(lapply(cId, function(x) x$y)))
+  y2 <- max(unlist(lapply(cId, function(x) x$y)))
   
   bgRet <- vector("list",length(bg)-1)
   labelRet <- vector("list",length(bg)-1)

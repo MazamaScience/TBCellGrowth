@@ -1,8 +1,6 @@
 #' @export
 #' @title Searches an image for dark cell colonies and incrementally labels each colony.
 #' @param images a sequence of labeled images. See \link{flow_labelPhase}.
-#' @param ignore a vector of row numbers to ignore. Blobs which have centroids
-#' in this range are removed.
 #' @param minTimespan remove blobs from output which aren't found in at least
 #' n sequential images.
 #' @param maxDistance the cutoff for distance between two blobs
