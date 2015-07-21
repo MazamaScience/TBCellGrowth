@@ -15,9 +15,6 @@ generateBlobTimeseries <- function(images, ignore=c(), minTimespan=5, maxDistanc
   
   # Get centroids for first frame (assuming empty background frame is in images[[1]])
   centroidsBefore <- getCentroids(images[[2]])
-
-  # Remove ignored indices
-  centroidsBefore <- removeIgnored(centroidsBefore, ignore)
   
   # Initialize return timeseries output
   output <- data.frame(t(data.frame(centroidsBefore$size,row.names=centroidsBefore$id)))
@@ -35,9 +32,6 @@ generateBlobTimeseries <- function(images, ignore=c(), minTimespan=5, maxDistanc
     print(paste0("Processing frame ", i, " of ", length(images)))
     
     centroidsAfter <- getCentroids(images[[i]])
-    
-    # Remove ignored y indices
-    centroidsBefore <- removeIgnored(centroidsBefore, ignore)
     
     # Find groups that are determined to be the same between the two images
     groups <- findSimilarGroups(centroidsBefore,centroidsAfter,maxDistance)
@@ -200,11 +194,4 @@ updateCentroidIDs <- function(c1, g) {
   
   return(c1)
   
-}
-
-
-removeIgnored <- function(df, ignore) {
-  remove <- apply(ignore, 1, function(ig) (df$x > ig[[1]]) & (df$x < ig[[2]]) & (df$y > ig[[3]]) & (df$y < ig[[4]]))
-  remove <- apply(remove, 1, function(x) sum(x) < 1)
-  return(df[remove,])
 }

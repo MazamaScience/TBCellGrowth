@@ -25,7 +25,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   dir.create(paste0(outputDir, "/fullFrame"))
   
   # Add overlays to phase
-  full_phase <- mapply(overlayColor, "phase", phase[-1], phase.labeled[-1], SIMPLIFY=FALSE)
+  full_phase <- mapply(overlayColor, "phase", phase[-1], labeled$phase[-1], SIMPLIFY=FALSE)
   # Create all phase
   writeImages(full_phase, outputDir, "fullFrame", "phase", filenames)
   

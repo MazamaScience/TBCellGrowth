@@ -5,7 +5,7 @@
 #' @description Searches an image for dark cell colonies and incrementally labels each colony.
 #' @return A \code{matrix} of integer labeled blobs.
 
-flow_labelPhase <- function(image, artifactMask) {
+flow_labelPhase <- function(image, artifactMask, ignore) {
   
   ptm <- proc.time()
   print("Searching new image...")
@@ -31,6 +31,20 @@ flow_labelPhase <- function(image, artifactMask) {
   imageEdit <- dilateGreyScale(imageEdit, EBImage::makeBrush(5))
   
   imageEdit <- removeBlobs(imageEdit, 150)
+  
+  imageEdit <- EBImage::bwlabel(imageEdit)
+  
+  for (i in 1:max(imageEdit)) {
+    ind <- which(i == imageEdit, arr.ind=TRUE)
+    xx <- mean(ind[,1])
+    yy <- mean(ind[,2])
+    for (j in 1:dim(ignore)[1]) {
+      ig <- ignore[j,]
+      if(xx >= ig[[1]] & xx <= ig[[2]] & yy >= ig[[3]] & yy <= ig[[4]]) {
+        imageEdit[imageEdit == i] <- 0
+      }
+    }
+  }
   
   imageEdit <- EBImage::bwlabel(imageEdit)
   
