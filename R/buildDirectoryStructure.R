@@ -15,8 +15,7 @@
 #' @description write a lot more here TODO
 #' @return none
 
-buildDirectoryStructure <- function(output, phase, phase.labeled, 
-                                    dyes.labeled,  dyeOverlap, filenames, outputDir="output") {
+buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filenames, outputDir="output") {
   
   dir.create(outputDir)
   

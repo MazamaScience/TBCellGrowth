@@ -15,9 +15,11 @@ flow_findDarkLines <- function(image) {
   }
   
   # Dark areas
-  start <- c(which(diff(meanValue < 0.35) > 0), which(diff(meanValue > 0.9) > 0)) - 10
-  end <-   c(which(diff(meanValue < 0.35) < 0), which(diff(meanValue > 0.9) < 0)) + 20
-  dRange <- cbind(start, end)
+  y1 <- c(which(diff(meanValue < 0.35) > 0), which(diff(meanValue > 0.9) > 0)) - 10
+  y2 <-   c(which(diff(meanValue < 0.35) < 0), which(diff(meanValue > 0.9) < 0)) + 20
+  dRange <- cbind(1, dim(image)[2], cbind(y1,y2))
+  
+  colnames(dRange) <- c("x1", "x2", "y1", "y2")
   
 #   rows <- unlist(apply(dRange, 1, function(x) x[[1]]:x[[2]]))
   

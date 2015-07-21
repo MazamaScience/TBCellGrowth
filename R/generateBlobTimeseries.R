@@ -1,45 +1,45 @@
 #' @export
 #' @title Searches an image for dark cell colonies and incrementally labels each colony.
-#' @param frames a sequence of labeled frames. See \link{flow_labelPhase}.
+#' @param images a sequence of labeled images. See \link{flow_labelPhase}.
 #' @param ignore a vector of row numbers to ignore. Blobs which have centroids
 #' in this range are removed.
 #' @param minTimespan remove blobs from output which aren't found in at least
-#' n sequential frames.
+#' n sequential images.
 #' @param maxDistance the cutoff for distance between two blobs
 #' @return A \code{list} with elements \code{timeseries}, a dataframe of blob IDs 
 #' and blob sizes at each timestep (in pixels) and \code{centroids}, a \code{list}
-#' of dataframes with centroids, blob ID's and original integer labels for mapping
+#' of dataimages with centroids, blob ID's and original integer labels for mapping
 #' output column names back to the original images.
 
-generateBlobTimeseries <- function(frames, ignore=c(), minTimespan=5, maxDistance=20) {
+generateBlobTimeseries <- function(images, ignore=c(), minTimespan=5, maxDistance=20) {
   
-  # Get centroids for first frame (assuming empty background frame is in frames[[1]])
-  centroidsBefore <- getCentroids(frames[[2]])
+  # Get centroids for first frame (assuming empty background frame is in images[[1]])
+  centroidsBefore <- getCentroids(images[[2]])
 
   # Remove ignored indices
-  centroidsBefore <- centroidsBefore[!(round(centroidsBefore$y) %in% ignore),]
+  centroidsBefore <- removeIgnored(centroidsBefore, ignore)
   
   # Initialize return timeseries output
   output <- data.frame(t(data.frame(centroidsBefore$size,row.names=centroidsBefore$id)))
   
-  # Initialize list of centroid data.frames. We'll also be returning this so we can map
+  # Initialize list of centroid data.frame. We'll also be returning this so we can map
   # the timeseries back to the original images.
-  centroids <- vector("list", length(frames))
+  centroids <- vector("list", length(images))
   centroids[[2]] <- centroidsBefore
   
-  # Now track blobs between each pair of frames
-  for (i in 3:length(frames)) {
+  # Now track blobs between each pair of images
+  for (i in 3:length(images)) {
     
     # Record time
     ptm <- proc.time()
-    print(paste0("Processing frame ", i, " of ", length(frames)))
+    print(paste0("Processing frame ", i, " of ", length(images)))
     
-    centroidsAfter <- getCentroids(frames[[i]])
+    centroidsAfter <- getCentroids(images[[i]])
     
     # Remove ignored y indices
-    centroidsBefore <- centroidsBefore[!(round(centroidsBefore$y) %in% ignore),]
+    centroidsBefore <- removeIgnored(centroidsBefore, ignore)
     
-    # Find groups that are determined to be the same between the two frames
+    # Find groups that are determined to be the same between the two images
     groups <- findSimilarGroups(centroidsBefore,centroidsAfter,maxDistance)
     
     # For those continued group, give them the ID's from the previous frame
@@ -59,7 +59,7 @@ generateBlobTimeseries <- function(frames, ignore=c(), minTimespan=5, maxDistanc
   }
   
   # Apply minimum timespan, only saving groups that are identified for at least
-  # n frames
+  # n images
   output <- output[,apply(output, 2, function(x) sum(!is.na(x)) > minTimespan)]
   
   return(list(
@@ -115,7 +115,7 @@ getCentroids <- function(m) {
 
 
 
-# Find the best fit between two frames of centroids based on 
+# Find the best fit between two images of centroids based on 
 # distance and size. Returns a best guess of which blobs became which
 findSimilarGroups <- function(c1, c2, maxDistance) {
   
@@ -200,4 +200,11 @@ updateCentroidIDs <- function(c1, g) {
   
   return(c1)
   
+}
+
+
+removeIgnored <- function(df, ignore) {
+  remove <- apply(ignore, 1, function(ig) (df$x > ig[[1]]) & (df$x < ig[[2]]) & (df$y > ig[[3]]) & (df$y < ig[[4]]))
+  remove <- apply(remove, 1, function(x) sum(x) < 1)
+  return(df[remove,])
 }

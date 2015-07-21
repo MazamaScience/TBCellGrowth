@@ -85,14 +85,26 @@ for (xyName in names(images)) {
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask)
   
+  # Interpret ignore regions as pixels
   ignore <- flow_findIgnore(params$ignore[[xyName]], dim(xy$phase[[1]]))
-  
+  # Find dark line areas to ignore
   darkLines <- flow_findDarkLines(xy$phase[[1]])
+  # Combine these two into a final ignore list
+  ignore <- rbind(ignore, darkLines)
   
+  output <- generateBlobTimeseries(xy.labeled$phase, ignore=ignore)
   
-  # TEST
-  outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
-  lapply(outlines, display)  
+  buildDirectoryStructure(output, 
+                          xy$phase, 
+                          xy.labeled=list(),
+                          dyeOverlap=list(), 
+                          params$filenames,
+                          outputDir=params$outputDir)
+  
+
+#   # TEST
+#   outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
+#   lapply(outlines, display)  
 }
 
 
