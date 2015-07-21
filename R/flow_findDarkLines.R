@@ -19,8 +19,8 @@ flow_findDarkLines <- function(image) {
   end <-   c(which(diff(meanValue < 0.35) < 0), which(diff(meanValue > 0.9) < 0)) + 20
   dRange <- cbind(start, end)
   
-  rows <- unlist(apply(dRange, 1, function(x) x[[1]]:x[[2]]))
+#   rows <- unlist(apply(dRange, 1, function(x) x[[1]]:x[[2]]))
   
-  return(rows)
+  return(dRange)
   
 }

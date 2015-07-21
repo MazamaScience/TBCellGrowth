@@ -12,7 +12,7 @@
 #' @return a \code{list} of two lists, \code{phase} and \code{dyes},
 #' which will be the same lengths as the input.
 
-flow_alignImages <- function(images, numTargets, targetWidth=30, searchSpace=30) {
+flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=30) {
   
   print("Finding alignment targets...")
   
@@ -54,6 +54,8 @@ flow_alignImages <- function(images, numTargets, targetWidth=30, searchSpace=30)
   print("Finding alignment offsets...")
 
   for (i in 2:length(images$phase)) {
+    
+    cat(".")
     
     image <- images$phase[[i]]
     
@@ -98,6 +100,7 @@ flow_alignImages <- function(images, numTargets, targetWidth=30, searchSpace=30)
   for (ii in 1:length(images)) {
     
     for (jj in 1:length(images[[ii]])) {
+      cat(".")
       im <- images[[ii]][[jj]]
       images[[ii]][[jj]] <- im[(cropX + offset.x[jj]):(dimx - cropX + offset.x[jj]),
                              (cropY + offset.y[jj]):(dimy - cropY + offset.y[jj])]

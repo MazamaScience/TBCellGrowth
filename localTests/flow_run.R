@@ -32,6 +32,7 @@ params$extension <- "tif"
 params$phaseMedian <- 0.4
 params$dyeMedian <- 0.02
 
+params$numTargets <- 12
 params$targetWidth <- 30
 params$searchSpace <- 30
 
@@ -68,11 +69,14 @@ rm(xy)
 
 # for output, handle each xy region at a time
 ### If we need to merge the xy output, make this a function and use lapply
-for (xy in images) {
+for (xyName in names(images)) {
+  
+  xy <- images[[xyName]]
   
   xy <- lapply(xy, function(dye) lapply(dye, flow_equalizeImages, params$phaseMedian))
   xy <- flow_rotateImages(xy)
   xy <- flow_alignImages(xy,
+                         numTargets=params$numTargets,
                          targetWidth=params$targetWidth, 
                          searchSpace=params$searchSpace)
   
@@ -81,65 +85,14 @@ for (xy in images) {
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask)
   
+  ignore <- flow_findIgnore(params$ignore[[xyName]], dim(xy$phase[[1]]))
+  
+  darkLines <- flow_findDarkLines(xy$phase[[1]])
+  
+  
+  # TEST
+  outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
+  lapply(outlines, display)  
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-### Equalize Images
-
-test <- lapply(images, )
-
-
-
-
- # Normalize Images
-phase <- lapply(phase, normalizeImages, params$phaseMedian)
-dyes <- lapply(dyes, function(x) lapply(x, normalizeImages, params$dyeMedian))
-
-# Apply image rotation
-rotated <- flow_rotateImages(phase=phase, dyes=dyes)
-phase <- rotated$phase
-dyes <- rotated$dyes
-
-# Apply image transformations
-processed <- flow_alignImages(phase=phase, dyes=dyes, 
-                                alignmentTargets=params$alignmentTargets, 
-                                targetWidth=params$targetWidth, 
-                                searchSpace=params$searchSpace)
-
-# Pull out phase and dyes, then removed process to save memory
-phase <- processed$phase
-dyes <- processed$dyes
-rm(processed)
-
-# Because of all of the non biological artifacts, flow experiments
-# require an artifact mask.
-artifactMask <- flow_createArtifactMask(phase[[1]])
-
-# Label phase
-phase.labeled <- lapply(phase, flow_labelPhase, artifactMask)
-dyes.labeled <- lapply(dyes, function(x) mapply(flow_labelDye, x, phase.labeled, list(artifactMask), SIMPLIFY=FALSE))
-
-# Find dark lines
-darkLines <- flow_findDarkLines(phase[[1]])
-
-output <- generateBlobTimeseries(phase.labeled, ignore=darkLines)
-
-dyeOverlap <- lapply(dyes.labeled, findDyeOverlap, phase.labeled, output)
-
-## Filenames TODO how should this work
-params$filenames <- unlist(lapply(1:6, function(x) if (x < 10) paste0(0,x) else x))
-
-
-buildDirectoryStructure(output, phase, phase.labeled, dyes.labeled, dyeOverlap, params$filenames,
-                        outputDir=params$outputDir)

@@ -25,12 +25,12 @@ flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   labeled <- EBImage::bwlabel(edges)
 
   # Remove dark / bright lines
-  for (i in 1:max(labeled)) {
-    xRange <- diff(range(which(labeled==i, arr.ind=T)[,1]))
-    if (xRange > 300) edges[labeled==i] <- 0
-  }
-  
-  edges <- removeBlobs(edges, 300)
+#   for (i in 1:max(labeled)) {
+#     xRange <- diff(range(which(labeled==i, arr.ind=T)[,1]))
+#     if (xRange > 300) edges[labeled==i] <- 0
+#   }
+#   
+  edges <- removeBlobs(edges, 250)
   
   print(proc.time() - ptm)
   
