@@ -13,41 +13,34 @@ flow_labelPhase <- function(image, artifactMask, ignore) {
   print("Searching new image...")
   
   imageMask <- image
+  imageMask[imageMask > 1] <- 1
   
-  imageMask[artifactMask] <- quantile(image)[[4]]
+  imageMask[artifactMask > 0] <- quantile(image)[[4]]
   
   imageEdit <- sobelFilter(imageMask)
   
   imageEdit <- imageEdit > 0.5
   
-  imageEdit[imageMask > 0.5] <- 0
+  imageEdit[equalize(imageMask) > 0.5] <- 0
   
-  imageEdit <- closingGreyScale(imageEdit, EBImage::makeBrush(9))
+  imageEdit <- closingGreyScale(imageEdit, EBImage::makeBrush(7))
   
   imageEdit <- EBImage::fillHull(imageEdit)
   
-  imageEdit <- dilateGreyScale(imageEdit, EBImage::makeBrush(7))
-  
-  imageEdit[imageMask > 0.4] <- 0
-  
   imageEdit <- dilateGreyScale(imageEdit, EBImage::makeBrush(5))
   
-  imageEdit <- removeBlobs(imageEdit, 150)
+  imageEdit[equalize(imageMask) > 0.4] <- 0
+  
+#   imageEdit <- dilateGreyScale(imageEdit, EBImage::makeBrush(5))
+  
+  imageEdit <- removeBlobs(imageEdit, 50)
   
   imageEdit <- EBImage::bwlabel(imageEdit)
   
-  for (i in 1:max(imageEdit)) {
-    ind <- which(i == imageEdit, arr.ind=TRUE)
-    xx <- mean(ind[,1])
-    yy <- mean(ind[,2])
-    for (j in 1:dim(ignore)[1]) {
-      ig <- ignore[j,]
-      if(xx >= ig[[1]] & xx <= ig[[2]] & yy >= ig[[3]] & yy <= ig[[4]]) {
-        imageEdit[imageEdit == i] <- 0
-      }
-    }
-  }
-  
+  centroids <- getCentroids(imageEdit)
+  toRemove <- removeIgnored(centroids, ignore)
+  imageEdit[!(imageEdit %in% toRemove)] <- 0
+
   imageEdit <- EBImage::bwlabel(imageEdit)
   
   imageEdit[imageMask > 0.35] <- 0
@@ -55,3 +48,10 @@ flow_labelPhase <- function(image, artifactMask, ignore) {
   return(imageEdit)
   
 }
+
+removeIgnored <- function(df, ignore) {
+  remove <- apply(ignore, 1, function(ig) (df$x > ig[[1]]) & (df$x < ig[[2]]) & (df$y > ig[[3]]) & (df$y < ig[[4]]))
+  remove <- apply(remove, 1, function(x) sum(x) < 1)
+  return(df[remove,]$index)
+} 
+

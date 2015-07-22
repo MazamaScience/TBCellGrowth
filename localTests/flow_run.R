@@ -18,7 +18,7 @@ if (FALSE) {
 
 
 # Configure which dyes to use,
-params$xy <- c("xy01","xy02")             # Single section to look at
+params$xy <- c("xy02")             # Single section to look at
 params$channels <- c("c1")         # One or more channels to look at, c1 required
 params$channelNames <- c("phase")    # Names of channels, 'phase' is required
 
@@ -37,7 +37,7 @@ params$targetWidth <- 30
 params$searchSpace <- 30
 
 # Which regions to ignore for various reasons
-params$ignoreSections <- list(xy01=c("topRight","bottomLeft"))
+params$ignoreSections <- list(xy02=c("topRight","topCenter","topLeft"))
 
 
 
