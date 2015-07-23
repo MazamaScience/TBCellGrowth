@@ -106,8 +106,8 @@ for (xyName in names(images)) {
   rownames(output$timeseries) <- filenames
   
   buildDirectoryStructure(output, 
-                          phase=xy$phase, 
-                          labeled=xy.labeled,
+                          phase=xy$phase[-1], 
+                          labeled=xy.labeled[-1],
                           dyeOverlap=list(), 
                           filenames=filenames,
                           outputDir=params$outputDir)

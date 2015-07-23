@@ -22,8 +22,9 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   excel$phase <- output$timeseries
   
   # Remove the background frames from images
-  phase <- phase[-1]
-  labeled <- lapply(labeled, function(x) x[-1])
+  # TODO can't assume there are background frames because of solid images
+#   phase <- phase[-1]
+#   labeled <- lapply(labeled, function(x) x[-1])
   
   
   

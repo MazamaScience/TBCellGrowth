@@ -47,17 +47,16 @@ cropImageByID <- function(id, output, bg, label) {
   bgRet <- vector("list",length(bg)-1)
   labelRet <- vector("list",length(bg)-1)
   
-  for (ii in 2:length(bg)) {
+  for (ii in 1:length(bg)) {
     
     # Crop the area
-    bgRet[[ii-1]] <- bg[[ii]][x1:x2,y1:y2]
+    bgRet[[ii]] <- bg[[ii]][x1:x2,y1:y2]
     
     # Get labeled subsection
     labelbg <- label[[ii]][x1:x2,y1:y2]
-    isIndex <- labelbg == cId[[ii-1]]$index
+    isIndex <- labelbg == cId[[ii]]$index
     if (length(isIndex) < 1)  isIndex <- labelbg < -1
-    labelRet[[ii-1]] <- isIndex
-    
+    labelRet[[ii]] <- isIndex
   
   }
     
