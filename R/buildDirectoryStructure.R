@@ -3,10 +3,8 @@
 #' @param output an output object with timeseries and centroids from
 #' \link{generateBlobTimeseries}
 #' @param phase a list of phase contrast image matrices
-#' @param phase.labeled a list of labeled phase images from
+#' @param labeled a list of labeled images from each channel
 #' \link{flow_labelPhase}
-#' @param dyes.labeled a list of labeled dye images from
-#' \link{flow_labelDye}
 #' @param dyeOverlap a \code{dataframe} of dye overlap values from
 #' \link{findDyeOverlap}
 #' @param filenames a vector of names equal to the length of the 
@@ -19,75 +17,56 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   
   dir.create(outputDir)
   
+  # Merge timeseries together
   excel <- lapply(dyeOverlap, function(x) x)
   excel$phase <- output$timeseries
   
+  # Remove the background frames from images
+  phase <- phase[-1]
+  labeled <- lapply(labeled, function(x) x[-1])
+  
+  
+  
+  #################################################################
+  #################################################################
+  
+  ### FULL FRAME ###
   dir.create(paste0(outputDir, "/fullFrame"))
   
   # Add overlays to phase
-  full_phase <- mapply(overlayColor, "phase", phase[-1], labeled$phase[-1], SIMPLIFY=FALSE)
-  # Create all phase
-  writeImages(full_phase, outputDir, "fullFrame", "phase", filenames)
+  # These overlays will also serve as a background to other channels
+  full_overlay <- mapply(overlayColor, "phase", phase, labeled$phase, SIMPLIFY=FALSE)
+  writeImages(phase_overlay, outputDir, "fullFrame", "phase", filenames)
   
-  
-  for (dye in names(dyes.labeled)) {
-    dir.create(paste0(outputDir, "/fullFrame/", dye))
-    full_dye <- mapply(overlayColor, dye, phase[-1], dyes.labeled[[dye]][-1], full_phase, SIMPLIFY=FALSE)
-    writeImages(full_dye, outputDir, "fullFrame", dye, filenames)
-    remove(full_dye)
+  # Write non phase channels
+  for (cName in names(labeled)[names(labeled) != "phase"]) {
+    channel <- labeled[[cName]]
+    overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
+    writeImages(overlay, outputDir, "fullFrame", cName, filenames)
   }
   
-  
-  
-  
-  # MULTIPLE dyes
-  if (length(names(dyeOverlap)) > 0) {
+  # All dyes combined of there are enough channels
+  if (length(names(labeled)) > 2) {  
     dir.create(paste0(outputDir, "/fullFrame/all"))
-    # This mergewith list is added to each iteration with new dyes
-    full_dye <- full_phase
-    for (dye in names(dyes.labeled)) {
-      dyes <- dyes.labeled[dye][[1]]
-      full_dye <- mapply(overlayColor, dye, phase[-1], dyes.labeled[[dye]][-1], full_dye, SIMPLIFY=FALSE)
+    for (cName in names(labeled)[names(labeled) != "phase"]) {
+      channel <- labeled[[cName]]
+      full_overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
     }
-    for (i in 1:length(full_dye)) {
-      EBImage::writeImage(full_dye[[i]], file=paste0(outputDir, "/fullFrame/all/", filenames[[i]], ".jpg"))
-    }
-    
+    writeImage(full_overlay, outputDir, "fullFrame", "all", filenames)
   }
   
-  
-  remove(full_phase)
+  rm(full_overlay)
   
   
   
   for (id in names(output$timeseries)) {
     
     ####################################################
-    ############## CREATE DIRECTORIES FOR EACH ID
-    ####################################################
-    
-    # Blob directory
-    dir.create(paste0(outputDir, "/", id))  
-    # Phase directory
-    dir.create(paste0(outputDir, "/", id, "/phase"))
-    # If there are dyes, make a directory for all colors
-    if (length(names(dyeOverlap)) > 0) {
-      dir.create(paste0(outputDir, "/", id, "/", "all"))
-    }
-    # Make a directory for each dye
-    for (dye in names(dyeOverlap)) {
-      dir.create(paste0(outputDir, "/", id, "/", dye))
-    }
-    
-    
-    
-    
-    ####################################################
     ############## ONLY PHASE
     ####################################################
     
     # Crop and color phase images
-    cropped_phase <- cropImageByID(id, output, phase, phase.labeled)
+    cropped_phase <- cropImageByID(id, output, phase, labeled$phase)
     colored_phase <- mapply(overlayColor, "phase", cropped_phase$bg, cropped_phase$label, SIMPLIFY=FALSE)
     
     # Write phase images to directory
@@ -205,6 +184,6 @@ writeImages <- function(images, outputDir, id, channel, filenames) {
   dir.create(paste0(outputDir, "/", id, "/", channel))
   for (i in 1:length(images)) {
     file <- paste0(outputDir, "/", id, "/", channel, "/", filenames[[i]], ".jpg")
-    EBImage::writeImage(imagges[[i]], file=file)
+    EBImage::writeImage(images[[i]], file=file)
   }
 }

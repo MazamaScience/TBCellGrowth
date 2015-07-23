@@ -10,7 +10,10 @@ getCentroids <- function(image) {
   # Initialize vectors
   x <- numeric(max(image))
   y <- numeric(max(image))
+  xmin <- numeric(max(image))
+  xmax <- numeric(max(image))
   ymin <- numeric(max(image))
+  ymax <- numeric(max(image))
   size <- numeric(max(image))
   id <- character(max(image))
   index <- numeric(max(image))
@@ -35,7 +38,10 @@ getCentroids <- function(image) {
     xx <- ind - (yy * dimx)
     x[[i]] <- round(mean(xx))
     y[[i]] <- round(mean(yy))
+    xmin[[i]] <- min(xx)
+    xmax[[i]] <- max(xx)
     ymin[[i]] <- min(yy)
+    ymax[[i]] <- max(yy)
     size[[i]] <- length(ind)
     id[[i]] <- generateID(x[[i]],y[[i]],size[[i]])
     index[[i]] <- i
@@ -45,7 +51,7 @@ getCentroids <- function(image) {
   
   
   # Create a dataframe
-  df <- data.frame(x=x,y=y,ymin=ymin,size=size,id=id,index=index)
+  df <- data.frame(x=x,y=y,xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax,size=size,id=id,index=index)
   
   # Remove blobs that are of size 0
   df <- df[size>0,]

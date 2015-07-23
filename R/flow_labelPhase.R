@@ -23,13 +23,13 @@ flow_labelPhase <- function(image, artifactMask, ignore) {
   
   imageEdit[EBImage::equalize(imageMask) > 0.5] <- 0
   
-  imageEdit <- closingGreyScale(imageEdit, EBImage::makeBrush(7))
+  imageEdit <- EBImage::closingGreyScale(imageEdit, EBImage::makeBrush(7))
+  
+  imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(5))
   
   imageEdit <- EBImage::fillHull(imageEdit)
   
-  imageEdit <- dilateGreyScale(imageEdit, EBImage::makeBrush(5))
-  
-  imageEdit[equalize(imageMask) > 0.4] <- 0
+  imageEdit[EBImage::equalize(imageMask) > 0.4] <- 0
   
 #   imageEdit <- dilateGreyScale(imageEdit, EBImage::makeBrush(5))
   

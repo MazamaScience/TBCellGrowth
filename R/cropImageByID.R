@@ -31,11 +31,18 @@ cropImageByID <- function(id, output, bg, label) {
   # Get centroid data just for this id
   cId <- lapply(centroids, function(x) x[x$id == id,])
   
-  # Find the mean center of this blob
-  x1 <- min(unlist(lapply(cId, function(x) x$x)))
-  x2 <- max(unlist(lapply(cId, function(x) x$x)))
-  y1 <- min(unlist(lapply(cId, function(x) x$y)))
-  y2 <- max(unlist(lapply(cId, function(x) x$y)))
+  # Find the boundaries of the blob
+  # Add a 15 pixel buffer
+  x1 <- min(unlist(lapply(cId, function(x) x$xmin))) - 15
+  x2 <- max(unlist(lapply(cId, function(x) x$xmax))) + 15
+  y1 <- min(unlist(lapply(cId, function(x) x$ymin))) - 15
+  y2 <- max(unlist(lapply(cId, function(x) x$ymax))) + 15
+  
+  # Make sure the images aren't out of bounds
+  x1 <- max(x1, 1)
+  x2 <- min(x2, dimx)
+  y1 <- max(y1, 1)
+  y2 <- min(y2, dimy)
   
   bgRet <- vector("list",length(bg)-1)
   labelRet <- vector("list",length(bg)-1)

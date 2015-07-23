@@ -23,21 +23,21 @@ params$channels <- c("c1")         # One or more channels to look at, c1 require
 params$channelNames <- c("phase")    # Names of channels, 'phase' is required
 
 # How many frames to load
-params$nFrames <- 20
+params$nFrames <- 5 # How many frames to load
 
 # What file extension to read
-params$extension <- "tif"
+params$extension <- "tif" # Image file extension
 
 # How to scale phase and dye
-params$phaseMedian <- 0.4
-params$dyeMedian <- 0.02
+params$phaseMedian <- 0.4 # What value phase images should be equalized to
+params$dyeMedian <- 0.02 # What value dye images should be equalized to
 
-params$numTargets <- 12
-params$targetWidth <- 30
-params$searchSpace <- 30
+params$numTargets <- 12 # How many target features to use for alignment
+params$targetWidth <- 30 # How large of a region the targets should be
+params$searchSpace <- 30 # How far left, top, right, down to search fo alignment
 
-params$startTime <- 0
-params$timestep <- 3
+params$startTime <- 0 # Time of first image
+params$timestep <- 3 # Timestep in hours
 
 # Which regions to ignore for various reasons
 params$ignoreSections <- list(xy02=c("topRight","topCenter","topLeft"))
@@ -95,14 +95,21 @@ for (xyName in names(images)) {
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask, ignore)
   
-
-  output <- generateBlobTimeseries(xy.labeled$phase)
+  output <- generateBlobTimeseries(xy.labeled$phase, minTimespan=2)
+  
+  # Generate filenames from timestamps
+  # Assuming hours < 1000
+  filenames <- params$startTime + ((0:(params$nFrames-1))*params$timestep)
+  filenames <- unlist(lapply(filenames, function(x) if(x<10) paste0("00",x) else if(x<100) paste0("0",x) else x))
+  
+  # Apply timesteps to row names of timeseries
+  rownames(output$timeseries) <- filenames
   
   buildDirectoryStructure(output, 
-                          xy$phase, 
-                          xy.labeled=list(),
+                          phase=xy$phase, 
+                          labeled=xy.labeled,
                           dyeOverlap=list(), 
-                          params$filenames,
+                          filenames=filenames,
                           outputDir=params$outputDir)
   
 
