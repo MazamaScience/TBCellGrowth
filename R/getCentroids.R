@@ -36,7 +36,7 @@ getCentroids <- function(image) {
     x[[i]] <- round(mean(xx))
     y[[i]] <- round(mean(yy))
     ymin[[i]] <- min(yy)
-    size[[i]] <- length(m1)
+    size[[i]] <- length(ind)
     id[[i]] <- generateID(x[[i]],y[[i]],size[[i]])
     index[[i]] <- i
     

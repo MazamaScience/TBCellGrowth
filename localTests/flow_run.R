@@ -23,7 +23,7 @@ params$channels <- c("c1")         # One or more channels to look at, c1 require
 params$channelNames <- c("phase")    # Names of channels, 'phase' is required
 
 # How many frames to load
-params$nFrames <- 10
+params$nFrames <- 20
 
 # What file extension to read
 params$extension <- "tif"
@@ -35,6 +35,9 @@ params$dyeMedian <- 0.02
 params$numTargets <- 12
 params$targetWidth <- 30
 params$searchSpace <- 30
+
+params$startTime <- 0
+params$timestep <- 3
 
 # Which regions to ignore for various reasons
 params$ignoreSections <- list(xy02=c("topRight","topCenter","topLeft"))
@@ -90,7 +93,7 @@ for (xyName in names(images)) {
   ignore <- rbind(ignore, darkLines)
   
   xy.labeled <- list()
-  xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask)
+  xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask, ignore)
   
 
   output <- generateBlobTimeseries(xy.labeled$phase)

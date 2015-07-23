@@ -21,7 +21,7 @@ flow_labelPhase <- function(image, artifactMask, ignore) {
   
   imageEdit <- imageEdit > 0.5
   
-  imageEdit[equalize(imageMask) > 0.5] <- 0
+  imageEdit[EBImage::equalize(imageMask) > 0.5] <- 0
   
   imageEdit <- closingGreyScale(imageEdit, EBImage::makeBrush(7))
   
@@ -43,7 +43,7 @@ flow_labelPhase <- function(image, artifactMask, ignore) {
 
   imageEdit <- EBImage::bwlabel(imageEdit)
   
-  imageEdit[equalize(imageMask) > 0.3] <- 0
+  imageEdit[EBImage::equalize(imageMask) > 0.3] <- 0
   
   return(imageEdit)
   

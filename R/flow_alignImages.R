@@ -76,7 +76,7 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
         # Find the total difference between samples
         diffs <- unlist(mapply(function(x,x1) sum(abs(x-x1)), bgSamples, phaseSubset, SIMPLIFY=FALSE))
         
-        sampleDiffs[ii,jj] <- min(diffs)
+        sampleDiffs[ii,jj] <- median(diffs)
         
       }
     }
