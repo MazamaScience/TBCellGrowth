@@ -3,13 +3,13 @@
 #' @param id the blob id to crop image around
 #' @param output an output object with timeseries and centroids from
 #' \link{generateBlobTimeseries}
-#' @param bg a phase image matrix
-#' @param label a binary image label
+#' @param phase a list of phase image matrices
+#' @param labeled a binary image label
 #' @description Given a blob ID string, crops an image around that id.
 #' @return a list with elements bg, the cropped background, and label, the cropped
 #' label
 
-cropImageByID <- function(id, output, bg, label) {
+cropImageByID <- function(id, output, phase, labeled) {
   
   # Extract timeseries and centroids for reference
   timeseries <- output$timeseries
@@ -18,12 +18,8 @@ cropImageByID <- function(id, output, bg, label) {
   # Ignore the first index here, it's empty (bg frame)
   centroids[[1]] <- NULL
   
-  dimx <- dim(bg[[1]])[[1]]
-  dimy <- dim(bg[[1]])[[2]]
-  
-  # The width and height of the cropped image
-  width <- 100
-  height <- 100
+  dimx <- dim(phase[[1]])[[1]]
+  dimy <- dim(phase[[1]])[[2]]
   
   # Get time series just for the id
   series <- timeseries[id]
@@ -44,21 +40,23 @@ cropImageByID <- function(id, output, bg, label) {
   y1 <- max(y1, 1)
   y2 <- min(y2, dimy)
   
-  bgRet <- vector("list",length(bg)-1)
-  labelRet <- vector("list",length(bg)-1)
+  bgRet    <- vector("list",length(phase))
+  labelRet <- vector("list",length(phase))
   
-  for (ii in 1:length(bg)) {
+  for (ii in 1:length(phase)) {
     
     # Crop the area
-    bgRet[[ii]] <- bg[[ii]][x1:x2,y1:y2]
+    bgRet[[ii]] <- phase[[ii]][x1:x2,y1:y2]
     
     # Get labeled subsection
-    labelbg <- label[[ii]][x1:x2,y1:y2]
+    labelbg <- labeled[[ii]][x1:x2,y1:y2]
     isIndex <- labelbg == cId[[ii]]$index
-    if (length(isIndex) < 1)  isIndex <- labelbg < -1
+    if (length(isIndex) < 1) isIndex <- labelbg < -1
     labelRet[[ii]] <- isIndex
   
   }
+  
+  print(lapply(labelRet, sum))
     
   return(list(bg=bgRet, label=labelRet))
   
