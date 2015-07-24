@@ -37,7 +37,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   # Add overlays to phase
   # These overlays will also serve as a background to other channels
   #full_overlay <- mapply(overlayColor, "phase", phase, labeled$phase, SIMPLIFY=FALSE)
-  full_overlay <- mapply(overlayOutlines, phase, labeled, col="yellow", SIMPLIFY=FALSE)
+  full_overlay <- mapply(overlayOutlines, phase, labeled$phase, col="yellow", SIMPLIFY=FALSE)
   writeImages(full_overlay, outputDir, "fullFrame", "phase", filenames)
   
   # Write non phase channels

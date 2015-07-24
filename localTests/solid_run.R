@@ -35,11 +35,12 @@ for (xyName in names(images)) {
   xy <- images[[xyName]]
   xy$phase <- lapply(xy$phase, solid_equalizeImages)
   
-  test <- solid_alignImages(xy)
+  xy <- solid_alignImages(xy)
   
   xy.labeled <- list()
-
-  output <- generateBlobTimeseries(xy.labeled$phase, minTimespan=2)
+  xy.labeled$phase <- lapply(xy$phase, solid_labelPhase)
+  
+  output <- generateBlobTimeseries(xy.labeled$phase, minTimespan=5)
   
   # Generate filenames from timestamps
   # Assuming hours < 1000

@@ -22,12 +22,15 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace
     return((xy[1] > 0) & (xy[1] < bounds[[1]]) & (xy[2] > 0) & (xy[2] < bounds[[2]]))
   }
   
+  dimx <- dim(images$phase[[1]])[1]
+  dimy <- dim(images$phase[[1]])[2]
+  
   # First find some aligment targets
   edges <- filter_sobel(images$phase[[1]])
   edges <- edges > 0.5
   edges <- EBImage::dilateGreyScale(edges, EBImage::makeBrush(7, 'disc'))
   edges <- EBImage::fillHull(edges)
-  edges <- removeBlobs(edges, 500, 1000)
+  edges <- removeBlobs(edges, 750)
   edges <- EBImage::bwlabel(edges)
   
   # Pick seven random features to track
@@ -39,9 +42,9 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace
   
   # Remove targets whose search space falls out of bounds
   alignmentTargets <- 
-    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x-(targetWidth + searchSpace)))))]
+    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x-(targetWidth + searchSpace + 100)))))]
   alignmentTargets <- 
-    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x+(targetWidth + searchSpace)))))]
+    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x+(targetWidth + searchSpace + 100)))))]
   
   # Sample the background image with alignment targets
   bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth):(x[1]+targetWidth),

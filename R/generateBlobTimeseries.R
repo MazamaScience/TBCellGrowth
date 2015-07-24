@@ -12,7 +12,7 @@
 generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
   
   # Get centroids for first frame (assuming empty background frame is in images[[1]])
-  centroidsBefore <- getCentroids(images[[2]])
+  centroidsBefore <- getCentroids(images[[1]])
   
   # Initialize return timeseries output
   output <- data.frame(t(data.frame(centroidsBefore$size,row.names=centroidsBefore$id)))
@@ -20,10 +20,10 @@ generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
   # Initialize list of centroid data.frame. We'll also be returning this so we can map
   # the timeseries back to the original images.
   centroids <- vector("list", length(images))
-  centroids[[2]] <- centroidsBefore
+  centroids[[1]] <- centroidsBefore
   
   # Now track blobs between each pair of images
-  for (i in 3:length(images)) {
+  for (i in 2:length(images)) {
     
     # Record time
     ptm <- proc.time()

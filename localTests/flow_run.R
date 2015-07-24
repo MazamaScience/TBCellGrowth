@@ -95,7 +95,7 @@ for (xyName in names(images)) {
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask, ignore)
   
-  output <- generateBlobTimeseries(xy.labeled$phase, minTimespan=2)
+  output <- generateBlobTimeseries(xy.labeled$phase[-1], minTimespan=2)
   
   # Generate filenames from timestamps
   # Assuming hours < 1000
