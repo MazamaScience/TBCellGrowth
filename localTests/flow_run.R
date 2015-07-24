@@ -54,7 +54,7 @@ params$ignoreSections <- list(xy02=c("topRight","topCenter","topLeft"))
 images <- solid_loadImages(params$inputDir, params$xy, params$channels,
                            params$channelNames, params$extension, n=params$nFrames)
 
-backgrounds <- solid_loadImages(params$backgroundDir, params$xy, params$channels,
+backgrounds <- loadImages(params$backgroundDir, params$xy, params$channels,
                                 params$channelNames, params$extension)
 
 

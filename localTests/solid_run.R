@@ -24,7 +24,7 @@ params$nFrames <- 10
 params$extension <- "tif"
 
 
-images <- solid_loadImages(params$inputDir, params$xy, params$channels,
+images <- loadImages(params$inputDir, params$xy, params$channels,
                            params$channelNames, params$extension, n=params$nFrames)
 
 phase <- images$xy2$phase
