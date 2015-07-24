@@ -7,7 +7,7 @@
 
 # based on photoshop and imagejay implementation
 # http://imagejdocu.tudor.lu/doku.php?id=faq:technical:what_is_the_algorithm_used_in_find_edges
-sobelFilter <- function(image) {
+filter_sobel <- function(image) {
   
   # Shift up
   p1 <- cbind(rbind(image,0,0),0,0)

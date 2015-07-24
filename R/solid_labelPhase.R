@@ -6,12 +6,7 @@
 
 solid_labelPhase <- function(image) {
   
-  # Wrapper for EBImage blur using filter2
-  blur <- function(im) {
-    flo = EBImage::makeBrush(3, shape='disc', step=FALSE)^2
-    flo = flo/sum(flo)
-    return(EBImage::filter2(im,flo))
-  }
+
   
   print("Searching new image...")
   ptm <- proc.time()
