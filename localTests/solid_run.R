@@ -30,8 +30,12 @@ images <- loadImages(params$inputDir, params$xy, params$channels,
 for (xyName in names(images)) {
   
   xy <- images[[xyName]]
-  test <- lapply(xy$phase, solid_equalizeImages)
+  xy$phase <- lapply(xy$phase, solid_equalizeImages)
   
   xy.labeled <- list()
-  xy.labeled$phase <- solid_labelPhase(xy$phase)
+  xy.labeled$phase <- lapply(xy$phase, solid_labelPhase)
+  
+  outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
+  lapply(outlines, display)
+  
 }

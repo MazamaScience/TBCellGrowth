@@ -5,22 +5,18 @@
 #' @return A \code{matrix} of integer labeled blobs.
 
 solid_labelPhase <- function(image) {
-  
 
-  
   print("Searching new image...")
   ptm <- proc.time()
   
-  print("Searching new image...")
-  
   # Blur image to reduce noise in edge finding
-  imageEdit <- blur(image)
+  imageEdit <- filter_blur(image)
   
   # Sobel edge finding implementation
-  imageEdit <- sobelFilter(imageEdit)
+  imageEdit <- filter_sobel(imageEdit)
   
   # Threshold sharp edges
-  imageEdit <- imageEdit > 0.4
+  imageEdit <- imageEdit > 0.5
   
   # Dilate and expand to join found edges
   imageEdit <- EBImage::closingGreyScale(imageEdit, EBImage::makeBrush(9, shape='disc'))
@@ -35,10 +31,14 @@ solid_labelPhase <- function(image) {
   imageEdit <- EBImage::fillHull(imageEdit)
   
   # Remove small blobs
-  imageEdit <- removeBlobs(imageEdit, 50)
+  imageEdit <- removeBlobs(imageEdit, 75)
   
   # Label images
   imageEdit <- EBImage::bwlabel(imageEdit)
+  
+  imageEdit[image < 0.5] <- 0
+  
+  imageEdit <- EBImage::fillHull(imageEdit)
   
   print(proc.time() - ptm)
   
