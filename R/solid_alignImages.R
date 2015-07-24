@@ -12,7 +12,7 @@
 #' @return a \code{list} of two lists, \code{phase} and \code{dyes},
 #' which will be the same lengths as the input.
 
-flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=30) {
+solid_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=30) {
   
   print("Finding alignment targets...")
   
@@ -74,9 +74,9 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
         phaseSubset <- lapply(phaseSamples, function(x) x[x1:x2,y1:y2])
         
         # Find the total difference between samples
-        diffs <- unlist(mapply(function(x,x1) sum(abs(x-x1)), bgSamples, phaseSubset, SIMPLIFY=FALSE))
+        diffs <- unlist(mapply(function(x,x1) sum(abs(x-x1), na.rm=TRUE), bgSamples, phaseSubset, SIMPLIFY=FALSE))
         
-        sampleDiffs[ii,jj] <- median(diffs)
+        sampleDiffs[ii,jj] <- median(diffs, na.rm=TRUE)
         
       }
     }
@@ -86,7 +86,13 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
     offset.x[[i]] <- bestFit[[1]] - searchSpace - 1
     offset.y[[i]] <- bestFit[[2]] - searchSpace - 1
     
+    bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth+offset.x[[i]]):(x[1]+targetWidth+offset.x[[i]]),
+                                                                        (x[2]-targetWidth+offset.y[[i]]):(x[2]+targetWidth+offset.y[[i]])])
+    
   }
+  
+  offset.x <- cumsum(offset.x)
+  offset.y <- cumsum(offset.y)
   
   # Crop images based on offset
   cropY <- max(abs(offset.y)) + 1

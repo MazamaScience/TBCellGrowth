@@ -8,8 +8,8 @@
 #' @description Creates an animated .gif file from a list of images using ImageMagick.
 #' @return none
 
-createGif <- function(dir, filename, ext="jpg", framerate=10, rescale=80) {
-  delay <- 1000 / framerate
+createGif <- function(dir, filename, ext="jpg", framerate=2, rescale=80) {
+  delay <- 100 / framerate
   system(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' ', dir, '*.', ext, " ", dir, filename))
 }
 

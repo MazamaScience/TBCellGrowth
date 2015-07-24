@@ -36,8 +36,9 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   
   # Add overlays to phase
   # These overlays will also serve as a background to other channels
-  full_overlay <- mapply(overlayColor, "phase", phase, labeled$phase, SIMPLIFY=FALSE)
-  writeImages(phase_overlay, outputDir, "fullFrame", "phase", filenames)
+  #full_overlay <- mapply(overlayColor, "phase", phase, labeled$phase, SIMPLIFY=FALSE)
+  full_overlay <- mapply(overlayOutlines, phase, labeled, col="yellow", SIMPLIFY=FALSE)
+  writeImages(full_overlay, outputDir, "fullFrame", "phase", filenames)
   
   # Write non phase channels
   for (cName in names(labeled)[names(labeled) != "phase"]) {
@@ -187,4 +188,5 @@ writeImages <- function(images, outputDir, id, channel, filenames) {
     file <- paste0(outputDir, "/", id, "/", channel, "/", filenames[[i]], ".jpg")
     EBImage::writeImage(images[[i]], file=file)
   }
+  createGif(paste0(outputDir, "/", id, "/", channel, "/"), paste0(id,".gif"))
 }
