@@ -59,8 +59,8 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace
     
     image <- images$phase[[i]]
     
-    phaseSamples <- lapply(alignmentTargets, function(x) image[(x[[1]]-targetWidth-searchSpace):(x[[1]]+targetWidth+searchSpace),
-                                                               (x[[2]]-targetWidth-searchSpace):(x[[2]]+targetWidth+searchSpace)])
+    phaseSamples <- lapply(alignmentTargets, function(x) image[(x[[1]]-targetWidth-searchSpace+offset.x[[i-1]]):(x[[1]]+targetWidth+searchSpace+offset.x[[i-1]]),
+                                                               (x[[2]]-targetWidth-searchSpace+offset.y[[i-1]]):(x[[2]]+targetWidth+searchSpace+offset.y[[i-1]])])
     
     sampleDiffs <- matrix(NA,nrow=1 + searchSpace*2,ncol=1 + searchSpace*2)
     
@@ -86,7 +86,7 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace
     offset.x[[i]] <- bestFit[[1]] - searchSpace - 1
     offset.y[[i]] <- bestFit[[2]] - searchSpace - 1
     
-    bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth+offset.x[[i]]):(x[1]+targetWidth+offset.x[[i]]),
+    bgSamples <- lapply(alignmentTargets, function(x) images$phase[[i]][(x[1]-targetWidth+offset.x[[i]]):(x[1]+targetWidth+offset.x[[i]]),
                                                                         (x[2]-targetWidth+offset.y[[i]]):(x[2]+targetWidth+offset.y[[i]])])
     
   }
