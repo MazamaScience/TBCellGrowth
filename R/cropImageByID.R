@@ -16,7 +16,7 @@ cropImageByID <- function(id, output, phase, labeled) {
   centroids <- output$centroids
   
   # Ignore the first index here, it's empty (bg frame)
-  centroids[[1]] <- NULL
+#   centroids[[1]] <- NULL
   
   dimx <- dim(phase[[1]])[[1]]
   dimy <- dim(phase[[1]])[[2]]

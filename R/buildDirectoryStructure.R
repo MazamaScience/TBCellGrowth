@@ -54,7 +54,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
       channel <- labeled[[cName]]
       full_overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
     }
-    writeImage(full_overlay, outputDir, "fullFrame", "all", filenames)
+    writeImages(full_overlay, outputDir, "fullFrame", "all", filenames)
   }
   
   rm(full_overlay)
@@ -63,60 +63,60 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   
   for (id in names(output$timeseries)) {
     
+    dir.create(paste0(outputDir,"/",id))
+    
     ####################################################
     ############## ONLY PHASE
     ####################################################
     
     # Crop and color phase images
     cropped_phase <- cropImageByID(id, output, phase, labeled$phase)
-    colored_phase <- mapply(overlayColor, "phase", cropped_phase$bg, cropped_phase$label, SIMPLIFY=FALSE)
-    
-    # Write phase images to directory
-    for (i in 1:length(colored_phase)) {
-      EBImage::writeImage(colored_phase[[i]], file=paste0(outputDir, "/", id, "/phase/", filenames[[i]], ".jpg"))
-    }
-    
-    
-    ####################################################
-    ############## SINGLE DYE + PHASE
-    ####################################################
-    
-    for (dye in names(dyes.labeled)) {
-      dyes <- dyes.labeled[dye][[1]]
-      
-      # Crop and color phase images
-      cropped_dye <- cropImageByID(id, output, phase, dyes)
-      colored_dye <- mapply(overlayColor, dye, cropped_dye$bg, cropped_dye$label, colored_phase, SIMPLIFY=FALSE)
-      
-      # Write images 
-      for (i in 1:length(colored_dye)) {
-        EBImage::writeImage(colored_dye[[i]], file=paste0(outputDir, "/", id, "/", dye, "/", filenames[[i]], ".jpg"))
-      }
-      
-    
-      
-    }
+#     colored_phase <- mapply(overlayColor, "phase", cropped_phase$bg, cropped_phase$label, SIMPLIFY=FALSE)
+    color_phase <- mapply(overlayOutlines, cropped_phase$bg, cropped_phase$label, col="yellow", SIMPLIFY=FALSE)
 
-    ####################################################
-    ############## ALL DYE + PHASE
-    ####################################################
-    
-    # Write MULTIPLE dye images
-    if (length(names(dyeOverlap)) > 0) {
-      # This mergewith list is added to each iteration with new dyes
-      mergeWith <- colored_phase
-      for (dye in names(dyes.labeled)) {
-
-        dyes <- dyes.labeled[dye][[1]]
-        
-        # Crop and color phase images
-        cropped_dye <- cropImageByID(id, output, phase, dyes)
-        mergeWith <- mapply(overlayColor, dye, cropped_dye$bg, cropped_dye$label, mergeWith, SIMPLIFY=FALSE) 
-      }
-      for (i in 1:length(mergeWith)) {
-        EBImage::writeImage(mergeWith[[i]], file=paste0(outputDir, "/", id, "/all/", filenames[[i]], ".jpg"))
-      }
-      
+    writeImages(colored_phase, outputDir, id, "phase", filenames)
+#     
+#     
+#     ####################################################
+#     ############## SINGLE DYE + PHASE
+#     ####################################################
+#     
+#     for (dye in names(dyes.labeled)) {
+#       dyes <- dyes.labeled[dye][[1]]
+#       
+#       # Crop and color phase images
+#       cropped_dye <- cropImageByID(id, output, phase, dyes)
+#       colored_dye <- mapply(overlayColor, dye, cropped_dye$bg, cropped_dye$label, colored_phase, SIMPLIFY=FALSE)
+#       
+#       # Write images 
+#       for (i in 1:length(colored_dye)) {
+#         EBImage::writeImage(colored_dye[[i]], file=paste0(outputDir, "/", id, "/", dye, "/", filenames[[i]], ".jpg"))
+#       }
+#       
+#     
+#       
+#     }
+# 
+#     ####################################################
+#     ############## ALL DYE + PHASE
+#     ####################################################
+#     
+#     # Write MULTIPLE dye images
+#     if (length(names(dyeOverlap)) > 0) {
+#       # This mergewith list is added to each iteration with new dyes
+#       mergeWith <- colored_phase
+#       for (dye in names(dyes.labeled)) {
+# 
+#         dyes <- dyes.labeled[dye][[1]]
+#         
+#         # Crop and color phase images
+#         cropped_dye <- cropImageByID(id, output, phase, dyes)
+#         mergeWith <- mapply(overlayColor, dye, cropped_dye$bg, cropped_dye$label, mergeWith, SIMPLIFY=FALSE) 
+#       }
+#       for (i in 1:length(mergeWith)) {
+#         EBImage::writeImage(mergeWith[[i]], file=paste0(outputDir, "/", id, "/all/", filenames[[i]], ".jpg"))
+#       }
+#       
     
     }
     
