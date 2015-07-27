@@ -141,16 +141,16 @@ excelHyperlink <- function(url, text) {
 
 # Accepts a table of values, the output directory, the current dye color,
 # and a vector of times / filenames
-writeExcel <- function(df, outputBase, color, filenames) {
+writeExcel <- function(df, outputDir, channel, filenames) {
   
-  write.csv(df, paste0(outputBase, "/", color, "_noLinks.csv"))
+  write.csv(df, paste0(outputDir, "/", channel, "_noLinks.csv"))
   
   # Creates hyperlinks to specific images
   cellHyperlinks <- function(id) {
-    oDir <- paste0(id, "/", color)
+    oDir <- paste0(id, "/", channel)
     cols <- df[id]
     for (i in 1:length(cols[[1]])) {
-      filename <- paste0(oDir, "/", filenames[[i]], ".jpg")
+      filename <- paste0(oDir, "/t_", filenames[[i]], ".jpg")
       cols[id][[1]][[i]] <- excelHyperlink(filename, cols[id][[1]][[i]])
     }
     return(cols)
@@ -159,12 +159,12 @@ writeExcel <- function(df, outputBase, color, filenames) {
   # Create hyperlinks on blob names
   colHyperlinks <- function(id) {
     oDir <- paste0(id, "/", color)
-    return(excelHyperlink(paste0(id, "/", color),id))
+    return(excelHyperlink(paste0(id, "/g_", channel),id))
   }
   
   # Create hyperlinks for full frames at time points
   timeHyperlinks <- function(time) {
-    link <- paste0("fullFrame/", color, "/", time,".jpg")
+    link <- paste0("fullFrame/", channel, "/", time,".jpg")
     return(excelHyperlink(link,time))
   }
   
@@ -174,7 +174,7 @@ writeExcel <- function(df, outputBase, color, filenames) {
 
   rownames(df) <- lapply(filenames, timeHyperlinks)
   
-  write.csv(df, paste0(outputBase, "/", color, ".csv"))
+  write.csv(df, paste0(outputDir, "/", channel, ".csv"))
   
  
   
@@ -185,8 +185,8 @@ writeExcel <- function(df, outputBase, color, filenames) {
 writeImages <- function(images, outputDir, id, channel, filenames) {
   dir.create(paste0(outputDir, "/", id, "/", channel))
   for (i in 1:length(images)) {
-    file <- paste0(outputDir, "/", id, "/", channel, "/", filenames[[i]], ".jpg")
+    file <- paste0(outputDir, "/", id, "/", channel, "/t_", filenames[[i]], ".jpg")
     EBImage::writeImage(images[[i]], file=file)
   }
-  createGif(paste0(outputDir, "/", id, "/", channel, "/"), paste0(id,".gif"))
+  createGif(paste0(outputDir, "/", id, "/", channel, "/"), paste0("g_",id,".gif"))
 }
