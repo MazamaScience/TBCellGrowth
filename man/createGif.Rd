@@ -4,7 +4,7 @@
 \alias{createGif}
 \title{Creates a gif animation.}
 \usage{
-createGif(dir, filename, ext = "jpg", framerate = 10, rescale = 80)
+createGif(dir, filename, ext = "jpg", framerate = 2, rescale = 80)
 }
 \arguments{
 \item{dir}{the directory of images to read}

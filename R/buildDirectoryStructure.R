@@ -118,7 +118,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
 #       }
 #       
     
-    }
+#     }
     
   }
   

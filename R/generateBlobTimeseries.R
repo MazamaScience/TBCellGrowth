@@ -54,6 +54,16 @@ generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
   # n images
   output <- output[,apply(output, 2, function(x) sum(!is.na(x)) > minTimespan)]
   
+  # Sort output by growth slope
+  sorted <- apply(log(test), 2, function(x) { 
+    x <- x[!is.na(x)]
+    y <- 1:length(x)
+    m <- lm(x ~ y)$coef[[1]]
+    return(m)
+  })
+  sorted <- sort(sorted,TRUE)
+  output <- output[,order(sorted)]
+  
   return(list(
     timeseries = output,
     centroids = centroids

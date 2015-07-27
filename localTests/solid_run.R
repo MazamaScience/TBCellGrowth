@@ -35,12 +35,21 @@ for (xyName in names(images)) {
   xy <- images[[xyName]]
   xy$phase <- lapply(xy$phase, solid_equalizeImages)
   
+  
   xy <- solid_alignImages(xy)
   
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, solid_labelPhase)
   
-  output <- generateBlobTimeseries(xy.labeled$phase, minTimespan=5)
+  output <- generateBlobTimeseries(xy.labeled$phase, minTimespan=7)
+  
+  test <- output$timeseries
+  sorted <- apply(test,2,function(x) range(x, na.rm=TRUE)[1] / range(x, na.rm=TRUE)[2])
+  sorted <- names(sort(sorted))
+  
+  foo <- test[,order(sorted)]
+  
+  View(test)
   
   # Generate filenames from timestamps
   # Assuming hours < 1000

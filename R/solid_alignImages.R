@@ -12,7 +12,7 @@
 #' @return a \code{list} of two lists, \code{phase} and \code{dyes},
 #' which will be the same lengths as the input.
 
-solid_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=30) {
+solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace=50) {
   
   print("Finding alignment targets...")
   
@@ -67,8 +67,8 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace
     
     sampleDiffs <- matrix(NA,nrow=1 + searchSpace*2,ncol=1 + searchSpace*2)
     
-    for (ii in 1:(searchSpace*2)) {
-      for (jj in 1:(searchSpace*2)) { 
+    for (ii in seq(1,searchSpace*2,by=2)) {
+      for (jj in seq(1,searchSpace*2,by=2)) { 
         
         x1 <- ii
         x2 <- ii + searchSpace*2
