@@ -24,13 +24,13 @@ plotToOverlay = function(plotf, dimx, dimy) {
   dev.off()
   
   # Reset parameters
-  par(oldPar)
+  try(par(oldPar), silent=TRUE)
   
   # Now load the png as an "image" type
   labels <- 1 - EBImage::readImage("temp345s45grf.png")[,,1]
   
   # Delete the file
-  file.remove("temp123423453456.png")
+  file.remove("temp345s45grf.png")
   
   # Return the mask
   return(labels)

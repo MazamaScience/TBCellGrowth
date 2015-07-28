@@ -43,14 +43,6 @@ for (xyName in names(images)) {
   
   output <- generateBlobTimeseries(xy.labeled$phase, minTimespan=7)
   
-  test <- output$timeseries
-  sorted <- apply(test,2,function(x) range(x, na.rm=TRUE)[1] / range(x, na.rm=TRUE)[2])
-  sorted <- names(sort(sorted))
-  
-  foo <- test[,order(sorted)]
-  
-  View(test)
-  
   # Generate filenames from timestamps
   # Assuming hours < 1000
   filenames <- params$startTime + ((0:(params$nFrames-1))*params$timestep)

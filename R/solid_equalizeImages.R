@@ -12,7 +12,7 @@ solid_equalizeImages <- function(image) {
   image <- filter_blur(image)
   
   # Make histogram of values
-  valueHist <- hist(image, breaks=40)
+  valueHist <- hist(image, breaks=40, plot=FALSE)
   
   # Which index of histogram is highest
   index <- which.max(valueHist$counts) - 1
@@ -27,7 +27,7 @@ solid_equalizeImages <- function(image) {
   image <- image / max(image, na.rm=TRUE)
   
   # Make a new histogram
-  valueHist <- hist(image, breaks=40)
+  valueHist <- hist(image, breaks=40, plot=FALSE)
   
   # Find the area after the histogram peak to expand
   index <- which(valueHist$counts/max(valueHist$counts) < 0.1 & c(FALSE,diff(valueHist$counts) < 0))[[1]]
