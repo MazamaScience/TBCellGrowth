@@ -4,12 +4,13 @@
 #' @param minTimespan remove blobs from output which aren't found in at least
 #' n sequential images.
 #' @param maxDistance the cutoff for distance between two blobs
+#' @param distanceScale the distance scale in pixels / micrometers
 #' @return A \code{list} with elements \code{timeseries}, a dataframe of blob IDs 
 #' and blob sizes at each timestep (in pixels) and \code{centroids}, a \code{list}
 #' of dataimages with centroids, blob ID's and original integer labels for mapping
 #' output column names back to the original images.
 
-generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
+generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20, distanceScale=1) {
   
   # Get centroids for first frame (assuming empty background frame is in images[[1]])
   centroidsBefore <- getCentroids(images[[1]], distanceScale)
@@ -64,8 +65,9 @@ generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
   sorted <- sort(sorted,TRUE)
   output <- output[,order(sorted)]
   
-  # Find st
-  
+  # Make analysis dataframe
+  analysis <- output[-c(1:dim(output)[1]),]
+  analysis[1,] <- 0
   
   return(list(
     timeseries = output,
