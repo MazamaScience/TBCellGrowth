@@ -4,8 +4,8 @@
 \alias{solid_alignImages}
 \title{Align A Series of Flow Images}
 \usage{
-solid_alignImages(images, numTargets = 12, targetWidth = 30,
-  searchSpace = 30)
+solid_alignImages(images, numTargets = 12, targetWidth = 50,
+  searchSpace = 50)
 }
 \arguments{
 \item{images}{a list of lists of images with channel names as keys.}

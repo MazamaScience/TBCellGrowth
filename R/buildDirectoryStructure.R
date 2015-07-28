@@ -74,12 +74,12 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
 #     colored_phase <- mapply(overlayColor, "phase", cropped_phase$bg, cropped_phase$label, SIMPLIFY=FALSE)
     color_phase <- mapply(overlayOutlines, cropped_phase$bg, cropped_phase$label, col="yellow", SIMPLIFY=FALSE)
 
-    # Add statistics overlay to image
-    test <- mapply(overlayVitalStats, 
-                   color_phase, id, 
-                   output$timeseries[,id], 
-                   list(output$timeseries[,id]), 
-                   filenames)
+#     # Add statistics overlay to image
+#     test <- mapply(overlayVitalStats, 
+#                    color_phase, id, 
+#                    output$timeseries[,id], 
+#                    list(output$timeseries[,id]), 
+#                    filenames)
 
     writeImages(colored_phase, outputDir, id, "phase", filenames)
 #     

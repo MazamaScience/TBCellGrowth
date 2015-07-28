@@ -1,11 +1,12 @@
 #' @export
 #' @title Finds Blob Centroids
 #' @param image a labeled image to search
+#' @param distanceScale the distance scale in pixels / micrometers
 #' @description Finds the center, size, and bounds of every non zero cluster
 #' of pixels. Requires the image was labeled using \code{EBImage::bwlabel}.
 #' @return A \code{dataframe} with a row for each unique blob.
 
-getCentroids <- function(image) {
+getCentroids <- function(image, distanceScale=1) {
   
   # Initialize vectors
   x <- numeric(max(image))
@@ -19,7 +20,7 @@ getCentroids <- function(image) {
   index <- numeric(max(image))
   
   # Function for generating an ID
-  generateID <- function(x, y,z) {
+  generateID <- function(x, y, z) {
     return(paste0("x", x, "y", y,"z",z))
   }
   
@@ -42,7 +43,7 @@ getCentroids <- function(image) {
     xmax[[i]] <- max(xx)
     ymin[[i]] <- min(yy)
     ymax[[i]] <- max(yy)
-    size[[i]] <- length(ind)
+    size[[i]] <- round(length(ind)*distanceScale)
     id[[i]] <- generateID(x[[i]],y[[i]],size[[i]])
     index[[i]] <- i
     

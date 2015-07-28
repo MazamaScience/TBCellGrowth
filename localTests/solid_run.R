@@ -19,12 +19,16 @@ params$channelNames <- c("phase")    # Names of channels, 'phase' is required
 
 params$startTime <- 0 # Time of first image
 params$timestep <- 3 # Timestep in hours
+params$distanceScale <- 0.43 # units: pixels / um
+
+params$minTimespan <- 7 # How long a blob must be active to appear on table
 
 # How many frames to load
 params$nFrames <- 10
 
 # What file extension to read
 params$extension <- "tif"
+
 
 
 images <- loadImages(params$inputDir, params$xy, params$channels,
@@ -41,7 +45,9 @@ for (xyName in names(images)) {
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, solid_labelPhase)
   
-  output <- generateBlobTimeseries(xy.labeled$phase, minTimespan=7)
+  output <- generateBlobTimeseries(xy.labeled$phase, 
+                                   minTimespan=params$minTimespan, 
+                                   distanceScale=params$distanceScale)
   
   # Generate filenames from timestamps
   # Assuming hours < 1000

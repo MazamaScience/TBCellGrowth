@@ -12,7 +12,7 @@
 generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
   
   # Get centroids for first frame (assuming empty background frame is in images[[1]])
-  centroidsBefore <- getCentroids(images[[1]])
+  centroidsBefore <- getCentroids(images[[1]], distanceScale)
   
   # Initialize return timeseries output
   output <- data.frame(t(data.frame(centroidsBefore$size,row.names=centroidsBefore$id)))
@@ -29,7 +29,7 @@ generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
     ptm <- proc.time()
     print(paste0("Processing frame ", i, " of ", length(images)))
     
-    centroidsAfter <- getCentroids(images[[i]])
+    centroidsAfter <- getCentroids(images[[i]], distanceScale)
     
     # Find groups that are determined to be the same between the two images
     groups <- findSimilarGroups(centroidsBefore,centroidsAfter,maxDistance)
@@ -54,7 +54,7 @@ generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
   # n images
   output <- output[,apply(output, 2, function(x) sum(!is.na(x)) > minTimespan)]
   
-  # Sort output by growth slope
+  # Sort output by linear growth slope
   sorted <- apply(log(output), 2, function(x) { 
     x <- x[!is.na(x)]
     y <- 1:length(x)
@@ -63,6 +63,9 @@ generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
   })
   sorted <- sort(sorted,TRUE)
   output <- output[,order(sorted)]
+  
+  # Find st
+  
   
   return(list(
     timeseries = output,

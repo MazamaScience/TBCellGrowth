@@ -4,10 +4,12 @@
 \alias{getCentroids}
 \title{Finds Blob Centroids}
 \usage{
-getCentroids(image)
+getCentroids(image, distanceScale = 1)
 }
 \arguments{
 \item{image}{a labeled image to search}
+
+\item{distanceScale}{the distance scale in pixels / micrometers}
 }
 \value{
 A \code{dataframe} with a row for each unique blob.
