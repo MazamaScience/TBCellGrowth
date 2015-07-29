@@ -1,6 +1,15 @@
-# Adds statistics to an image
-# How to get the statistics on an image?
-overlayVitalStats <- function(image, id, size, growth, time) {
+#' @export
+#' @title Adds Basic Statistics to an Image
+#' @param image an image matrix
+#' @param id the blob id the image is focused on
+#' @param size the object size in um
+#' @param time the timestep at this frame
+#' @description Overylay a series of statistics to an image
+#' from cropImageByID. TODO add more details when they are
+#' avaiable
+#' @return a \code{matrix} image.
+
+overlayVitalStats <- function(image, id, size, time) {
   
   # Get dimensions
   dimx <- dim(image)[[1]]
