@@ -1,18 +1,11 @@
 
 params <- list()
 
-## WORK COMPUTER
-if (FALSE) {
-  params$inputDir <- "~/Desktop/TBData/solid/Time course"
-  params$outputDir <- "~/Desktop/outputSolid/"
-}
+# Input and output directories
+params$inputDir <- "localData/solid/"
+params$outputDir <- "~/Desktop/outputSolid/"
 
-## WILL'S LAPTOP
-if (FALSE) {
-  params$inputDir <- "~/Desktop/tbTest/solid/Time course"
-  params$outputDir <- "~/Desktop/outputSolid/"
-}
-
+# Which channels and regions to load
 params$xy <- c("xy2")             # Single section to look at
 params$channels <- c("c1")         # One or more channels to look at, c1 required
 params$channelNames <- c("phase")    # Names of channels, 'phase' is required

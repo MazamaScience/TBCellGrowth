@@ -15,7 +15,7 @@ flow_rotateImages <- function(images,
   background <- images$phase[[1]]
   
   # Find background edges
-  edges <- sobelFilter(background) > 0.5
+  edges <- filter_sobel(background) > 0.5
   edges <- EBImage::fillHull(edges)
   
   searchBorders <- 200

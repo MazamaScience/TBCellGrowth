@@ -1,32 +1,21 @@
 
-
 params <- list()
 
-## WORK COMPUTER
-if (FALSE) {
-  params$inputDir <- "~/Desktop/TBData/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course/"
-  params$backgroundDir <- "~/Desktop/TBData/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background/"
-  params$outputDir <- "~/Desktop/output/"
-}
-
-## LAPTOP
-if (FALSE) {
-  params$inputDir <- "/Volumes/MazamaDataMobile/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course/"
-  params$backgroundDir <- "/Volumes/MazamaDataMobile/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background/"
-  params$outputDir <- "~/Desktop/output/"
-}
-
+# Input and output directories
+params$inputDir <- "localData/fluid/Time Course"
+params$backgroundDir <- "localdata/fluid/Background"
+params$outputDir <- "~/Desktop/outputSolid/"
 
 # Configure which dyes to use,
-params$xy <- c("xy02")             # Single section to look at
-params$channels <- c("c1")         # One or more channels to look at, c1 required
-params$channelNames <- c("phase")    # Names of channels, 'phase' is required
+params$xy <- c("xy06")             # Single section to look at
+params$channels <- c("c1","c4")         # One or more channels to look at, c1 required
+params$channelNames <- c("phase","red")    # Names of channels, 'phase' is required
 
 # How many frames to load
-params$nFrames <- 5 # How many frames to load
+params$nFrames <- 20 # How many frames to load
 
 # What file extension to read
-params$extension <- "tif" # Image file extension
+params$extension <- "jpg"
 
 # How to scale phase and dye
 params$phaseMedian <- 0.4 # What value phase images should be equalized to
@@ -39,8 +28,10 @@ params$searchSpace <- 30 # How far left, top, right, down to search fo alignment
 params$startTime <- 0 # Time of first image
 params$timestep <- 3 # Timestep in hours
 
+params$minTimespan <- 10
+
 # Which regions to ignore for various reasons
-params$ignoreSections <- list(xy02=c("topRight","topCenter","topLeft"))
+params$ignoreSections <- list(xy06=c("topLeft"))
 
 
 
@@ -51,7 +42,7 @@ params$ignoreSections <- list(xy02=c("topRight","topCenter","topLeft"))
 ### TODO Ask Kyle about filenaming
 ### TODO the file loading sequence will change, my example
 ### file structure isn't in the final form
-images <- solid_loadImages(params$inputDir, params$xy, params$channels,
+images <- loadImages(params$inputDir, params$xy, params$channels,
                            params$channelNames, params$extension, n=params$nFrames)
 
 backgrounds <- loadImages(params$backgroundDir, params$xy, params$channels,
@@ -76,7 +67,15 @@ for (xyName in names(images)) {
   
   xy <- images[[xyName]]
   
-  xy <- lapply(xy, function(dye) lapply(dye, flow_equalizeImages, params$phaseMedian))
+  # Equalize phase images
+  xy$phase <- lapply(xy$phase, flow_equalizeImages, params$phaseMedian)
+  
+  # Equalize non-phase images
+#   for (channel in names(xy)[-(names(xy) == "phase")]) {
+#     xy[channel] <- lapply(xy[channel], flow_equalizeDye)
+#   }
+  
+  # Rotate and align all channels
   xy <- flow_rotateImages(xy)
   xy <- flow_alignImages(xy,
                          numTargets=params$numTargets,
@@ -95,7 +94,9 @@ for (xyName in names(images)) {
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask, ignore)
   
-  output <- generateBlobTimeseries(xy.labeled$phase[-1], minTimespan=2)
+  output <- generateBlobTimeseries(xy.labeled$phase[-1], minTimespan=params$minTimespan)
+  
+  overlap <- findDyeOverlap()
   
   # Generate filenames from timestamps
   # Assuming hours < 1000
