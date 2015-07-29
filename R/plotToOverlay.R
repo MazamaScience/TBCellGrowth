@@ -1,3 +1,4 @@
+#' @export
 #' @title Saves a plot as an image and loads it as an image.
 #' @param plotf a function which plots lines, points, or text over the blank plot.
 #' @param dimx the image's x dimension.
