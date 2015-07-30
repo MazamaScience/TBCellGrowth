@@ -27,12 +27,12 @@ findDyeOverlap <- function(dye, phase.labeled, output) {
     dd <- dd[mask]
     indices <- indices[mask]
     
-    for (jj in 1:dim(centroids)[1]) {
-      row <- centroids[jj,]
-      if (is.null(tsCopy[[row$id]])) break
-      ## TODO only first row is being filled
-      count <- sum(dd == row$index)
-      tsCopy[[row$id]][ii] <- count
+    for (id in colnames(tsCopy)) {
+      row <- which(centroids$id == id)
+      if (length(row) > 0) {
+        index <- centroids[row,]$index
+        tsCopy[[id]][[ii]] <- sum(dd==index)
+      }
     }
     
   }
