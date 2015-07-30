@@ -82,51 +82,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
 #                    filenames)
 
     writeImages(colored_phase, outputDir, id, "phase", filenames)
-#     
-#     
-#     ####################################################
-#     ############## SINGLE DYE + PHASE
-#     ####################################################
-#     
-#     for (dye in names(dyes.labeled)) {
-#       dyes <- dyes.labeled[dye][[1]]
-#       
-#       # Crop and color phase images
-#       cropped_dye <- cropImageByID(id, output, phase, dyes)
-#       colored_dye <- mapply(overlayColor, dye, cropped_dye$bg, cropped_dye$label, colored_phase, SIMPLIFY=FALSE)
-#       
-#       # Write images 
-#       for (i in 1:length(colored_dye)) {
-#         EBImage::writeImage(colored_dye[[i]], file=paste0(outputDir, "/", id, "/", dye, "/", filenames[[i]], ".jpg"))
-#       }
-#       
-#     
-#       
-#     }
-# 
-#     ####################################################
-#     ############## ALL DYE + PHASE
-#     ####################################################
-#     
-#     # Write MULTIPLE dye images
-#     if (length(names(dyeOverlap)) > 0) {
-#       # This mergewith list is added to each iteration with new dyes
-#       mergeWith <- colored_phase
-#       for (dye in names(dyes.labeled)) {
-# 
-#         dyes <- dyes.labeled[dye][[1]]
-#         
-#         # Crop and color phase images
-#         cropped_dye <- cropImageByID(id, output, phase, dyes)
-#         mergeWith <- mapply(overlayColor, dye, cropped_dye$bg, cropped_dye$label, mergeWith, SIMPLIFY=FALSE) 
-#       }
-#       for (i in 1:length(mergeWith)) {
-#         EBImage::writeImage(mergeWith[[i]], file=paste0(outputDir, "/", id, "/all/", filenames[[i]], ".jpg"))
-#       }
-#       
-    
-#     }
-    
+
   }
   
   ####################################################

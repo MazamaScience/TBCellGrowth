@@ -9,18 +9,18 @@ params$outputDir <- "~/Desktop/outputSolid/"
 # Configure which dyes to use,
 params$xy <- c("xy06")             # Single section to look at
 params$channels <- c("c1","c4")         # One or more channels to look at, c1 required
-params$channelNames <- c("phase","red")    # Names of channels, 'phase' is required
+params$channelNames <- c("phase","green")    # Names of channels, 'phase' is required
 
 # How many frames to load
-params$nFrames <- 20 # How many frames to load
+params$nFrames <- 10 # How many frames to load
 
 # What file extension to read
 params$extension <- "jpg"
 
 # How to scale phase and dye
 params$phaseMedian <- 0.4 # What value phase images should be equalized to
-params$dyeMedian <- 0.02 # What value dye images should be equalized to
 
+# Image alignment
 params$numTargets <- 12 # How many target features to use for alignment
 params$targetWidth <- 30 # How large of a region the targets should be
 params$searchSpace <- 30 # How far left, top, right, down to search fo alignment
@@ -28,26 +28,24 @@ params$searchSpace <- 30 # How far left, top, right, down to search fo alignment
 params$startTime <- 0 # Time of first image
 params$timestep <- 3 # Timestep in hours
 
+# How many frames a blob must be in to be included in output
 params$minTimespan <- 10
 
 # Which regions to ignore for various reasons
+# Mainly used to deal with poor microscope shifting
 params$ignoreSections <- list(xy06=c("topLeft"))
 
 
 
 
 
-
-### TODO Separate script for testing alignment and normalization?
-### TODO Ask Kyle about filenaming
-### TODO the file loading sequence will change, my example
-### file structure isn't in the final form
+# Load images
 images <- loadImages(params$inputDir, params$xy, params$channels,
                            params$channelNames, params$extension, n=params$nFrames)
 
+# Load background images
 backgrounds <- loadImages(params$backgroundDir, params$xy, params$channels,
                                 params$channelNames, params$extension)
-
 
 ### Merge backgrounds into images list
 for (xy in names(images)) {
@@ -55,6 +53,7 @@ for (xy in names(images)) {
     images[[xy]][[dye]] <- c(backgrounds[[xy]][[dye]], images[[xy]][[dye]]) 
   }
 }
+# Clear large objects out of memory
 rm(backgrounds)
 rm(dye)
 rm(xy)
@@ -62,7 +61,6 @@ rm(xy)
 
 
 # for output, handle each xy region at a time
-### If we need to merge the xy output, make this a function and use lapply
 for (xyName in names(images)) {
   
   xy <- images[[xyName]]
@@ -70,10 +68,7 @@ for (xyName in names(images)) {
   # Equalize phase images
   xy$phase <- lapply(xy$phase, flow_equalizeImages, params$phaseMedian)
   
-  # Equalize non-phase images
-#   for (channel in names(xy)[-(names(xy) == "phase")]) {
-#     xy[channel] <- lapply(xy[channel], flow_equalizeDye)
-#   }
+ 
   
   # Rotate and align all channels
   xy <- flow_rotateImages(xy)
@@ -84,15 +79,20 @@ for (xyName in names(images)) {
   
   artifactMask <- flow_createArtifactMask(xy$phase[[1]], TRUE)
   
+  # Equalize non-phase images
+  for (channel in names(xy)[-(names(xy) == "phase")]) {
+    test <- lapply(xy[[channel]], flow_equalizeDyeImages, artifactMask)
+  }
+  
   # Interpret ignore regions as pixels
-  ignore <- flow_findIgnore(params$ignore[[xyName]], dim(xy$phase[[1]]))
+  ignoredRegions <- flow_findIgnore(params$ignore[[xyName]], dim(xy$phase[[1]]))
   # Find dark line areas to ignore
   darkLines <- flow_findDarkLines(xy$phase[[1]])
   # Combine these two into a final ignore list
-  ignore <- rbind(ignore, darkLines)
+  ignoredRegions <- rbind(ignoredRegions, darkLines)
   
   xy.labeled <- list()
-  xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask, ignore)
+  xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask, ignoredRegions)
   
   output <- generateBlobTimeseries(xy.labeled$phase[-1], minTimespan=params$minTimespan)
   

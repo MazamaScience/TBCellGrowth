@@ -44,6 +44,8 @@ flow_labelPhase <- function(image, artifactMask, ignore) {
   imageEdit <- EBImage::bwlabel(imageEdit)
   
   imageEdit[EBImage::equalize(imageMask) > 0.3] <- 0
+
+  imageEdit <- EBImage::fillHull(imageEdit)
   
   return(imageEdit)
   
