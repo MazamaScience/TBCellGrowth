@@ -29,7 +29,7 @@ params$startTime <- 0 # Time of first image
 params$timestep <- 3 # Timestep in hours
 
 # How many frames a blob must be in to be included in output
-params$minTimespan <- 10
+params$minTimespan <- 5
 
 # Which regions to ignore for various reasons
 # Mainly used to deal with poor microscope shifting
@@ -78,12 +78,7 @@ for (xyName in names(images)) {
                          searchSpace=params$searchSpace)
   
   artifactMask <- flow_createArtifactMask(xy$phase[[1]], TRUE)
-  
-  # Equalize non-phase images
-  for (channel in names(xy)[-(names(xy) == "phase")]) {
-    test <- lapply(xy[[channel]], flow_equalizeDyeImages, artifactMask)
-  }
-  
+
   # Interpret ignore regions as pixels
   ignoredRegions <- flow_findIgnore(params$ignore[[xyName]], dim(xy$phase[[1]]))
   # Find dark line areas to ignore
@@ -94,9 +89,19 @@ for (xyName in names(images)) {
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask, ignoredRegions)
   
+  # Equalize and label non-phase images
+  for (channel in names(xy)[-(names(xy) == "phase")]) {
+    xy[[channel]] <- lapply(xy[[channel]], flow_equalizeDyeImages, artifactMask)
+    xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
+  }
+  
   output <- generateBlobTimeseries(xy.labeled$phase[-1], minTimespan=params$minTimespan)
   
-  overlap <- findDyeOverlap()
+  dyeOverlap <- list()
+  for (channel in names(xy)[-(names(xy) == "phase")]) {
+    dyeOverlap <- findDyeOverlap(xy.labeled[[channel]][-1], xy.labeled$phase[-1], output)
+  }
+  
   
   # Generate filenames from timestamps
   # Assuming hours < 1000

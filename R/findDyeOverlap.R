@@ -14,22 +14,25 @@ findDyeOverlap <- function(dye, phase.labeled, output) {
   tsCopy[,] <- 0
   
   # Loop through each timestep (row) of the timeseries
-  for (i in 1:dim(tsCopy)[[1]]) {
+  for (ii in 1:dim(tsCopy)[[1]]) {
     
-    d <- dye[[i+1]]
-    p <- phase.labeled[[i+1]]
-    c <- output$centroids[[i+1]]
+    print(ii)
     
-    if (max(d) < 1) break
+    centroids <- output$centroids[[ii]]
     
-    for (j in 1:max(d)) {
-      
-      if (sum(d==j)) {
-        overlap <- p[d==j]
-        id <- as.character(c[c$index == j,]$id)
-        if (length(id) > 0 && id %in% names(tsCopy)) tsCopy[[id]][[i]] <- sum(overlap > 0)
-      }
-      
+    # Dyes already have correct indices
+    dd <- as.numeric(dye[[ii]])
+    indices <- 1:length(dd)
+    mask <- dd > 0
+    dd <- dd[mask]
+    indices <- indices[mask]
+    
+    for (jj in 1:dim(centroids)[1]) {
+      row <- centroids[jj,]
+      if (is.null(tsCopy[[row$id]])) break
+      ## TODO only first row is being filled
+      count <- sum(dd == row$index)
+      tsCopy[[row$id]][ii] <- count
     }
     
   }
