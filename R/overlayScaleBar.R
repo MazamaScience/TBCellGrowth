@@ -16,12 +16,16 @@ overlayScaleBar <- function(image, distanceScale, barLength=100) {
   dimy <- dim(image)[[2]]
   
   plotf <- function() {
-    text(dimx-60, dimy-30, paste(distanceScale,"µm"), cex=1.2)
-    lines(c(dimx-barlength-10,dimx-10), rep(dimy-20,2), lwd=3)
+    text(dimx-(barLength/2)-10, dimy-20, paste(distanceScale,"µm"), cex=barLength/85)
+    lines(c(dimx-barLength-10,dimx-10), rep(dimy-10,2), lwd=3)
   }
+  
+  labels <- plotToOverlay(plotf, dimx, dimy)
   
   image[labels > 0.4] <- 1
   
-  labels <- plotToOverlay(plotf, dimx, dimy)
+  return(image)
+  
+  
   
 }

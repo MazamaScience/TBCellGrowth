@@ -34,4 +34,6 @@ stitchImages <- function(images, ncol=2, na.fill=NA) {
   
   d <- do.call(cbind, test)
   
+  return(d)
+  
 }

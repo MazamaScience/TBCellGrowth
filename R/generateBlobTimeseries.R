@@ -113,7 +113,7 @@ findSimilarGroups <- function(c1, c2, maxDistance) {
   df <- df[!is.nan(df$score),]
   
   # Remove unrealistic growth
-  df <- df[df$growthPer < 1.5 & df$growthPer > 0.75,]
+  df <- df[df$growthPer < 2 & df$growthPer > 0.75,]
   
   # Remove unrealistic distance travelled
   df <- df[df$dist < maxDistance,]

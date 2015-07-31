@@ -9,7 +9,7 @@
 #' avaiable
 #' @return a \code{matrix} image.
 
-overlayVitalStats <- function(image, id, size, time) {
+overlayVitalStats <- function(image, id, time, size) {
   
   # Get dimensions
   dimx <- dim(image)[[1]]
@@ -23,7 +23,7 @@ overlayVitalStats <- function(image, id, size, time) {
   plotf <- function() {
     text(5,8,paste0(time,"hr"),cex=1,adj=c(0,NA))
     text(5,20,paste0(id,"id"),cex=1,adj=c(0,NA))
-    text(5,32,paste0(size,"px"),cex=1,adj=c(0,NA))
+    text(5,32,paste0(size,"µm^2"),cex=1,adj=c(0,NA))
   }
   
   labels <- plotToOverlay(plotf, dimx, dimy)

@@ -4,7 +4,7 @@ params <- list()
 # Input and output directories
 params$inputDir <- "localData/fluid/Time Course"
 params$backgroundDir <- "localdata/fluid/Background"
-params$outputDir <- "~/Desktop/outputSolid/"
+params$outputDir <- "~/Desktop/outputFlow/"
 
 # Configure which dyes to use,
 params$xy <- c("xy06")             # Single section to look at
@@ -30,6 +30,8 @@ params$timestep <- 3 # Timestep in hours
 
 # How many frames a blob must be in to be included in output
 params$minTimespan <- 5
+
+params$distanceScale <- 0.21
 
 # Which regions to ignore for various reasons
 # Mainly used to deal with poor microscope shifting
@@ -78,13 +80,18 @@ for (xyName in names(images)) {
                          searchSpace=params$searchSpace)
   
   artifactMask <- flow_createArtifactMask(xy$phase[[1]], TRUE)
-
+  
   # Interpret ignore regions as pixels
   ignoredRegions <- flow_findIgnore(params$ignore[[xyName]], dim(xy$phase[[1]]))
   # Find dark line areas to ignore
   darkLines <- flow_findDarkLines(xy$phase[[1]])
   # Combine these two into a final ignore list
   ignoredRegions <- rbind(ignoredRegions, darkLines)
+  
+  # At this point we no longer need backgrounds
+  for (channel in names(xy)) {
+    xy[[channel]][[1]] <- NULL
+  }
   
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask, ignoredRegions)
@@ -95,13 +102,14 @@ for (xyName in names(images)) {
     xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
   }
   
-  output <- generateBlobTimeseries(xy.labeled$phase[-1], minTimespan=params$minTimespan)
+  output <- generateBlobTimeseries(xy.labeled$phase, 
+                                   minTimespan=params$minTimespan, 
+                                   distanceScale=params$distanceScale)
   
   dyeOverlap <- list()
   for (channel in names(xy)[-(names(xy) == "phase")]) {
-    dyeOverlap <- findDyeOverlap(xy.labeled[[channel]][-1], xy.labeled$phase[-1], output)
+    dyeOverlap[[channel]] <- findDyeOverlap(xy.labeled[[channel]], xy.labeled$phase, output)
   }
-  
   
   # Generate filenames from timestamps
   # Assuming hours < 1000
@@ -110,13 +118,18 @@ for (xyName in names(images)) {
   
   # Apply timesteps to row names of timeseries
   rownames(output$timeseries) <- filenames
+  # Apply timesteps to overlap row names
+  for (channel in names(dyeOverlap)) {
+    rownames(dyeOverlap[[channel]]) <- filenames
+  }
   
   buildDirectoryStructure(output, 
-                          phase=xy$phase[-1], 
-                          labeled=xy.labeled[-1],
-                          dyeOverlap=list(), 
+                          phase=xy$phase, 
+                          labeled=xy.labeled,
+                          dyeOverlap=dyeOverlap, 
                           filenames=filenames,
-                          outputDir=params$outputDir)
+                          outputDir=params$outputDir,
+                          params$distanceScale)
   
 
 #   # TEST
