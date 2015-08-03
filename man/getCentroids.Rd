@@ -8,8 +8,6 @@ getCentroids(image)
 }
 \arguments{
 \item{image}{a labeled image to search}
-
-\item{distanceScale}{the distance scale in pixels / micrometers}
 }
 \value{
 A \code{dataframe} with a row for each unique blob.

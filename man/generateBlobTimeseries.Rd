@@ -13,8 +13,6 @@ generateBlobTimeseries(images, minTimespan = 5, maxDistance = 20)
 n sequential images.}
 
 \item{maxDistance}{the cutoff for distance between two blobs}
-
-\item{distanceScale}{the distance scale in pixels / micrometers}
 }
 \value{
 A \code{list} with elements \code{timeseries}, a dataframe of blob IDs

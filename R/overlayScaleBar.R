@@ -1,7 +1,7 @@
 #' @export
 #' @title Add a Scale Bar to an Image
 #' @param image an image matrix
-#' @param distanceScale the image scale in µm
+#' @param distanceScale the image scale in micrometers
 #' @param barLength how many pixels wide the scale bar should be
 #' @description Adds a bar to the bottom right of an image.
 #' The bar is labeled according to the scale that is passed in.

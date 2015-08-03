@@ -4,7 +4,7 @@
 \alias{overlayOutlines}
 \title{Overlays Colored Outlines Over Blobs}
 \usage{
-overlayOutlines(image, mask, color = "red")
+overlayOutlines(image, mask, color = "red", thick = TRUE)
 }
 \arguments{
 \item{image}{the image matrix to modify.}
@@ -13,6 +13,8 @@ overlayOutlines(image, mask, color = "red")
 e.g. \link{flow_labelPhase}.}
 
 \item{color}{the outline color}
+
+\item{thick}{if TRUE then outlines will be thickened}
 }
 \value{
 an image of the same dimensions.

@@ -1,11 +1,15 @@
 #' @export
 #' @title Normalize Dye Image Values
 #' @param image the image matrix to modify.
-#' @param medianNew a new median value to set scale the image values against
+#' @param artifactMask a mask of non biological features to ignore. See \link{flow_createArtifactMask}.
 #' @description Normalize a given dye image. TODO More info here
 #' @return an image of the same dimensions.
 
-flow_equalizeDyeImages <- function(im, artifactMask) {
+flow_equalizeDyeImages <- function(image, artifactMask) {
+  
+  # For development shorten this so it's easier to play
+  im <- image
+  rm(image)
   
 #   im <- xy$green[[2]]
   

@@ -9,7 +9,7 @@ overlayScaleBar(image, distanceScale, barLength = 100)
 \arguments{
 \item{image}{an image matrix}
 
-\item{distanceScale}{the image scale in µm}
+\item{distanceScale}{the image scale in micrometers}
 
 \item{barLength}{how many pixels wide the scale bar should be}
 }

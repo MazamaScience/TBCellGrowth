@@ -4,12 +4,12 @@
 \alias{flow_equalizeDyeImages}
 \title{Normalize Dye Image Values}
 \usage{
-flow_equalizeDyeImages(im, artifactMask)
+flow_equalizeDyeImages(image, artifactMask)
 }
 \arguments{
 \item{image}{the image matrix to modify.}
 
-\item{medianNew}{a new median value to set scale the image values against}
+\item{artifactMask}{a mask of non biological features to ignore. See \link{flow_createArtifactMask}.}
 }
 \value{
 an image of the same dimensions.

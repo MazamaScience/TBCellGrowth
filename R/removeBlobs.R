@@ -1,7 +1,8 @@
 #' @export
 #' @title Remove Blobs By Size
 #' @param image an image matrix
-#' @param size threshold for removal
+#' @param minSize lower threshold for removal
+#' @param maxSize upper threshold for removal
 #' @description Finds the size of each blob group in an image and removes
 #' blobs under the given threshold of pixels. A blob is defined as a group of
 #' pixels connected horizontally or vertically.

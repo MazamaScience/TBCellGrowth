@@ -9,7 +9,9 @@ removeBlobs(image, minSize = 0, maxSize = Inf)
 \arguments{
 \item{image}{an image matrix}
 
-\item{size}{threshold for removal}
+\item{minSize}{lower threshold for removal}
+
+\item{maxSize}{upper threshold for removal}
 }
 \value{
 An image \code{matrix} of size equal to the input image

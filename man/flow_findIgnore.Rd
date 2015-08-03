@@ -4,12 +4,12 @@
 \alias{flow_findIgnore}
 \title{Find Boundaries of Ignored Areas}
 \usage{
-flow_findIgnore(ignore, dd)
+flow_findIgnore(ignore, dims)
 }
 \arguments{
 \item{ignore}{a vector of ignore strings (i.e. "topRight")}
 
-\item{dimensions}{the dimensions of the image}
+\item{dims}{the dimensions of the image}
 }
 \value{
 A \code{data frame} of rectangle boundaries corresponing to

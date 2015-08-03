@@ -1,7 +1,6 @@
 #' @export
 #' @title Finds Blob Centroids
 #' @param image a labeled image to search
-#' @param distanceScale the distance scale in pixels / micrometers
 #' @description Finds the center, size, and bounds of every non zero cluster
 #' of pixels. Requires the image was labeled using \code{EBImage::bwlabel}.
 #' @return A \code{dataframe} with a row for each unique blob.
