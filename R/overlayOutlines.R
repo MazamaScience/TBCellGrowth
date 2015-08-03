@@ -9,12 +9,12 @@
 #' of equal dimensions.
 #' @return an image of the same dimensions.
 
-overlayOutlines <- function(image, mask, color="red") {
+overlayOutlines <- function(image, mask, color="red", thick=TRUE) {
   # paintObjects needs a logical matrix, so convert if need be
   if (typeof(mask) == "double") mask <- mask > 0
   image[image > 1] <- 1
   # Convert image to an EBImage Image object and set chanel to color
   im = EBImage::channel(EBImage::Image(image), 'rgb')
   # Paint outlines
-  return(EBImage::paintObjects(mask, im, thick=TRUE, col=color))
+  return(EBImage::paintObjects(mask, im, thick=thick, col=color))
 }

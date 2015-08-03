@@ -78,18 +78,19 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
     # Crop and color phase images
     cropped_phase <- cropImageByID(id, output, phase, labeled$phase)
 #     colored_phase <- mapply(overlayColor, "phase", cropped_phase$bg, cropped_phase$label, SIMPLIFY=FALSE)
-    color_phase <- mapply(overlayOutlines, cropped_phase$bg, cropped_phase$label, col="yellow", SIMPLIFY=FALSE)
+    color_phase <- mapply(overlayOutlines, cropped_phase$bg, cropped_phase$label, col="yellow", thick=FALSE, SIMPLIFY=FALSE)
     color_phase <- lapply(color_phase, overlayScaleBar, distanceScale, 80)
     color_phase <- mapply(overlayVitalStats, color_phase, id, filenames, sizes, distanceScale, SIMPLIFY=FALSE)
 
     writeImages(color_phase, outputDir, id, "phase", filenames)
 
-#     # Write non phase channels
-#     for (cName in names(labeled)[names(labeled) != "phase"]) {
-#       channel <- labeled[[cName]]
-#       overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
-#       writeImages(overlay, outputDir, "fullFrame", cName, filenames)
-#     }
+    # Write non phase channels
+    for (cName in names(labeled)[names(labeled) != "phase"]) {
+      channel <- labeled[[cName]]
+      cropped_dye <- cropImageByID(id, output, phase, channel)$label
+      color_dye <- mapply(overlayOutlines, color_phase, cropped_dye, col=cName, thick=FALSE, SIMPLIFY=FALSE)
+      writeImages(color_dye, outputDir, id, cName, filenames)
+    }
 
   }
   
@@ -97,9 +98,9 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   ############## CREATE EXCEL FILES
   ####################################################
   
-  writeExcel(excel$phase, outputDir, "phase", filenames)
-  for (dye in names(dyes.labeled)) {
-    writeExcel(excel[[dye]], outputDir, dye, filenames)
+#   writeExcel(excel$phase, outputDir, "phase", filenames)
+  for (cName in names(labeled)) {
+    writeExcel(excel[[cName]], outputDir, cName, filenames)
   }
   
 }
