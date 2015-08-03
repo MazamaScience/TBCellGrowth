@@ -2,20 +2,22 @@
 params <- list()
 
 # Input and output directories
-params$inputDir <- "localData/fluid/Time Course"
-params$backgroundDir <- "localdata/fluid/Background"
-params$outputDir <- "~/Desktop/outputFlow/"
+params$inputDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Time Course"
+params$backgroundDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Background"
+params$outputDir <- "~/Desktop/outputFlow_030815"
 
 # Configure which dyes to use,
-params$xy <- c("xy02")             # Single section to look at
+params$xy <- c("xy01","xy02","xy03","xy04",
+               "xy05","xy06","xy07","xy08",
+               "xy09","xy10","xy11","xy12")             # Single section to look at
 params$channels <- c("c1","c3","c4")         # One or more channels to look at, c1 required
 params$channelNames <- c("phase","red","green")    # Names of channels, 'phase' is required
 
 # How many frames to load
-params$nFrames <- 6 # How many frames to load
+params$nFrames <- 20 # How many frames to load
 
 # What file extension to read
-params$extension <- "jpg"
+params$extension <- "tif"
 
 # How to scale phase and dye
 params$phaseMedian <- 0.4 # What value phase images should be equalized to
@@ -35,37 +37,55 @@ params$distanceScale <- 0.21
 
 # Which regions to ignore for various reasons
 # Mainly used to deal with poor microscope shifting
-params$ignoreSections <- list(xy06=c("topLeft"))
+params$ignoreSections <- list(xy01=c("bottomLeft","topRight"),
+                              xy02=c("topLeft","topCenter","topRight"),
+                              xy03=c("bottomLeft","left"),
+                              xy04=c("topLeft","topCenter"),
+                              xy05=c("topLeft","topCenter","topRight"),
+                              xy06=c("topLeft"),
+                              xy07=c("bottomLeft","bottomRight"),
+                              xy08=c("topLeft","topCenter","topRight"),
+                              xy09=c("topLeft","topCenter","topRight"),
+                              xy10=c("topLeft","topCenter","topRight"),
+                              xy11=c("topLeft","topCenter","topRight","right"),
+                              xy12=c())
 
 
 
 
 
-# Load images
-images <- loadImages(params$inputDir, params$xy, params$channels,
-                           params$channelNames, params$extension, n=params$nFrames)
 
-# Load background images
-backgrounds <- loadImages(params$backgroundDir, params$xy, params$channels,
-                                params$channelNames, params$extension)
-
-### Merge backgrounds into images list
-for (xy in names(images)) {
-  for (dye in names(images[[xy]])) {
-    images[[xy]][[dye]] <- c(backgrounds[[xy]][[dye]], images[[xy]][[dye]]) 
-  }
-}
-# Clear large objects out of memory
-rm(backgrounds)
-rm(dye)
-rm(xy)
-
-
+ptmTotal <- proc.time()
+print("Starting run...")
 
 # for output, handle each xy region at a time
-for (xyName in names(images)) {
+for (xyName in params$xy) {
   
-  xy <- images[[xyName]]
+  ptm <- proc.time()
+  print(paste0("PROCESSING ",xyName))
+  
+  # Load images
+  images <- loadImages(params$inputDir, c(xyName), params$channels,
+                       params$channelNames, params$extension, n=params$nFrames)[[xyName]]
+  
+  # Load background images
+  backgrounds <- loadImages(params$backgroundDir, c(xyName), params$channels,
+                            params$channelNames, params$extension)[[xyName]]
+  
+  ### Merge backgrounds into images list
+
+  for (dye in names(images)) {
+    images[[dye]] <- c(backgrounds[[dye]], images[[dye]]) 
+  }
+
+  # Clear large objects out of memory
+  rm(backgrounds)
+  rm(dye)
+  
+  
+  
+  
+  xy <- images
   
   # Equalize phase images
   xy$phase <- lapply(xy$phase, flow_equalizeImages, params$phaseMedian)
@@ -127,13 +147,13 @@ for (xyName in names(images)) {
                           labeled=xy.labeled,
                           dyeOverlap=dyeOverlap, 
                           filenames=filenames,
-                          outputDir=params$outputDir,
+                          outputDir=paste0(params$outputDir,xyName,"/"),
                           params$distanceScale)
   
-
-#   # TEST
-#   outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
-#   lapply(outlines, display)  
+  print(paste0("directory structure build in ", (proc.time() - ptm)[[3]]))
+  
+  
 }
 
+print(paste0("complete run finished in ", (proc.time() - ptmTotal)[[3]]))
 

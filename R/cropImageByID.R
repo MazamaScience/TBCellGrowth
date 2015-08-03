@@ -57,8 +57,6 @@ cropImageByID <- function(id, output, phase, labeled) {
     labelRet[[ii]] <- isIndex
   
   }
-  
-  print(lapply(labelRet, sum))
     
   return(list(bg=bgRet, label=labelRet))
   
