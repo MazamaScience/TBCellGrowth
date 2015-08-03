@@ -130,12 +130,12 @@ writeExcel <- function(df, outputDir, channel, filenames) {
   # Create hyperlinks on blob names
   colHyperlinks <- function(id) {
     oDir <- paste0(id, "/", channel)
-    return(excelHyperlink(paste0(id, "/g_", channel),id))
+    return(excelHyperlink(paste0(oDir),id))
   }
   
   # Create hyperlinks for full frames at time points
   timeHyperlinks <- function(time) {
-    link <- paste0("fullFrame/", channel, "/", time,".jpg")
+    link <- paste0("fullFrame/", channel, "/t_", time,".jpg")
     return(excelHyperlink(link,time))
   }
   
