@@ -2,18 +2,22 @@
 #' @title Adds Basic Statistics to an Image
 #' @param image an image matrix
 #' @param id the blob id the image is focused on
-#' @param size the object size in um
 #' @param time the timestep at this frame
+#' @param size the object size in um
+#' @param distanceScale the distance conversion in um/pixel
 #' @description Overylay a series of statistics to an image
 #' from cropImageByID. TODO add more details when they are
 #' avaiable
 #' @return a \code{matrix} image.
 
-overlayVitalStats <- function(image, id, time, size) {
+overlayVitalStats <- function(image, id, time, size, distanceScale) {
   
   # Get dimensions
   dimx <- dim(image)[[1]]
   dimy <- dim(image)[[2]]
+  
+  # Convert size
+  size <- round((distanceScale * sqrt(size))^2, 1)
   
 #   growth <- growth[!is.na(growth)]
 #   slope <- lm(1:length(growth) ~ growth)

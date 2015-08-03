@@ -7,12 +7,12 @@ params$backgroundDir <- "localdata/fluid/Background"
 params$outputDir <- "~/Desktop/outputFlow/"
 
 # Configure which dyes to use,
-params$xy <- c("xy06")             # Single section to look at
-params$channels <- c("c1","c4")         # One or more channels to look at, c1 required
-params$channelNames <- c("phase","green")    # Names of channels, 'phase' is required
+params$xy <- c("xy02")             # Single section to look at
+params$channels <- c("c1","c3","c4")         # One or more channels to look at, c1 required
+params$channelNames <- c("phase","red","green")    # Names of channels, 'phase' is required
 
 # How many frames to load
-params$nFrames <- 10 # How many frames to load
+params$nFrames <- 6 # How many frames to load
 
 # What file extension to read
 params$extension <- "jpg"
@@ -103,8 +103,7 @@ for (xyName in names(images)) {
   }
   
   output <- generateBlobTimeseries(xy.labeled$phase, 
-                                   minTimespan=params$minTimespan, 
-                                   distanceScale=params$distanceScale)
+                                   minTimespan=params$minTimespan)
   
   dyeOverlap <- list()
   for (channel in names(xy)[-(names(xy) == "phase")]) {

@@ -10,6 +10,7 @@
 #' @param filenames a vector of names equal to the length of the 
 #' image lists. Usually timesteps.
 #' @param outputDir the directory to build the file structure
+#' @param distanceScale the distance conversion in um/pixel
 #' @description write a lot more here TODO
 #' @return none
 
@@ -79,7 +80,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
 #     colored_phase <- mapply(overlayColor, "phase", cropped_phase$bg, cropped_phase$label, SIMPLIFY=FALSE)
     color_phase <- mapply(overlayOutlines, cropped_phase$bg, cropped_phase$label, col="yellow", SIMPLIFY=FALSE)
     color_phase <- lapply(color_phase, overlayScaleBar, distanceScale, 80)
-    color_phase <- mapply(overlayVitalStats, color_phase, id, filenames, sizes, SIMPLIFY=FALSE)
+    color_phase <- mapply(overlayVitalStats, color_phase, id, filenames, sizes, distanceScale, SIMPLIFY=FALSE)
 
     writeImages(color_phase, outputDir, id, "phase", filenames)
 

@@ -10,10 +10,10 @@
 #' of dataimages with centroids, blob ID's and original integer labels for mapping
 #' output column names back to the original images.
 
-generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20, distanceScale=1) {
+generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
   
   # Get centroids for first frame (assuming empty background frame is in images[[1]])
-  centroidsBefore <- getCentroids(images[[1]], distanceScale)
+  centroidsBefore <- getCentroids(images[[1]])
   
   # Initialize return timeseries output
   output <- data.frame(t(data.frame(centroidsBefore$size,row.names=centroidsBefore$id)))
@@ -30,7 +30,7 @@ generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20, distan
     ptm <- proc.time()
     print(paste0("Processing frame ", i, " of ", length(images)))
     
-    centroidsAfter <- getCentroids(images[[i]], distanceScale)
+    centroidsAfter <- getCentroids(images[[i]])
     
     # Find groups that are determined to be the same between the two images
     groups <- findSimilarGroups(centroidsBefore,centroidsAfter,maxDistance)

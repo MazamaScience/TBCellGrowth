@@ -6,7 +6,7 @@
 #' of pixels. Requires the image was labeled using \code{EBImage::bwlabel}.
 #' @return A \code{dataframe} with a row for each unique blob.
 
-getCentroids <- function(image, distanceScale=1) {
+getCentroids <- function(image) {
   
   # Initialize vectors
   x <- numeric(max(image))
@@ -43,7 +43,7 @@ getCentroids <- function(image, distanceScale=1) {
     xmax[[i]] <- max(xx)
     ymin[[i]] <- min(yy)
     ymax[[i]] <- max(yy)
-    size[[i]] <- round((sqrt(length(ind))*distanceScale)^2)
+    size[[i]] <- length(ind)
     id[[i]] <- generateID(x[[i]],y[[i]],size[[i]])
     index[[i]] <- i
     
