@@ -12,6 +12,7 @@ flow_equalizeImages <- function(image, medianNew) {
   image <- image - min(image)
   # Scale image values so median matched new median
   image <- image * (medianNew / median(image))
+  
   return(image)
   
 }

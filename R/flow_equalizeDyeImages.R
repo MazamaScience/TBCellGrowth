@@ -25,7 +25,7 @@ flow_equalizeDyeImages <- function(image, artifactMask) {
   keybreak <- h$mids[h$counts < (max(h$counts)/200)][1]
   
   im <- im / keybreak
-  
+
   return(im)
   
 }

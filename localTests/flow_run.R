@@ -90,8 +90,6 @@ for (xyName in params$xy) {
   # Equalize phase images
   xy$phase <- lapply(xy$phase, flow_equalizeImages, params$phaseMedian)
   
- 
-  
   # Rotate and align all channels
   xy <- flow_rotateImages(xy)
   xy <- flow_alignImages(xy,
@@ -150,7 +148,7 @@ for (xyName in params$xy) {
                           outputDir=paste0(params$outputDir,xyName,"/"),
                           params$distanceScale)
   
-  print(paste0("directory structure build in ", (proc.time() - ptm)[[3]]))
+  print(paste0("FINISHED PROCESSING ",xyName, " IN ", (proc.time() - ptm)[[3]]))
   
   
 }

@@ -10,7 +10,7 @@
 flow_labelPhase <- function(image, artifactMask, ignore) {
   
   ptm <- proc.time()
-  print("Searching new image...")
+  cat(".")
   
   imageMask <- image
   imageMask[imageMask > 1] <- 1
@@ -29,11 +29,11 @@ flow_labelPhase <- function(image, artifactMask, ignore) {
   
   imageEdit <- EBImage::fillHull(imageEdit)
   
-  imageEdit[EBImage::equalize(imageMask) > 0.4] <- 0
+  imageEdit[EBImage::equalize(imageMask) > 0.5] <- 0
   
 #   imageEdit <- dilateGreyScale(imageEdit, EBImage::makeBrush(5))
   
-  imageEdit <- removeBlobs(imageEdit, 50)
+  imageEdit <- removeBlobs(imageEdit, 40)
   
   imageEdit <- EBImage::bwlabel(imageEdit)
   
@@ -43,7 +43,7 @@ flow_labelPhase <- function(image, artifactMask, ignore) {
 
   imageEdit <- EBImage::bwlabel(imageEdit)
   
-  imageEdit[EBImage::equalize(imageMask) > 0.3] <- 0
+  imageEdit[EBImage::equalize(imageMask) > 0.35] <- 0
 
 #   imageEdit <- EBImage::fillHull(imageEdit)
   
