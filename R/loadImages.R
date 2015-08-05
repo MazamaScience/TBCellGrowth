@@ -15,6 +15,9 @@
 
 loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), ext="tiff", start=1, n=NA) {
   
+  ptc <- proc.time()
+  cat("\nLoading images")
+  
   readf <- function(im) {
     return(EBImage::readImage(im)@.Data)
   }
@@ -37,12 +40,14 @@ loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), e
     images[[xyn]] <- list()
     for (channel in channels) {
       for (time in times) {
-        print(paste("loading",xyn,channel,time))
+        cat(".")
         images[[xyn]][[channel]][[time]] <- round(readf(paste0(dataDir,"/",time,"/",xyn,channel,".",ext)),4)
       }
     }
     names(images[[xyn]]) <- channelNames
   }
+  
+  cat(paste0("\nImages loaded in ", (proc.time() - ptc)[[3]]))
   
   return(images)
   

@@ -12,14 +12,15 @@ flow_labelPhase <- function(image, artifactMask, ignore) {
   ptm <- proc.time()
   cat(".")
   
-  imageMask <- image
-  imageMask[imageMask > 1] <- 1
+  image[image > 1] <- 1
   
-  imageMask[artifactMask > 0] <- quantile(image)[[4]]
+  imageMask <- image
+  
+  imageMask[artifactMask > 0] <- quantile(image, seq(0,1,0.05))[[19]]
   
   imageEdit <- filter_sobel(imageMask)
   
-  imageEdit <- imageEdit > 0.5
+  imageEdit <- imageEdit > 0.4
   
   imageEdit[EBImage::equalize(imageMask) > 0.5] <- 0
   
@@ -29,7 +30,7 @@ flow_labelPhase <- function(image, artifactMask, ignore) {
   
   imageEdit <- EBImage::fillHull(imageEdit)
   
-  imageEdit[EBImage::equalize(imageMask) > 0.5] <- 0
+  imageEdit[EBImage::equalize(imageMask) > 0.6] <- 0
   
 #   imageEdit <- dilateGreyScale(imageEdit, EBImage::makeBrush(5))
   

@@ -12,7 +12,7 @@ flow_rotateImages <- function(images,
                          searchSpace=seq(-2,2,by=0.2)) {
   
   ptm <- proc.time()
-  print("RotatingImages")
+  cat("\nRotating images")
   
   # Always assume phase[[1]] is background image
   background <- images$phase[[1]]
@@ -57,13 +57,16 @@ flow_rotateImages <- function(images,
   }
   
   rotateAndCrop <- function(x) {
+    cat(".")
     rotated <- EBImage::rotate(x, bestRotation)
     return(rotated[(xOffset):(dim(x)[[1]]-xOffset), (yOffset):(dim(x)[[2]]-yOffset)])
   }
   
-  print(paste0("Images rotated in ", (proc.time() - ptm)[[3]]))
+  images <- lapply(images, function(dye) lapply(dye, rotateAndCrop))
   
-  return(lapply(images, function(dye) lapply(dye, rotateAndCrop)))
+  cat(paste0("\nImages rotated in ", (proc.time() - ptm)[[3]]))
+  
+  return(images)
   
 }
 

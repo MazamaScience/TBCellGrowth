@@ -16,7 +16,7 @@ findDyeOverlap <- function(dye, phase.labeled, output) {
   # Loop through each timestep (row) of the timeseries
   for (ii in 1:dim(tsCopy)[[1]]) {
     
-    print(ii)
+    cat(".")
     
     centroids <- output$centroids[[ii]]
     

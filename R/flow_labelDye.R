@@ -9,8 +9,7 @@
 
 flow_labelDye <- function(image, phase.labeled, artifactMask) {
 
-  print("Searching new image...")
-  ptm <- proc.time()
+  cat(".")
   
   imageEdit <- image
   imageEdit[phase.labeled<1] <- 0

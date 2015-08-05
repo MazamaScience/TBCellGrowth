@@ -1,17 +1,37 @@
 
 params <- list()
 
+# Massive run
+if (FALSE) {
+  
 # Input and output directories
 params$inputDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Time Course"
 params$backgroundDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Background"
-params$outputDir <- "~/Desktop/outputFlow_030815"
+params$outputDir <- "~/Desktop/outputFlow_08052015"
 
 # Configure which dyes to use,
 params$xy <- c("xy01","xy02","xy03","xy04",
                "xy05","xy06","xy07","xy08",
                "xy09","xy10","xy11","xy12")             # Single section to look at
-params$channels <- c("c1","c3","c4")         # One or more channels to look at, c1 required
-params$channelNames <- c("phase","red","green")    # Names of channels, 'phase' is required
+params$channels <- c("c1","c4")         # One or more channels to look at, c1 required
+params$channelNames <- c("phase","green")    # Names of channels, 'phase' is required
+
+}
+
+# Testing run
+if (FALSE) {
+  # Input and output directories
+  params$inputDir <- "localData/fluid/Time Course/"
+  params$backgroundDir <- "localData/fluid/Background/"
+  params$outputDir <- "~/Desktop/outputTest"
+  
+  # Configure which dyes to use,
+  params$xy <- c("xy06")             # Single section to look at
+  params$channels <- c("c1","c4")         # One or more channels to look at, c1 required
+  params$channelNames <- c("phase","green")    # Names of channels, 'phase' is required
+  
+}
+
 
 # How many frames to load
 params$nFrames <- 20 # How many frames to load
@@ -56,16 +76,18 @@ params$ignoreSections <- list(xy01=c("bottomLeft","topRight"),
 
 
 ptmTotal <- proc.time()
-print("Starting run...")
+cat("Starting run...")
 
 # for output, handle each xy region at a time
 for (xyName in params$xy) {
   
-  ptm <- proc.time()
-  print(paste0("PROCESSING ",xyName))
+  regionTime <- proc.time()
+  cat("\n---------------------------")
+  cat(paste0("\nPROCESSING ",xyName))
+  cat("\n---------------------------")
   
   # Load images
-  images <- loadImages(params$inputDir, c(xyName), params$channels,
+  xy <- loadImages(params$inputDir, c(xyName), params$channels,
                        params$channelNames, params$extension, n=params$nFrames)[[xyName]]
   
   # Load background images
@@ -74,8 +96,8 @@ for (xyName in params$xy) {
   
   ### Merge backgrounds into images list
 
-  for (dye in names(images)) {
-    images[[dye]] <- c(backgrounds[[dye]], images[[dye]]) 
+  for (dye in names(xy)) {
+    xy[[dye]] <- c(backgrounds[[dye]], xy[[dye]]) 
   }
 
   # Clear large objects out of memory
@@ -85,10 +107,11 @@ for (xyName in params$xy) {
   
   
   
-  xy <- images
-  
   # Equalize phase images
+  cat("\nEqualizing images")
+  ptm <- proc.time()
   xy$phase <- lapply(xy$phase, flow_equalizeImages, params$phaseMedian)
+  cat(paste0("\nImages equalized in ", (proc.time() - ptm)[[3]]))
   
   # Rotate and align all channels
   xy <- flow_rotateImages(xy)
@@ -99,6 +122,9 @@ for (xyName in params$xy) {
   
   artifactMask <- flow_createArtifactMask(xy$phase[[1]], TRUE)
   
+  cat("\nFinding regions to ignore...")
+  ptm <- proc.time()
+  
   # Interpret ignore regions as pixels
   ignoredRegions <- flow_findIgnore(params$ignore[[xyName]], dim(xy$phase[[1]]))
   # Find dark line areas to ignore
@@ -106,25 +132,43 @@ for (xyName in params$xy) {
   # Combine these two into a final ignore list
   ignoredRegions <- rbind(ignoredRegions, darkLines)
   
+  cat(paste0("\nIgnored regions found in ", (proc.time() - ptm)[[3]]))
+  
   # At this point we no longer need backgrounds
   for (channel in names(xy)) {
     xy[[channel]][[1]] <- NULL
   }
   
+  cat("\nLabeling phase images")
+  ptm <- proc.time()
+  
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, flow_labelPhase, artifactMask, ignoredRegions)
   
+  cat(paste0("\nPhase images labeled in ", (proc.time() - ptm)[[3]]))
+  
+  
+  cat("\nEqualizing and labeling dye images")
+  ptm <- proc.time()
+  
   # Equalize and label non-phase images
   for (channel in names(xy)[-(names(xy) == "phase")]) {
+    cat(paste0("\n",channel))
     xy[[channel]] <- lapply(xy[[channel]], flow_equalizeDyeImages, artifactMask)
     xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
   }
   
+  cat(paste0("\nDye images labeled in ", (proc.time() - ptm)[[3]]))
+  
   output <- generateBlobTimeseries(xy.labeled$phase, 
                                    minTimespan=params$minTimespan)
   
+  cat("\nFinding dye overlap")
+  ptm <- proc.time()
+  
   dyeOverlap <- list()
   for (channel in names(xy)[-(names(xy) == "phase")]) {
+    cat(paste0("\n",channel))
     dyeOverlap[[channel]] <- findDyeOverlap(xy.labeled[[channel]], xy.labeled$phase, output)
   }
   
@@ -148,10 +192,12 @@ for (xyName in params$xy) {
                           outputDir=paste0(params$outputDir,xyName,"/"),
                           params$distanceScale)
   
-  print(paste0("FINISHED PROCESSING ",xyName, " IN ", (proc.time() - ptm)[[3]]))
-  
+
+  cat("\n---------------------------")
+  cat(paste0("\nFinished ",xyName, " in ", (proc.time() - regionTime)[[3]]))
+  cat("\n---------------------------")
   
 }
 
-print(paste0("complete run finished in ", (proc.time() - ptmTotal)[[3]]))
+cat(paste0("\nComplete run finished in ", (proc.time() - ptmTotal)[[3]]))
 

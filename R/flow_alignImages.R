@@ -14,8 +14,8 @@
 
 flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=30) {
   
-  ptm <- proc.time()
-  print("Aligning Images")
+  ptc <- proc.time()
+  cat("\nFinding alignment targets...")
   
   # Is the xy pair in the given bounds?
   isInBounds <- function(bounds, xy) {
@@ -52,7 +52,7 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
   offset.x <- numeric(length(images$phase))
   offset.y <- numeric(length(images$phase))  
   
-  print("Finding alignment offsets")
+  cat("\nFinding alignment offsets")
   
   for (i in 2:length(images$phase)) {
     
@@ -96,7 +96,7 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
   dimx <- dim(images$phase[[1]])[[1]]
   dimy <- dim(images$phase[[1]])[[2]]
   
-  print("Aligning and cropping images")
+  cat("\nAligning images")
   
   for (ii in 1:length(images)) {
     
@@ -109,7 +109,7 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
     
   }
   
-  print(paste0("Images aligned in ", (proc.time() - ptm)[[3]]))
+  cat(paste0("\nImages aligned in ", (proc.time() - ptc)[[3]]))
   
   return(images)
   

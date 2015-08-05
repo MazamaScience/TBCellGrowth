@@ -8,6 +8,8 @@
 
 flow_equalizeImages <- function(image, medianNew) {
   
+  cat(".")
+  
   # Set darkest value to 0
   image <- image - min(image)
   # Scale image values so median matched new median

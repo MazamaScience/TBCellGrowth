@@ -9,7 +9,10 @@
 #' of dataimages with centroids, blob ID's and original integer labels for mapping
 #' output column names back to the original images.
 
-generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
+generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
+  
+  ptm <- proc.time()
+  cat("\nMaking timeseries")
   
   # Get centroids for first frame (assuming empty background frame is in images[[1]])
   centroidsBefore <- getCentroids(images[[1]])
@@ -22,12 +25,12 @@ generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
   centroids <- vector("list", length(images))
   centroids[[1]] <- centroidsBefore
   
+  cat("\nTracking blobs")
+  
   # Now track blobs between each pair of images
   for (i in 2:length(images)) {
     
-    # Record time
-    ptm <- proc.time()
-    print(paste0("Processing frame ", i, " of ", length(images)))
+    cat(".")
     
     centroidsAfter <- getCentroids(images[[i]])
     
@@ -45,8 +48,6 @@ generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
     
     # Reassign "before" centroids to the current frame
     centroidsBefore <- centroidsAfter
-    
-    print(proc.time() - ptm)
     
   }
   
@@ -67,6 +68,8 @@ generateBlobTimeseries <- function(images, minTimespan=5, maxDistance=20) {
   # Make analysis dataframe
   analysis <- output[-c(1:dim(output)[1]),]
   analysis[1,] <- 0
+  
+  cat(paste0("\nTimeseries built in ", (proc.time() - ptm)[[3]]))
   
   return(list(
     timeseries = output,
@@ -112,7 +115,7 @@ findSimilarGroups <- function(c1, c2, maxDistance) {
   df <- df[!is.nan(df$score),]
   
   # Remove unrealistic growth
-  df <- df[df$growthPer < 2 & df$growthPer > 0.75,]
+  df <- df[df$growthPer < 2.5 & df$growthPer > 0.5,]
   
   # Remove unrealistic distance travelled
   df <- df[df$dist < maxDistance,]

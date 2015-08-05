@@ -15,17 +15,22 @@
 #' @return none
 
 buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filenames, 
-                                    outputDir="output", distanceScale=NULL) {
-  
+                                    outputDir="output", distanceScale=NULL) { 
+
   dir.create(outputDir)
   
   # Merge timeseries together
   excel <- lapply(dyeOverlap, function(x) x)
   excel$phase <- output$timeseries
   
+  directoryTime <- proc.time()
+  cat("\nBuilding directory structure")
   
   #################################################################
   #################################################################
+  
+  ptm <- proc.time()
+  cat("\nfullFrame ")
   
   ### FULL FRAME ###
   dir.create(paste0(outputDir, "/fullFrame"))
@@ -38,28 +43,39 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   
   writeImages(full_overlay, outputDir, "fullFrame", "phase", filenames)
   
+  cat((proc.time()-ptm)[[3]])
+  
   # Write non phase channels
   for (cName in names(labeled)[names(labeled) != "phase"]) {
+    ptm <- proc.time()
+    cat(paste0("\n",cName," "))
     channel <- labeled[[cName]]
     overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
     writeImages(overlay, outputDir, "fullFrame", cName, filenames)
+    cat((proc.time()-ptm)[[3]])
   }
   
   # All dyes combined of there are enough channels
-  if (length(names(labeled)) > 2) {  
+  if (length(names(labeled)) > 2) {
+    ptm <- proc.time()
+    cat("\nallDyes ")
     dir.create(paste0(outputDir, "/fullFrame/all"))
     for (cName in names(labeled)[names(labeled) != "phase"]) {
       channel <- labeled[[cName]]
       full_overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
     }
     writeImages(full_overlay, outputDir, "fullFrame", "all", filenames)
+    cat((proc.time()-ptm)[[3]])
   }
   
   rm(full_overlay)
   
-  
+  ptm <- proc.time()
+  cat("\nIndividual ids")
   
   for (id in names(output$timeseries)) {
+    
+    cat(".")
     
     dir.create(paste0(outputDir,"/",id))
     
@@ -93,6 +109,8 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
     }
 
   }
+
+  cat(paste0("\nIndividual ids finished in", (proc.time()-ptm)[[3]]))
   
   ####################################################
   ############## CREATE EXCEL FILES
@@ -102,6 +120,8 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   for (cName in names(labeled)) {
     writeExcel(excel[[cName]], outputDir, cName, filenames)
   }
+
+  cat(paste0("\nFull directory built in ", (proc.time()-directoryTime)[[3]]))
   
 }
 

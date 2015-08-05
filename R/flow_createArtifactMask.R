@@ -11,7 +11,7 @@
 flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   
   ptm <- proc.time()
-  print("Making artifact mask...")
+  cat("\nMaking artifact mask...")
   
   # Find harshest edges
   edges <- filter_sobel(bg) > 0.5
@@ -33,7 +33,7 @@ flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
 #   
   edges <- removeBlobs(edges, 250)
   
-  print(proc.time() - ptm)
+  cat(paste0("\nArtifact mask create in ", (proc.time() - ptm)[[3]]))
   
   return (edges > 0)
   
