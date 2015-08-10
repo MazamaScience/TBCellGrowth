@@ -25,6 +25,7 @@ createGifFromList <- function(images, filename, delay=15, rescale=100) {
   # Save each frame as a .tiff file
   for (i in 1:length(images)) {
     j <- ifelse(i<10,paste0("0",i),i)
+    images[[i]][is.na(images[[i]])] <- 0
     EBImage::writeImage(images[[i]],paste0(tempDir,j,".tiff"))
   }
   

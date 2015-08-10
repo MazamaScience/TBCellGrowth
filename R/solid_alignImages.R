@@ -42,15 +42,17 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
   
   # Remove targets whose search space falls out of bounds
   alignmentTargets <- 
-    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x-(targetWidth + searchSpace + 100)))))]
+    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x-(targetWidth + searchSpace + 50)))))]
   alignmentTargets <- 
-    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x+(targetWidth + searchSpace + 100)))))]
+    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x+(targetWidth + searchSpace + 50)))))]
   
-  # Sample the background image with alignment targets
-  bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth):(x[1]+targetWidth),
-                                                                      (x[2]-targetWidth):(x[2]+targetWidth)])
+  alignmentTargets <- alignmentTargets[1]
   
-  bgSamples <- lapply(bgSamples, function(x) filter_blur(x)^2)
+#   # Sample the background image with alignment targets
+#   bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth):(x[1]+targetWidth),
+#                                                                       (x[2]-targetWidth):(x[2]+targetWidth)])
+#   
+#   bgSamples <- lapply(bgSamples, function(x) filter_blur(x)^2 > 0.3)
   
   # Vectors detailing how much to shift images
   offset.x <- numeric(length(images$phase))
@@ -64,42 +66,49 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
     
     image <- images$phase[[i]]
     
-    phaseSamples <- lapply(alignmentTargets, function(x) image[(x[[1]]-targetWidth-searchSpace+offset.x[[i-1]]):(x[[1]]+targetWidth+searchSpace+offset.x[[i-1]]),
+    phaseSamples <- lapply(alignmentTargets, function(x) images$phase[[i]][(x[[1]]-targetWidth-searchSpace+offset.x[[i-1]]):(x[[1]]+targetWidth+searchSpace+offset.x[[i-1]]),
                                                                (x[[2]]-targetWidth-searchSpace+offset.y[[i-1]]):(x[[2]]+targetWidth+searchSpace+offset.y[[i-1]])])
     
-    phaseSamples <- lapply(phaseSamples, function(x) filter_blur(x)^2)
+    bgSamples <- lapply(alignmentTargets, function(x) images$phase[[i-1]][(x[[1]]-targetWidth+offset.x[[i-1]]):(x[[1]]+targetWidth+offset.x[[i-1]]),
+                                                               (x[[2]]-targetWidth+offset.y[[i-1]]):(x[[2]]+targetWidth+offset.y[[i-1]])])
+    
+    bgSamples <- lapply(bgSamples, function(x) filter_blur(x)^2 > 0.3)
+    phaseSamples <- lapply(phaseSamples, function(x) filter_blur(x)^2 > 0.3)
     
     sampleDiffs <- matrix(NA,nrow=1 + searchSpace*2,ncol=1 + searchSpace*2)
     
-    for (ii in seq(1,searchSpace*2,by=2)) {
-      for (jj in seq(1,searchSpace*2,by=2)) { 
+    for (ii in seq(1,searchSpace*2,by=1)) {
+      for (jj in seq(1,searchSpace*2,by=1)) { 
         
         x1 <- ii
-        x2 <- ii + searchSpace*2
+        x2 <- ii + targetWidth*2
         y1 <- jj
-        y2 <- jj + searchSpace*2
+        y2 <- jj + targetWidth*2
         phaseSubset <- lapply(phaseSamples, function(x) x[x1:x2,y1:y2])
         
         # Find the total difference between samples
         diffs <- unlist(mapply(function(x,x1) sum(abs(x-x1), na.rm=TRUE), bgSamples, phaseSubset, SIMPLIFY=FALSE))
         
-        sampleDiffs[ii,jj] <- median(diffs, na.rm=TRUE)
+        sampleDiffs[ii,jj] <- min(diffs, na.rm=TRUE)
         
       }
     }
     
     bestFit <- which(sampleDiffs == min(sampleDiffs, na.rm=T),arr.ind=T)
     
-    offset.x[[i]] <- bestFit[[1]] - searchSpace - 1
-    offset.y[[i]] <- bestFit[[2]] - searchSpace - 1
+    offset.x[[i]] <- offset.x[[i-1]] + bestFit[[1]] - searchSpace - 1
+    offset.y[[i]] <- offset.y[[i-1]] + bestFit[[2]] - searchSpace - 1
     
-    bgSamples <- lapply(alignmentTargets, function(x) images$phase[[i]][(x[1]-targetWidth+offset.x[[i]]):(x[1]+targetWidth+offset.x[[i]]),
-                                                                        (x[2]-targetWidth+offset.y[[i]]):(x[2]+targetWidth+offset.y[[i]])])
+#     display(bgSamples[[1]])
+#     
+#     bgSamples <- lapply(phaseSamples, function(x) x[ bestFit[[1]]:(bestFit[[1]]+targetWidth*2), 
+#                                                      bestFit[[2]]:(bestFit[[2]]+targetWidth*2) ])
+
     
   }
   
-  offset.x <- cumsum(offset.x)
-  offset.y <- cumsum(offset.y)
+#   offset.x <- cumsum(offset.x)
+#   offset.y <- cumsum(offset.y)
   
   # Crop images based on offset
   cropT <- abs(max(offset.y)) + 1
@@ -122,10 +131,10 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
       padL <- cropL - offset.x[jj]
       padR <- cropR + offset.x[jj]
       
-      im <- cbind(matrix(1, nrow=dim(im)[[1]], ncol=padT), im)
-      im <- cbind(im, matrix(1, nrow=dim(im)[[1]], ncol=padB))
-      im <- rbind(matrix(1, nrow=padL, ncol=dim(im)[[2]]), im)
-      im <- rbind(im, matrix(1, nrow=padR, ncol=dim(im)[[2]]))
+      im <- cbind(matrix(NA, nrow=dim(im)[[1]], ncol=padT), im)
+      im <- cbind(im, matrix(NA, nrow=dim(im)[[1]], ncol=padB))
+      im <- rbind(matrix(NA, nrow=padL, ncol=dim(im)[[2]]), im)
+      im <- rbind(im, matrix(NA, nrow=padR, ncol=dim(im)[[2]]))
       
       images[[ii]][[jj]] <- im
 #       images[[ii]][[jj]] <- im[(cropX + offset.x[jj]):(dimx - cropX + offset.x[jj]),

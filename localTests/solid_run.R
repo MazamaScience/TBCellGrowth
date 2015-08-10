@@ -14,8 +14,8 @@ params$startTime <- 0 # Time of first image
 params$timestep <- 3 # Timestep in hours
 params$distanceScale <- 0.43 # units: pixels / um
 
-params$numTargets <- 10 # How many target features to use for alignment
-params$targetWidth <- 30 # How large of a region the targets should be
+params$numTargets <- 12 # How many target features to use for alignment
+params$targetWidth <- 50 # How large of a region the targets should be
 params$searchSpace <- 70 # How far left, top, right, down to search for alignment
 
 params$minTimespan <- 7 # How long a blob must be active to appear on table
