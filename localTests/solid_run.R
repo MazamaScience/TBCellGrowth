@@ -50,14 +50,13 @@ for (xyName in params$xy) {
   xy$phase <- lapply(xy$phase, solid_equalizeImages)
   cat(paste0("\nImages equalized in ", (proc.time() - ptm)[[3]]))
   
-  test <- solid_alignImages(xy,
+  xy$phase <- solid_alignImages(xy,
                          numTargets=params$numTargets,
                          targetWidth=params$targetWidth, 
                          searchSpace=params$searchSpace)
   
-  
-  
-  
+  xy.labeled <- list()
+  xy.labeled$phase <- lapply(xy$phase, solid_labelPhase)
   
   
   xy <- solid_alignImages(xy)
