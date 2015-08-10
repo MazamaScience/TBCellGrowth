@@ -50,6 +50,8 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
   bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth):(x[1]+targetWidth),
                                                                       (x[2]-targetWidth):(x[2]+targetWidth)])
   
+  bgSamples <- lapply(bgSamples, function(x) filter_blur(x)^2)
+  
   # Vectors detailing how much to shift images
   offset.x <- numeric(length(images$phase))
   offset.y <- numeric(length(images$phase))  
@@ -64,6 +66,8 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
     
     phaseSamples <- lapply(alignmentTargets, function(x) image[(x[[1]]-targetWidth-searchSpace+offset.x[[i-1]]):(x[[1]]+targetWidth+searchSpace+offset.x[[i-1]]),
                                                                (x[[2]]-targetWidth-searchSpace+offset.y[[i-1]]):(x[[2]]+targetWidth+searchSpace+offset.y[[i-1]])])
+    
+    phaseSamples <- lapply(phaseSamples, function(x) filter_blur(x)^2)
     
     sampleDiffs <- matrix(NA,nrow=1 + searchSpace*2,ncol=1 + searchSpace*2)
     
@@ -98,8 +102,10 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
   offset.y <- cumsum(offset.y)
   
   # Crop images based on offset
-  cropY <- max(abs(offset.y)) + 1
-  cropX <- max(abs(offset.x)) + 1
+  cropT <- abs(max(offset.y)) + 1
+  cropB <- abs(min(offset.y)) + 1
+  cropR <- abs(min(offset.x)) + 1
+  cropL <- abs(max(offset.x)) + 1
   
   dimx <- dim(images$phase[[1]])[[1]]
   dimy <- dim(images$phase[[1]])[[2]]
@@ -111,8 +117,19 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
     for (jj in 1:length(images[[ii]])) {
       cat(".")
       im <- images[[ii]][[jj]]
-      images[[ii]][[jj]] <- im[(cropX + offset.x[jj]):(dimx - cropX + offset.x[jj]),
-                               (cropY + offset.y[jj]):(dimy - cropY + offset.y[jj])]
+      padT <- cropT - offset.y[jj]
+      padB <- cropB + offset.y[jj]
+      padL <- cropL - offset.x[jj]
+      padR <- cropR + offset.x[jj]
+      
+      im <- cbind(matrix(1, nrow=dim(im)[[1]], ncol=padT), im)
+      im <- cbind(im, matrix(1, nrow=dim(im)[[1]], ncol=padB))
+      im <- rbind(matrix(1, nrow=padL, ncol=dim(im)[[2]]), im)
+      im <- rbind(im, matrix(1, nrow=padR, ncol=dim(im)[[2]]))
+      
+      images[[ii]][[jj]] <- im
+#       images[[ii]][[jj]] <- im[(cropX + offset.x[jj]):(dimx - cropX + offset.x[jj]),
+#                                (cropY + offset.y[jj]):(dimy - cropY + offset.y[jj])]
     }
     
   }

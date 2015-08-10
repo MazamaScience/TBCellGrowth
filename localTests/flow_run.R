@@ -45,7 +45,7 @@ params$phaseMedian <- 0.4 # What value phase images should be equalized to
 # Image alignment
 params$numTargets <- 12 # How many target features to use for alignment
 params$targetWidth <- 30 # How large of a region the targets should be
-params$searchSpace <- 30 # How far left, top, right, down to search fo alignment
+params$searchSpace <- 30 # How far left, top, right, down to search for alignment
 
 params$startTime <- 0 # Time of first image
 params$timestep <- 3 # Timestep in hours
@@ -196,6 +196,11 @@ for (xyName in params$xy) {
   cat("\n---------------------------")
   cat(paste0("\nFinished ",xyName, " in ", (proc.time() - regionTime)[[3]]))
   cat("\n---------------------------")
+  
+  rm(xy)
+  rm(xy.labeled)
+  rm(dyeOverlap)
+  rm(output)
   
 }
 
