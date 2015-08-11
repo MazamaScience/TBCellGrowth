@@ -2,8 +2,8 @@
 params <- list()
 
 # Input and output directories
-params$inputDir <- "localData/solid/"
-params$outputDir <- "~/Desktop/outputSolidTest01"
+params$inputDir <- "~/Desktop/TBData/solid/Time course/"
+params$outputDir <- "~/Desktop/outputSolid_08112015"
 
 # Which channels and regions to load
 params$xy <- c("xy2")             # Single section to look at
@@ -22,7 +22,7 @@ params$minTimespan <- 7 # How long a blob must be active to appear on table
 params$maxDistance <- 75 # How far a blob can travel in pixels
 
 # How many frames to load
-params$nFrames <- 2
+params$nFrames <- 20
 
 # What file extension to read
 params$extension <- "jpg"
