@@ -7,10 +7,12 @@
 #' @return An image of the same dimensions.
 
 filter_blur <- function(image, radius=3) {
+  save <- image
   image[is.na(image)] <- 0
   flo <- EBImage::makeBrush(radius, shape='disc', step=FALSE)^2
   flo <- flo/sum(flo)
   image <- EBImage::filter2(image,flo)
   image[is.na(image)] <- 0
+  image[is.na(save)] <- NA
   return(image)
 }

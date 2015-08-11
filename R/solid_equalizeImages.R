@@ -9,6 +9,8 @@
 
 solid_equalizeImages <- function(image) {
   
+  cat(".")
+  
   image <- filter_blur(image)
   
   # Make histogram of values

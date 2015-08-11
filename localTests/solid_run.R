@@ -22,7 +22,7 @@ params$minTimespan <- 7 # How long a blob must be active to appear on table
 params$maxDistance <- 75 # How far a blob can travel in pixels
 
 # How many frames to load
-params$nFrames <- 15
+params$nFrames <- 10
 
 # What file extension to read
 params$extension <- "jpg"
@@ -50,7 +50,7 @@ for (xyName in params$xy) {
   xy$phase <- lapply(xy$phase, solid_equalizeImages)
   cat(paste0("\nImages equalized in ", (proc.time() - ptm)[[3]]))
   
-  xy$phase <- solid_alignImages(xy,
+  xy <- solid_alignImages(xy,
                          numTargets=params$numTargets,
                          targetWidth=params$targetWidth, 
                          searchSpace=params$searchSpace)
@@ -58,11 +58,7 @@ for (xyName in params$xy) {
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, solid_labelPhase)
   
-  
   xy <- solid_alignImages(xy)
-  
-  xy.labeled <- list()
-  xy.labeled$phase <- lapply(xy$phase, solid_labelPhase)
   
   output <- generateBlobTimeseries(xy.labeled$phase, 
                                    minTimespan=params$minTimespan, 
@@ -82,7 +78,7 @@ for (xyName in params$xy) {
   
   
   
-#   outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
-#   lapply(outlines, display)
+  outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
+  lapply(outlines, display)
   
 }

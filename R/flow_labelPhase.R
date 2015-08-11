@@ -16,7 +16,7 @@ flow_labelPhase <- function(image, artifactMask, ignore) {
   
   imageMask <- image
   
-  imageMask[artifactMask > 0] <- quantile(image, seq(0,1,0.05))[[19]]
+  imageMask[artifactMask > 0] <- quantile(image, seq(0,1,0.05), na.rm=T)[[19]]
   
   imageEdit <- filter_sobel(imageMask)
   

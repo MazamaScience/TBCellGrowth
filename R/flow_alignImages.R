@@ -31,7 +31,7 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
   edges <- removeBlobs(edges, 500, 1000)
   edges <- EBImage::bwlabel(edges)
   
-  # Pick seven random features to track
+  # Pick n random features to track
   alignmentTargets <- sample(1:max(edges), numTargets, replace=TRUE)
   
   # Find centroids of alignment targets

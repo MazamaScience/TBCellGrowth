@@ -46,7 +46,7 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
   alignmentTargets <- 
     alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x+(targetWidth + searchSpace + 50)))))]
   
-  alignmentTargets <- alignmentTargets[1]
+#   alignmentTargets <- alignmentTargets[1]
   
 #   # Sample the background image with alignment targets
 #   bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth):(x[1]+targetWidth),
@@ -77,8 +77,8 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
     
     sampleDiffs <- matrix(NA,nrow=1 + searchSpace*2,ncol=1 + searchSpace*2)
     
-    for (ii in seq(1,searchSpace*2,by=1)) {
-      for (jj in seq(1,searchSpace*2,by=1)) { 
+    for (ii in seq(1,searchSpace*2,by=2)) {
+      for (jj in seq(1,searchSpace*2,by=2)) { 
         
         x1 <- ii
         x2 <- ii + targetWidth*2
