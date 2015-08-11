@@ -4,7 +4,7 @@
 \alias{generateBlobTimeseries}
 \title{Searches an image for dark cell colonies and incrementally labels each colony.}
 \usage{
-generateBlobTimeseries(images, minTimespan = 5, maxDistance = 20)
+generateBlobTimeseries(images, minTimespan = 8, maxDistance = 50)
 }
 \arguments{
 \item{images}{a sequence of labeled images. See \link{flow_labelPhase}.}

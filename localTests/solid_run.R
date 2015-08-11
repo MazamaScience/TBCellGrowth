@@ -3,7 +3,7 @@ params <- list()
 
 # Input and output directories
 params$inputDir <- "localData/solid/"
-params$outputDir <- "~/Desktop/outputSolidTest01/"
+params$outputDir <- "~/Desktop/outputSolidTest01"
 
 # Which channels and regions to load
 params$xy <- c("xy2")             # Single section to look at
@@ -22,7 +22,7 @@ params$minTimespan <- 7 # How long a blob must be active to appear on table
 params$maxDistance <- 75 # How far a blob can travel in pixels
 
 # How many frames to load
-params$nFrames <- 10
+params$nFrames <- 2
 
 # What file extension to read
 params$extension <- "jpg"
@@ -58,12 +58,9 @@ for (xyName in params$xy) {
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, solid_labelPhase)
   
-  xy <- solid_alignImages(xy)
-  
   output <- generateBlobTimeseries(xy.labeled$phase, 
                                    minTimespan=params$minTimespan, 
-                                   maxDistance=params$maxDistance,
-                                   distanceScale=params$distanceScale)
+                                   maxDistance=params$maxDistance)
   
   # Generate filenames from timestamps
   # Assuming hours < 1000
@@ -73,12 +70,37 @@ for (xyName in params$xy) {
   # Apply timesteps to row names of timeseries
   rownames(output$timeseries) <- filenames
   
-  buildDirectoryStructure(output, xy$phase, xy.labeled, list(), 
-                          filenames, params$outputDir, params$distanceScale)
+  
+  cat("\nEqualizing and labeling dye images")
+  ptm <- proc.time()
+  
+  # Equalize and label non-phase images
+  for (channel in names(xy)[-(names(xy) == "phase")]) {
+    cat(paste0("\n",channel))
+    xy[[channel]] <- lapply(xy[[channel]], solid_equalizeDyeImages)
+    xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
+  }
+  
+  cat("\nFinding dye overlap")
+  ptm <- proc.time()
+  
+  dyeOverlap <- list()
+  for (channel in names(xy)[-(names(xy) == "phase")]) {
+    cat(paste0("\n",channel))
+    dyeOverlap[[channel]] <- findDyeOverlap(xy.labeled[[channel]], xy.labeled$phase, output)
+  }
+  
+  buildDirectoryStructure(output, 
+                          phase=xy$phase, 
+                          labeled=xy.labeled,
+                          dyeOverlap=dyeOverlap, 
+                          filenames=filenames,
+                          outputDir=paste0(params$outputDir,xyName,"/"),
+                          params$distanceScale)
   
   
-  
-  outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
-  lapply(outlines, display)
+#   # USEFUL FOR TESITNG
+#   outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
+#   lapply(outlines, display)
   
 }

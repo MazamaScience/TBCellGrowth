@@ -36,9 +36,9 @@ overlayColor <- function(color, bg, label, mergeWith=NULL) {
   if (typeof(label) == "double") label <- label>0
   
   # red, green, blue channels
-  image[,,1] <- (image[,,1] * !label) + (bg + color[[1]]) * label
-  image[,,2] <- (image[,,2] * !label) + (bg + color[[2]]) * label
-  image[,,3] <- (image[,,3] * !label) + (bg + color[[3]]) * label
+  image[,,1] <- (image[,,1] * !label) + (bg/2 + color[[1]]) * label
+  image[,,2] <- (image[,,2] * !label) + (bg/2 + color[[2]]) * label
+  image[,,3] <- (image[,,3] * !label) + (bg/2 + color[[3]]) * label
 
 #   image[,,1] <- bg + label * color[[1]]
 #   image[,,2] <- bg + label * color[[2]]

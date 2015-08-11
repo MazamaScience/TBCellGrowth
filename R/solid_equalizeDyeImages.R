@@ -4,6 +4,7 @@
 #' @param artifactMask a mask of non biological features to ignore. See \link{flow_createArtifactMask}.
 #' @description Normalize a given dye image. TODO More info here
 #' @return an image of the same dimensions.
+#' 
 #TODO how do we know if a frame isn't useful? Too dark?
 solid_equalizeDyeImages <- function(image) {
   
