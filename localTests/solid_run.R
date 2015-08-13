@@ -1,14 +1,21 @@
 
 params <- list()
 
-# Input and output directories
-params$inputDir <- "~/Desktop/TBData/solid/Time course/"
-params$outputDir <- "~/Desktop/outputSolid_08112015"
+### TESTING
+if (FALSE) {
+  params$inputDir <- "localData/solid/"
+  params$outputDir <- "~/Desktop/outputTest01"
+}
+
+if (FALSE) {
+  params$inputDir <- "/Volumes/MazamaDataMobile/Data/solid/Time course/"
+  params$outputDir <- "~/Desktop/outputSolid_08122015"
+}
 
 # Which channels and regions to load
 params$xy <- c("xy2")             # Single section to look at
-params$channels <- c("c1","c2","c3")         # One or more channels to look at, c1 required
-params$channelNames <- c("phase","green","red")    # Names of channels, 'phase' is required
+params$channels <- c("c1","c3")         # One or more channels to look at, c1 required
+params$channelNames <- c("phase","red")    # Names of channels, 'phase' is required
 
 params$startTime <- 0 # Time of first image
 params$timestep <- 3 # Timestep in hours
@@ -22,10 +29,13 @@ params$minTimespan <- 7 # How long a blob must be active to appear on table
 params$maxDistance <- 75 # How far a blob can travel in pixels
 
 # How many frames to load
-params$nFrames <- 20
+params$nFrames <- 15
 
 # What file extension to read
 params$extension <- "jpg"
+
+
+
 
 
 
@@ -36,6 +46,12 @@ cat("Starting run...")
 # for output, handle each xy region at a time
 for (xyName in params$xy) {
   
+  outputDir <- paste0(params$outputDir,"_",xyName,"/")
+  
+  # Make directories and open file
+  dir.create(outputDir)
+  sink(file="run_output.txt", type="output")
+  
   regionTime <- proc.time()
   cat("\n---------------------------")
   cat(paste0("\nPROCESSING ",xyName))
@@ -45,9 +61,9 @@ for (xyName in params$xy) {
                    params$channelNames, params$extension, n=params$nFrames)[[xyName]]
   
   # Equalize phase images
-  cat("\nEqualizing images")
+  cat("\nEqualizing phase images, formula (image-a)*b")
   ptm <- proc.time()
-  xy$phase <- lapply(xy$phase, solid_equalizeImages)
+  xy$phase <- lapply(xy$phase, solid_equalizePhase)
   cat(paste0("\nImages equalized in ", (proc.time() - ptm)[[3]]))
   
   xy <- solid_alignImages(xy,
@@ -70,24 +86,22 @@ for (xyName in params$xy) {
   # Apply timesteps to row names of timeseries
   rownames(output$timeseries) <- filenames
   
-  
-  cat("\nEqualizing and labeling dye images")
-  ptm <- proc.time()
-  
   # Equalize and label non-phase images
   for (channel in names(xy)[-(names(xy) == "phase")]) {
-    cat(paste0("\n",channel))
-    xy[[channel]] <- lapply(xy[[channel]], solid_equalizeDyeImages)
+    ptm <- proc.time()
+    cat(paste0("\nEqualizing ",channel,", formula (image-a)*b"))
+    xy[[channel]] <- lapply(xy[[channel]], solid_equalizeDye)
+    cat(paste0("\nLabeling ",channel))
     xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
+    cat(paste0("\n", channel, "equalized and labeled in ", (proc.time() - ptm)[[3]]))
   }
-  
-  cat("\nFinding dye overlap")
-  ptm <- proc.time()
   
   dyeOverlap <- list()
   for (channel in names(xy)[-(names(xy) == "phase")]) {
-    cat(paste0("\n",channel))
+    ptm <- proc.time()
+    cat(paste0("\nFinding ",channel, " overlap"))
     dyeOverlap[[channel]] <- findDyeOverlap(xy.labeled[[channel]], xy.labeled$phase, output)
+    cat(paste0("\n", channel, " overlap found in ", (proc.time() - ptm)[[3]]))
   }
   
   buildDirectoryStructure(output, 
@@ -95,12 +109,26 @@ for (xyName in params$xy) {
                           labeled=xy.labeled,
                           dyeOverlap=dyeOverlap, 
                           filenames=filenames,
-                          outputDir=paste0(params$outputDir,xyName,"/"),
+                          outputDir=outputDir,
                           params$distanceScale)
   
+  
+  cat("\n---------------------------")
+  cat(paste0("\nFinished ",xyName, " in ", (proc.time() - regionTime)[[3]]))
+  cat("\n---------------------------")
+  
+  rm(xy)
+  rm(xy.labeled)
+  rm(dyeOverlap)
+  rm(output)
+
+  sink()
+
   
 #   # USEFUL FOR TESITNG
 #   outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
 #   lapply(outlines, display)
   
 }
+
+cat(paste0("\nComplete run finished in ", (proc.time() - ptmTotal)[[3]]))

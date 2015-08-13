@@ -6,8 +6,7 @@
 
 solid_labelPhase <- function(image) {
 
-  print("Searching new image...")
-  ptm <- proc.time()
+  cat(".")
   
   # Blur image to reduce noise in edge finding
   imageEdit <- filter_blur(image)
@@ -39,8 +38,6 @@ solid_labelPhase <- function(image) {
   imageEdit[image < 0.5] <- 0
   
   imageEdit <- EBImage::fillHull(imageEdit)
-  
-  print(proc.time() - ptm)
   
   return(imageEdit)
   

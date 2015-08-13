@@ -75,11 +75,19 @@ params$ignoreSections <- list(xy01=c("bottomLeft","topRight"),
 
 
 
+
+
 ptmTotal <- proc.time()
 cat("Starting run...")
 
 # for output, handle each xy region at a time
 for (xyName in params$xy) {
+  
+  outputDir <- paste0(params$outputDir,"_",xyName,"/")
+  
+  # Make directories and open file
+  dir.create(outputDir)
+  sink(file="run_output.txt", type="output")
   
   regionTime <- proc.time()
   cat("\n---------------------------")
@@ -104,13 +112,10 @@ for (xyName in params$xy) {
   rm(backgrounds)
   rm(dye)
   
-  
-  
-  
   # Equalize phase images
-  cat("\nEqualizing images")
+  cat("\nEqualizing phase images, formula (image-a)*b")
   ptm <- proc.time()
-  xy$phase <- lapply(xy$phase, flow_equalizeImages, params$phaseMedian)
+  xy$phase <- lapply(xy$phase, flow_equalizePhase, params$phaseMedian)
   cat(paste0("\nImages equalized in ", (proc.time() - ptm)[[3]]))
   
   # Rotate and align all channels
@@ -147,29 +152,25 @@ for (xyName in params$xy) {
   
   cat(paste0("\nPhase images labeled in ", (proc.time() - ptm)[[3]]))
   
-  
-  cat("\nEqualizing and labeling dye images")
-  ptm <- proc.time()
-  
-  # Equalize and label non-phase images
-  for (channel in names(xy)[-(names(xy) == "phase")]) {
-    cat(paste0("\n",channel))
-    xy[[channel]] <- lapply(xy[[channel]], flow_equalizeDyeImages, artifactMask)
-    xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
-  }
-  
-  cat(paste0("\nDye images labeled in ", (proc.time() - ptm)[[3]]))
-  
   output <- generateBlobTimeseries(xy.labeled$phase, 
                                    minTimespan=params$minTimespan)
-  
-  cat("\nFinding dye overlap")
-  ptm <- proc.time()
+
+  # Equalize and label non-phase images
+  for (channel in names(xy)[-(names(xy) == "phase")]) {
+    ptm <- proc.time()
+    cat(paste0("\nEqualizing ",channel,", formula (image-a)*"))
+    xy[[channel]] <- lapply(xy[[channel]], flow_equalizeDye, artifactMask)
+    cat(paste0("\nLabeling ",channel))
+    xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
+    cat(paste0("\n", channel, "equalized and labeled in ", (proc.time() - ptm)[[3]]))
+  }
   
   dyeOverlap <- list()
   for (channel in names(xy)[-(names(xy) == "phase")]) {
-    cat(paste0("\n",channel))
+    ptm <- proc.time()
+    cat(paste0("\nFinding ",channel, " overlap"))
     dyeOverlap[[channel]] <- findDyeOverlap(xy.labeled[[channel]], xy.labeled$phase, output)
+    cat(paste0("\n", channel, " overlap found in ", (proc.time() - ptm)[[3]]))
   }
   
   # Generate filenames from timestamps
@@ -189,7 +190,7 @@ for (xyName in params$xy) {
                           labeled=xy.labeled,
                           dyeOverlap=dyeOverlap, 
                           filenames=filenames,
-                          outputDir=paste0(params$outputDir,xyName,"/"),
+                          outputDir=outputDir,
                           params$distanceScale)
   
 
@@ -201,6 +202,8 @@ for (xyName in params$xy) {
   rm(xy.labeled)
   rm(dyeOverlap)
   rm(output)
+  
+  sink()
   
 }
 

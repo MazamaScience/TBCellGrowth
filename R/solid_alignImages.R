@@ -14,7 +14,8 @@
 
 solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace=50) {
   
-  print("Finding alignment targets...")
+  ptm <- proc.time()
+  cat("\nFinding alignment targets...")
   
   # Is the xy pair in the given bounds?
   isInBounds <- function(bounds, xy) {
@@ -46,19 +47,11 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
   alignmentTargets <- 
     alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x+(targetWidth + searchSpace + 50)))))]
   
-#   alignmentTargets <- alignmentTargets[1]
-  
-#   # Sample the background image with alignment targets
-#   bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth):(x[1]+targetWidth),
-#                                                                       (x[2]-targetWidth):(x[2]+targetWidth)])
-#   
-#   bgSamples <- lapply(bgSamples, function(x) filter_blur(x)^2 > 0.3)
-  
   # Vectors detailing how much to shift images
   offset.x <- numeric(length(images$phase))
   offset.y <- numeric(length(images$phase))  
   
-  print("Finding alignment offsets...")
+  cat("\nFinding alignment offsets")
   
   for (i in 2:length(images$phase)) {
     
@@ -99,16 +92,8 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
     offset.x[[i]] <- offset.x[[i-1]] + bestFit[[1]] - searchSpace - 1
     offset.y[[i]] <- offset.y[[i-1]] + bestFit[[2]] - searchSpace - 1
     
-#     display(bgSamples[[1]])
-#     
-#     bgSamples <- lapply(phaseSamples, function(x) x[ bestFit[[1]]:(bestFit[[1]]+targetWidth*2), 
-#                                                      bestFit[[2]]:(bestFit[[2]]+targetWidth*2) ])
-
-    
   }
   
-#   offset.x <- cumsum(offset.x)
-#   offset.y <- cumsum(offset.y)
   
   # Crop images based on offset
   cropT <- abs(max(offset.y)) + 1
@@ -119,7 +104,7 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
   dimx <- dim(images$phase[[1]])[[1]]
   dimy <- dim(images$phase[[1]])[[2]]
   
-  print("Aligning and cropping images...")
+  cat("\nAligning images")
   
   for (ii in 1:length(images)) {
     
@@ -137,11 +122,12 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
       im <- rbind(im, matrix(NA, nrow=padR, ncol=dim(im)[[2]]))
       
       images[[ii]][[jj]] <- im
-#       images[[ii]][[jj]] <- im[(cropX + offset.x[jj]):(dimx - cropX + offset.x[jj]),
-#                                (cropY + offset.y[jj]):(dimy - cropY + offset.y[jj])]
+
     }
     
   }
+  
+  cat(paste0("\nImages aligned in ", (proc.time() - ptm)[[3]]))
   
   return(images)
   

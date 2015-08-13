@@ -14,7 +14,7 @@
 
 flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=30) {
   
-  ptc <- proc.time()
+  ptm <- proc.time()
   cat("\nFinding alignment targets...")
   
   # Is the xy pair in the given bounds?
@@ -40,9 +40,9 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
   
   # Remove targets whose search space falls out of bounds
   alignmentTargets <- 
-    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x-(targetWidth + searchSpace)))))]
+    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x-(50 + targetWidth + searchSpace)))))]
   alignmentTargets <- 
-    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x+(targetWidth + searchSpace)))))]
+    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x+(50 + targetWidth + searchSpace)))))]
   
   # Sample the background image with alignment targets
   bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth):(x[1]+targetWidth),

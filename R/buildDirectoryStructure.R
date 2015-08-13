@@ -16,8 +16,6 @@
 
 buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filenames, 
                                     outputDir="output", distanceScale=NULL) { 
-
-  dir.create(outputDir)
   
   # Merge timeseries together
   excel <- lapply(dyeOverlap, function(x) x)

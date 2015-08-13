@@ -9,7 +9,6 @@
 
 flow_labelPhase <- function(image, artifactMask, ignore) {
   
-  ptm <- proc.time()
   cat(".")
   
   image[image > 1] <- 1

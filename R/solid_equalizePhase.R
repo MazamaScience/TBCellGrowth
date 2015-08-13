@@ -7,9 +7,9 @@
 #' 0 and ~0.5
 #' @return an image of the same dimensions.
 
-solid_equalizeImages <- function(image) {
+solid_equalizePhase<- function(image) {
   
-  cat(".")
+  cat("\n")
   
   image <- filter_blur(image)
   
@@ -21,6 +21,9 @@ solid_equalizeImages <- function(image) {
   
   # What value corresponds to that
   minVal <- valueHist$breaks[index]
+  
+  cat("a=")
+  cat(round(minVal,3))
   
   # Shift and stretch the image so the new minimum is this 
   # minVal and the max is 1
@@ -36,6 +39,9 @@ solid_equalizeImages <- function(image) {
   midVal <- valueHist$breaks[index]
   image <- image / (midVal * 2)
   image[image > 1] <- 1
+  
+  cat(", b=")
+  cat(round(1/(midVal*2),3))
   
   return(image)
   
