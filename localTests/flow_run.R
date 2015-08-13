@@ -162,7 +162,7 @@ for (xyName in params$xy) {
     xy[[channel]] <- lapply(xy[[channel]], flow_equalizeDye, artifactMask)
     cat(paste0("\nLabeling ",channel))
     xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
-    cat(paste0("\n", channel, "equalized and labeled in ", (proc.time() - ptm)[[3]]))
+    cat(paste0("\n", channel, " equalized and labeled in ", (proc.time() - ptm)[[3]]))
   }
   
   dyeOverlap <- list()
