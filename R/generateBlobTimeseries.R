@@ -82,7 +82,11 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   
   # Make a dictionary mapping old ids to names
   if (length(ids) > length(names)) {
-    names <- c(names, paste0(names, "_2"))
+    tempNames <- names
+    times <- ceiling(length(ids) / lenth(names))
+    for (ii in 1:times) {
+      names <- c(names, paste0(tempNames, "_", ii))
+    }
   } 
   newNames <- names[sample(1:length(names),length(ids))]
   names(newNames) <- ids
