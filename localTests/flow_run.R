@@ -34,10 +34,10 @@ if (FALSE) {
 
 
 # How many frames to load
-params$nFrames <- 20 # How many frames to load
+params$nFrames <- 10 # How many frames to load
 
 # What file extension to read
-params$extension <- "tif"
+params$extension <- "jpg"
 
 # How to scale phase and dye
 params$phaseMedian <- 0.4 # What value phase images should be equalized to
@@ -82,12 +82,12 @@ cat("Starting run...")
 
 # for output, handle each xy region at a time
 for (xyName in params$xy) {
-  
+
   outputDir <- paste0(params$outputDir,"_",xyName,"/")
   
   # Make directories and open file
   dir.create(outputDir)
-  sink(file="run_output.txt", type="output")
+  if(!DEBUG) sink(file=paste0(outputDir,"run_output.txt"), type="output")
   
   regionTime <- proc.time()
   cat("\n---------------------------")
@@ -203,7 +203,7 @@ for (xyName in params$xy) {
   rm(dyeOverlap)
   rm(output)
   
-  sink()
+  if(!DEBUG) sink()
   
 }
 

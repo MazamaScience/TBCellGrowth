@@ -180,3 +180,4 @@ writeImages <- function(images, outputDir, id, channel, filenames) {
   }
   createGif(paste0(outputDir, "/", id, "/", channel, "/"), paste0("g_",id,".gif"))
 }
+

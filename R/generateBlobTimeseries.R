@@ -71,6 +71,34 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   
   cat(paste0("\nTimeseries built in ", (proc.time() - ptm)[[3]]))
   
+  
+  
+  # DEV
+  names <- as.list(read.csv("localData/names.csv", stringsAsFactors=F))[[1]]
+  names <- names[nchar(names) < 8]
+  
+  # Find all IDs that are in use
+  ids <- unique(unlist(lapply(centroids, function(x) as.character(x$id))))
+  
+  # Make a dictionary mapping old ids to names
+  if (length(ids) > length(names)) {
+    names <- c(names, paste0(names, "_2"))
+  } 
+  newNames <- names[sample(1:length(names),length(ids))]
+  names(newNames) <- ids
+  
+  # Apply new names to centroids
+  for (ii in 1:length(centroids)) {
+    cen <- centroids[[ii]]
+    ids <- as.character(cen$id)
+    cen$id <- unlist(newNames[ids])
+  }
+  
+  # Apply new names to timeseries
+  colnames(output) <- unlist(newNames[colnames(output)])
+  
+  
+  
   return(list(
     timeseries = output,
     centroids = centroids

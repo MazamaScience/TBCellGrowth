@@ -37,7 +37,7 @@ params$extension <- "jpg"
 
 
 
-
+DEBUG <- TRUE
 
 
 ptmTotal <- proc.time()
@@ -50,7 +50,7 @@ for (xyName in params$xy) {
   
   # Make directories and open file
   dir.create(outputDir)
-  sink(file=paste0(outputDir,"run_output.txt"), type="output")
+  if(!DEBUG) sink(file=paste0(outputDir,"run_output.txt"), type="output")
   
   regionTime <- proc.time()
   cat("\n---------------------------")
@@ -124,7 +124,7 @@ for (xyName in params$xy) {
   rm(dyeOverlap)
   rm(output)
 
-  sink()
+  if(!DEBUG) sink()
 
   
 #   # USEFUL FOR TESITNG

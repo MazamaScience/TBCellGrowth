@@ -27,7 +27,7 @@ cropImageByID <- function(id, output, phase, labeled) {
   # Get centroid data just for this id
   cId <- lapply(centroids, function(x) x[x$id == id,])
 
-  buffer <- 50
+  buffer <- 75
   
   # Find the boundaries of the blob
   # Add a 15 pixel buffer
