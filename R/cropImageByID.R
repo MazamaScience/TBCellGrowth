@@ -43,21 +43,25 @@ cropImageByID <- function(id, output, phase, labeled) {
   y2 <- min(y2, dimy)
   
   bgRet    <- vector("list",length(phase))
-  labelRet <- vector("list",length(phase))
+  labelSingle <- vector("list",length(phase))
+  labelFull <- vector("list",length(phase))
   
   for (ii in 1:length(phase)) {
     
     # Crop the area
     bgRet[[ii]] <- phase[[ii]][x1:x2,y1:y2]
     
+    # All blobs
+    labelFull[[ii]] <- labeled[[ii]][x1:x2,y1:y2]
+    
     # Get labeled subsection
     labelbg <- labeled[[ii]][x1:x2,y1:y2]
     isIndex <- labelbg == cId[[ii]]$index
     if (length(isIndex) < 1) isIndex <- labelbg < -1
-    labelRet[[ii]] <- isIndex
+    labelSingle[[ii]] <- isIndex
   
   }
     
-  return(list(bg=bgRet, label=labelRet))
+  return(list(bg=bgRet, labelSingle=labelSingle, labelFull=labelFull))
   
 }

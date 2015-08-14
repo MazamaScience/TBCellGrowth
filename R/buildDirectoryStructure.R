@@ -92,7 +92,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
     # Crop and color phase images
     cropped_phase <- cropImageByID(id, output, phase, labeled$phase)
 #     colored_phase <- mapply(overlayColor, "phase", cropped_phase$bg, cropped_phase$label, SIMPLIFY=FALSE)
-    color_phase <- mapply(overlayOutlines, cropped_phase$bg, cropped_phase$label, col="yellow", thick=FALSE, SIMPLIFY=FALSE)
+    color_phase <- mapply(overlayOutlines, cropped_phase$bg, cropped_phase$labelSingle, col="yellow", thick=FALSE, SIMPLIFY=FALSE)
     color_phase <- lapply(color_phase, overlayScaleBar, distanceScale, 80)
     color_phase <- mapply(overlayVitalStats, color_phase, id, filenames, sizes, distanceScale, SIMPLIFY=FALSE)
 

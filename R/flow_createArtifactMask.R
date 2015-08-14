@@ -19,7 +19,7 @@ flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   edges <- EBImage::dilateGreyScale(edges, EBImage::makeBrush(9, 'disc'))
   # Fill holes
   edges <- EBImage::fillHull(edges)
-  edges <- EBImage::erodeGreyScale(edges, EBImage::makeBrush(7, 'disc'))
+  edges <- EBImage::erodeGreyScale(edges, EBImage::makeBrush(5, 'disc'))
   
   
   # Label blobs

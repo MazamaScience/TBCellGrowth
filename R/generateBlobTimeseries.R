@@ -91,7 +91,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   for (ii in 1:length(centroids)) {
     cen <- centroids[[ii]]
     ids <- as.character(cen$id)
-    cen$id <- unlist(newNames[ids])
+    centroids[[ii]]$id <- unlist(newNames[ids])
   }
   
   # Apply new names to timeseries

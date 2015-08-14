@@ -26,7 +26,7 @@ overlayVitalStats <- function(image, id, time, size, distanceScale) {
   # near the grid lines
   plotf <- function() {
     text(5,8,paste0(time,"hr"),cex=1,adj=c(0,NA))
-    text(5,20,paste0(id,"id"),cex=1,adj=c(0,NA))
+    text(5,20,paste0(id),cex=1,adj=c(0,NA))
     text(5,32,paste0(size,"µm^2"),cex=1,adj=c(0,NA))
   }
   
