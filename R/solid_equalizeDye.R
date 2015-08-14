@@ -1,7 +1,6 @@
 #' @export
 #' @title Normalize Dye Image Values
 #' @param image the image matrix to modify.
-#' @param artifactMask a mask of non biological features to ignore. See \link{flow_createArtifactMask}.
 #' @description Normalize a given dye image. TODO More info here
 #' @return an image of the same dimensions.
 #' 

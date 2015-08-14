@@ -34,7 +34,7 @@ if (FALSE) {
 
 
 # How many frames to load
-params$nFrames <- 10 # How many frames to load
+params$nFrames <- 6 # How many frames to load
 
 # What file extension to read
 params$extension <- "jpg"
@@ -188,7 +188,7 @@ for (xyName in params$xy) {
   buildDirectoryStructure(output, 
                           phase=xy$phase, 
                           labeled=xy.labeled,
-                          dyeOverlap=dyeOverlap, 
+                          dyeOverlap=dyeOverlap,
                           filenames=filenames,
                           outputDir=outputDir,
                           distanceScale=params$distanceScale)

@@ -27,8 +27,13 @@ overlayColor <- function(color, bg, label, mergeWith=NULL) {
       image <- EBImage::Image(stack, colormode="Color") 
     }
   } else {
-    stack <- simplify2array(list(bg,bg,bg))
-    image <- EBImage::Image(stack, colormode="Color") 
+    if (class(bg) != "Image") {
+      stack <- simplify2array(list(bg,bg,bg))
+      image <- EBImage::Image(stack, colormode="Color") 
+    } else {
+      image <- bg
+    }
+   
   }
   
   # Some labels are in 0 to n  instead of TRUE/FALSE.

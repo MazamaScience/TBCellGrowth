@@ -1,16 +1,22 @@
 #' @export
 #' @title Adds ID Labels to Neighboring BLobs
 #' @param image an image matrix
+#' @param labels a matrix of blob labels
 #' @param id the blob id the image is focused on
-#' @param time the timestep at this frame
-#' @param size the object size in um
-#' @param distanceScale the distance conversion in um/pixel
-#' @description Overylay a series of statistics to an image
-#' from cropImageByID. TODO add more details when they are
-#' avaiable
+#' @param centroids a dataframe of blob centroids corresponding to this frame
+#' @description Add text id labels to nearby blobs for cropped images.
 #' @return a \code{matrix} image.
 
+
+## DEBUG
+# i = 2
+# image <- color_phase[[i]]
+# labels <- cropped_phase$labelFull[[i]]
+# centroids <- output$centroids[[i]]
+
 overlayNeighborsIDs <- function(image, labels, id, centroids) {
+  
+  if (sum(labels) < 1) return(image)
   
   #centroids = output$centroids[[1]]
   
@@ -30,7 +36,6 @@ overlayNeighborsIDs <- function(image, labels, id, centroids) {
     centroids <- centroids[centroids$index %in% indices[-which(whichIsMain)],]
   }
   
-  
   # Find new centroids for just this image
   for (index in centroids$index) {
     ind <- which(labels == index, arr.ind=T)
@@ -42,10 +47,12 @@ overlayNeighborsIDs <- function(image, labels, id, centroids) {
     centroids[centroids$index==index,]$ymax <- max(ind[,2])
   }
   
-  ymask <- centroids$y < 40
-  xmask <- centroids$x < 60
+  ymask <- centroids$y > 40
+  xmask <- centroids$x > 60
   
-  centroids <- centroids[!xmask & !ymask,]
+  centroids <- centroids[(xmask | ymask),]
+  
+  if (dim(centroids)[[1]] < 1) return(image)
   
   plotf <- function() {
     for (ii in 1:dim(centroids)[[1]]) {

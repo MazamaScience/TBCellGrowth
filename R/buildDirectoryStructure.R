@@ -102,7 +102,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
     # Write non phase channels
     for (cName in names(labeled)[names(labeled) != "phase"]) {
       channel <- labeled[[cName]]
-      cropped_dye <- cropImageByID(id, output, phase, channel)$label
+      cropped_dye <- cropImageByID(id, output, phase, channel)$labelFull
       color_dye <- mapply(overlayOutlines, color_phase, cropped_dye, col=cName, thick=FALSE, SIMPLIFY=FALSE)
       writeImages(color_dye, outputDir, id, cName, filenames)
     }
