@@ -12,6 +12,8 @@
 
 overlayNeighborsIDs <- function(image, labels, id, centroids) {
   
+  #centroids = output$centroids[[1]]
+  
   dimx <- dim(image)[[1]]
   dimy <- dim(image)[[2]]
   
@@ -23,7 +25,11 @@ overlayNeighborsIDs <- function(image, labels, id, centroids) {
   centroids <- centroids[which(centroids$index %in% indices),]
   
   # Remove main id from indices
-  centroids <- centroids[centroids$index %in% indices[-which(indices==centroids[centroids$id==id,]$index)],]
+  whichIsMain <- indices==centroids[centroids$id==id,]$index
+  if (length(whichIsMain) > 0) {
+    centroids <- centroids[centroids$index %in% indices[-which(whichIsMain)],]
+  }
+  
   
   # Find new centroids for just this image
   for (index in centroids$index) {
@@ -57,5 +63,7 @@ overlayNeighborsIDs <- function(image, labels, id, centroids) {
   overlay <- plotToOverlay(plotf, dimx, dimy)
   
   image[overlay > 0.4] <- 1
+  
+  return(image)
   
 }

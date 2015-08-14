@@ -95,6 +95,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
     color_phase <- mapply(overlayOutlines, cropped_phase$bg, cropped_phase$labelSingle, col="yellow", thick=FALSE, SIMPLIFY=FALSE)
     color_phase <- lapply(color_phase, overlayScaleBar, distanceScale, 80)
     color_phase <- mapply(overlayVitalStats, color_phase, id, filenames, sizes, distanceScale, SIMPLIFY=FALSE)
+    color_phase <- mapply(overlayNeighborsIDs, color_phase, cropped_phase$labelFull, id, output$centroids, SIMPLIFY=FALSE)
 
     writeImages(color_phase, outputDir, id, "phase", filenames)
 
