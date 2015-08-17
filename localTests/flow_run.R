@@ -7,7 +7,7 @@ if (FALSE) {
 # Input and output directories
 params$inputDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Time Course"
 params$backgroundDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Background"
-params$outputDir <- "~/Desktop/outputFlow_08052015"
+params$outputDir <- "~/Desktop/outputFlow_08142015"
 
 # Configure which dyes to use,
 params$xy <- c("xy01","xy02","xy03","xy04",
@@ -34,10 +34,10 @@ if (FALSE) {
 
 
 # How many frames to load
-params$nFrames <- 6 # How many frames to load
+params$nFrames <- 20 # How many frames to load
 
 # What file extension to read
-params$extension <- "jpg"
+params$extension <- "tif"
 
 # How to scale phase and dye
 params$phaseMedian <- 0.4 # What value phase images should be equalized to
@@ -75,7 +75,7 @@ params$ignoreSections <- list(xy01=c("bottomLeft","topRight"),
 
 
 
-
+DEBUG = FALSE
 
 ptmTotal <- proc.time()
 cat("Starting run...")

@@ -63,7 +63,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
     return(m)
   })
   sorted <- sort(sorted,TRUE)
-  output <- output[,order(sorted)]
+  output <- output[,names(sorted)]
   
   # Make analysis dataframe
   analysis <- output[-c(1:dim(output)[1]),]

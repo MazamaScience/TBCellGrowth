@@ -5,11 +5,15 @@ params <- list()
 if (FALSE) {
   params$inputDir <- "localData/solid/"
   params$outputDir <- "~/Desktop/outputTest01"
+  params$nFrames <- 7
+  params$extension <- "jpg"
 }
 
 if (FALSE) {
-  params$inputDir <- "/Volumes/MazamaDataMobile/Data/solid/Time course/"
-  params$outputDir <- "~/Desktop/outputSolid_08122015"
+  params$inputDir <- "~/Desktop/TBData/solid/Time course/"
+  params$outputDir <- "~/Desktop/outputSolid_08152015"
+  params$nFrames <- 20
+  params$extension <- "tif"
 }
 
 # Which channels and regions to load
@@ -28,16 +32,10 @@ params$searchSpace <- 70 # How far left, top, right, down to search for alignmen
 params$minTimespan <- 7 # How long a blob must be active to appear on table
 params$maxDistance <- 75 # How far a blob can travel in pixels
 
-# How many frames to load
-params$nFrames <- 15
-
-# What file extension to read
-params$extension <- "jpg"
 
 
 
-
-DEBUG <- TRUE
+DEBUG <- FALSE
 
 
 ptmTotal <- proc.time()
@@ -67,9 +65,9 @@ for (xyName in params$xy) {
   cat(paste0("\nImages equalized in ", (proc.time() - ptm)[[3]]))
   
   xy <- solid_alignImages(xy,
-                         numTargets=params$numTargets,
-                         targetWidth=params$targetWidth, 
-                         searchSpace=params$searchSpace)
+                          numTargets=params$numTargets,
+                          targetWidth=params$targetWidth, 
+                          searchSpace=params$searchSpace)
   
   cat("Labeling phase images")
   
@@ -123,13 +121,13 @@ for (xyName in params$xy) {
   rm(xy.labeled)
   rm(dyeOverlap)
   rm(output)
-
-  if(!DEBUG) sink()
-
   
-#   # USEFUL FOR TESITNG
-#   outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
-#   lapply(outlines, display)
+  if(!DEBUG) sink()
+  
+  
+  #   # USEFUL FOR TESITNG
+  #   outlines <- mapply(overlayOutlines, xy$phase, xy.labeled$phase, SIMPLIFY=FALSE)
+  #   lapply(outlines, display)
   
 }
 
