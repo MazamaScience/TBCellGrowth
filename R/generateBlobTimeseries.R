@@ -75,9 +75,12 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   
   
   
-  # DEV
+  # HUMAN READABLE NAMES
+  ######################
+  ######################
+  
   names <- as.list(read.csv("localData/names.csv", stringsAsFactors=F))[[1]]
-  names <- names[nchar(names) < 8]
+  names <- unique(names[nchar(names) < 8])
   
   # Find all IDs that are in use
   ids <- unique(unlist(lapply(centroids, function(x) as.character(x$id))))
@@ -103,7 +106,8 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   # Apply new names to timeseries
   colnames(output) <- unlist(newNames[colnames(output)])
   
-  
+  ######################
+  ######################
   
   return(list(
     timeseries = output,
