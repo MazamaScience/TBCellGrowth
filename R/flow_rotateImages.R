@@ -64,7 +64,7 @@ flow_rotateImages <- function(images,
   
   images <- lapply(images, function(dye) lapply(dye, rotateAndCrop))
   
-  cat(paste0("\nImages rotated in ", (proc.time() - ptm)[[3]]))
+  cat(paste0("\nImages rotated in ", formatTime(ptm)))
   
   return(images)
   

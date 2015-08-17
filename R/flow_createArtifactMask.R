@@ -33,7 +33,7 @@ flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
 #   
   edges <- removeBlobs(edges, 250)
   
-  cat(paste0("\nArtifact mask create in ", (proc.time() - ptm)[[3]]))
+  cat(paste0("\nArtifact mask created in ", formatTime(ptm)))
   
   return (edges > 0)
   

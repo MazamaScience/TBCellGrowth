@@ -109,7 +109,7 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
     
   }
   
-  cat(paste0("\nImages aligned in ", (proc.time() - ptm)[[3]]))
+  cat(paste0("\nImages aligned in ", formatTime(ptm)))
   
   return(images)
   

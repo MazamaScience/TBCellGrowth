@@ -71,7 +71,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   analysis <- output[-c(1:dim(output)[1]),]
   analysis[1,] <- 0
   
-  cat(paste0("\nTimeseries built in ", (proc.time() - ptm)[[3]]))
+  cat(paste0("\nTimeseries built in ", formatTime(ptm)))
   
   
   

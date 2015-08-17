@@ -2,12 +2,14 @@
 #' @title Add a Scale Bar to an Image
 #' @param image an image matrix
 #' @param distanceScale the image scale in micrometers
-#' @param barLength how many pixels wide the scale bar should be
+#' @param thresholds the length of the scale bar in sequential order. The last
+#' number in the vector will be used unless the image is small enough for one
+#' of the other values.
 #' @description Adds a bar to the bottom right of an image.
 #' The bar is labeled according to the scale that is passed in.
 #' @return a \code{matrix} image.
 
-overlayScaleBar <- function(image, distanceScale) {
+overlayScaleBar <- function(image, distanceScale, thresholds=c(10,50,100)) {
   
 #   distanceScale <- distanceScale * barLength
 #   
@@ -33,7 +35,10 @@ overlayScaleBar <- function(image, distanceScale) {
   
   dimxum <- distanceScale * dimx
   
-  distance <- ifelse(dimxum < 120, 50, 100)
+  distance <- thresholds[dimxum > thresholds + 10]
+  distance <- distance[length(distance)]
+  if (length(distance) < 1) distance <- 5
+  
   barLength <- distance / distanceScale
   
   plotf <- function() {
