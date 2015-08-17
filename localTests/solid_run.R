@@ -4,7 +4,8 @@ params <- list()
 ### TESTING
 if (FALSE) {
   params$inputDir <- "localData/solid/"
-  params$outputDir <- "~/Desktop/outputTest01"
+  # params$outputDir <- "~/Desktop/outputTest01"
+  params$outputDir <- "/Users/Jonathan/Desktop/outputSolidTest"
   params$nFrames <- 7
   params$minTimespan <- 5
   params$extension <- "jpg"
@@ -32,10 +33,6 @@ params$distanceScale <- 0.43 # units: pixels / um
 params$numTargets <- 12 # How many target features to use for alignment
 params$targetWidth <- 50 # How large of a region the targets should be
 params$searchSpace <- 70 # How far left, top, right, down to search for alignment
-
-params$maxDistance <- 75 # How far a blob can travel in pixels
-
-
 
 
 DEBUG <- FALSE
@@ -72,7 +69,7 @@ for (xyName in params$xy) {
                           targetWidth=params$targetWidth, 
                           searchSpace=params$searchSpace)
   
-  cat("Labeling phase images")
+  cat("\nLabeling phase images")
   
   xy.labeled <- list()
   xy.labeled$phase <- lapply(xy$phase, solid_labelPhase)
@@ -135,3 +132,7 @@ for (xyName in params$xy) {
 }
 
 cat(paste0("\nComplete run finished in ", formatTime(ptmTotal)))
+params$maxDistance <- 75 # How far a blob can travel in pixels
+
+
+

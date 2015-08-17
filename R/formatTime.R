@@ -1,3 +1,4 @@
+#' @export
 #' @title Formats Elapsed Time
 #' @param proctime a proc_time object
 #' @param digits the number of digits to round the output time to
