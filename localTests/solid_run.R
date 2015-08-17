@@ -110,7 +110,7 @@ for (xyName in params$xy) {
                           dyeOverlap=dyeOverlap, 
                           filenames=filenames,
                           outputDir=outputDir,
-                          params$distanceScale)
+                          distanceScale=params$distanceScale)
   
   
   cat("\n---------------------------")

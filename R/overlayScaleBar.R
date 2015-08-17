@@ -7,7 +7,7 @@
 #' The bar is labeled according to the scale that is passed in.
 #' @return a \code{matrix} image.
 
-overlayScaleBar <- function(image, distanceScale, barLength=100) {
+overlayScaleBar <- function(image, distanceScale) {
   
 #   distanceScale <- distanceScale * barLength
 #   
@@ -27,14 +27,17 @@ overlayScaleBar <- function(image, distanceScale, barLength=100) {
 #   return(image)
 # 
   
-  distanceScale <- distanceScale * barLength
-  
   # Get dimensions
   dimx <- dim(image)[[1]]
   dimy <- dim(image)[[2]]
   
+  dimxum <- distanceScale * dimx
+  
+  distance <- ifelse(dimxum < 120, 50, 100)
+  barLength <- distance / distanceScale
+  
   plotf <- function() {
-    text(dimx-(barLength/2)-10, dimy-20, paste(distanceScale,"µm"), cex=barLength/85)
+    text(dimx-(barLength/2)-10, dimy-20, paste(distance,"µm"), cex=barLength/100)
     lines(c(dimx-barLength-10,dimx-10), rep(dimy-10,2), lwd=3)
   }
   

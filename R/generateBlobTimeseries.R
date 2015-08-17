@@ -55,6 +55,8 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   # n images
   output <- output[,apply(output, 2, function(x) sum(!is.na(x)) > minTimespan)]
   
+  cat("\nTimeseries sorted by slope of ln(timeseries)")
+  
   # Sort output by linear growth slope
   sorted <- apply(log(output), 2, function(x) { 
     x <- x[!is.na(x)]
