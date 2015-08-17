@@ -6,7 +6,11 @@ if (FALSE) {
   params$inputDir <- "localData/solid/"
   params$outputDir <- "~/Desktop/outputTest01"
   params$nFrames <- 7
+  params$minTimespan <- 5
   params$extension <- "jpg"
+  params$xy <- c("xy2")             # Single section to look at
+  params$channels <- c("c1","c3")         # One or more channels to look at, c1 required
+  params$channelNames <- c("phase","red")    # Names of channels, 'phase' is required
 }
 
 if (FALSE) {
@@ -14,12 +18,12 @@ if (FALSE) {
   params$outputDir <- "~/Desktop/outputSolid_08152015"
   params$nFrames <- 20
   params$extension <- "tif"
+  params$xy <- c("xy2")             # Single section to look at
+  params$channels <- c("c1","c3")         # One or more channels to look at, c1 required
+  params$channelNames <- c("phase","red")    # Names of channels, 'phase' is required
+  params$minTImespan <- 8
 }
 
-# Which channels and regions to load
-params$xy <- c("xy2")             # Single section to look at
-params$channels <- c("c1","c3")         # One or more channels to look at, c1 required
-params$channelNames <- c("phase","red")    # Names of channels, 'phase' is required
 
 params$startTime <- 0 # Time of first image
 params$timestep <- 3 # Timestep in hours
@@ -29,7 +33,6 @@ params$numTargets <- 12 # How many target features to use for alignment
 params$targetWidth <- 50 # How large of a region the targets should be
 params$searchSpace <- 70 # How far left, top, right, down to search for alignment
 
-params$minTimespan <- 7 # How long a blob must be active to appear on table
 params$maxDistance <- 75 # How far a blob can travel in pixels
 
 
