@@ -15,7 +15,7 @@
 
 loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), ext="tiff", start=1, n=NA) {
   
-  ptc <- proc.time()
+  ptm <- proc.time()
   cat("\nLoading images")
   
   readf <- function(im) {
@@ -47,7 +47,7 @@ loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), e
     names(images[[xyn]]) <- channelNames
   }
   
-  cat(paste0("\nImages loaded in ", (proc.time() - ptc)[[3]]))
+  cat(paste0("\nImages loaded in ", formatTime(ptm)))
   
   return(images)
   

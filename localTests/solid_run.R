@@ -62,7 +62,7 @@ for (xyName in params$xy) {
   cat("\nEqualizing phase images, formula (image-a)*b")
   ptm <- proc.time()
   xy$phase <- lapply(xy$phase, solid_equalizePhase)
-  cat(paste0("\nImages equalized in ", (proc.time() - ptm)[[3]]))
+  cat(paste0("\nImages equalized in ", formatTime(ptm)))
   
   xy <- solid_alignImages(xy,
                           numTargets=params$numTargets,
@@ -93,7 +93,7 @@ for (xyName in params$xy) {
     xy[[channel]] <- lapply(xy[[channel]], solid_equalizeDye)
     cat(paste0("\nLabeling ",channel))
     xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
-    cat(paste0("\n", channel, " equalized and labeled in ", (proc.time() - ptm)[[3]]))
+    cat(paste0("\n", channel, " equalized and labeled in ", formatTime(ptm)))
   }
   
   dyeOverlap <- list()
@@ -101,7 +101,7 @@ for (xyName in params$xy) {
     ptm <- proc.time()
     cat(paste0("\nFinding ",channel, " overlap"))
     dyeOverlap[[channel]] <- findDyeOverlap(xy.labeled[[channel]], xy.labeled$phase, output)
-    cat(paste0("\n", channel, " overlap found in ", (proc.time() - ptm)[[3]]))
+    cat(paste0("\n", channel, " overlap found in ", formatTime(ptm)))
   }
   
   buildDirectoryStructure(output, 
@@ -114,7 +114,7 @@ for (xyName in params$xy) {
   
   
   cat("\n---------------------------")
-  cat(paste0("\nFinished ",xyName, " in ", (proc.time() - regionTime)[[3]]))
+  cat(paste0("\nFinished ",xyName, " in ", formatTime(regionTime)))
   cat("\n---------------------------")
   
   rm(xy)
@@ -131,4 +131,4 @@ for (xyName in params$xy) {
   
 }
 
-cat(paste0("\nComplete run finished in ", (proc.time() - ptmTotal)[[3]]))
+cat(paste0("\nComplete run finished in ", formatTime(ptmTotal)))
