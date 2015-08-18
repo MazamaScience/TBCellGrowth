@@ -64,11 +64,36 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
     
     image <- images$phase[[i]]
     
-    phaseSamples <- lapply(alignmentTargets, function(x) images$phase[[i]][(x[[1]]-targetWidth-searchSpace+offset.x[[i-1]]):(x[[1]]+targetWidth+searchSpace+offset.x[[i-1]]),
-                                                               (x[[2]]-targetWidth-searchSpace+offset.y[[i-1]]):(x[[2]]+targetWidth+searchSpace+offset.y[[i-1]])])
+    phaseSamples <- lapply(alignmentTargets, function(x) {
+      x1 <- (x[[1]]-targetWidth-searchSpace+offset.x[[i-1]])
+      x2 <- (x[[1]]+targetWidth+searchSpace+offset.x[[i-1]])
+      y1 <- (x[[2]]-targetWidth-searchSpace+offset.y[[i-1]])
+      y2 <- (x[[2]]+targetWidth+searchSpace+offset.y[[i-1]])
+      result <- tryCatch({
+        sample <- images$phase[[i]][x1:x2,y1:y2]
+      }, error = function(e) {
+        NULL
+      })
+      return(sample)
+    })
     
-    bgSamples <- lapply(alignmentTargets, function(x) images$phase[[i-1]][(x[[1]]-targetWidth+offset.x[[i-1]]):(x[[1]]+targetWidth+offset.x[[i-1]]),
-                                                               (x[[2]]-targetWidth+offset.y[[i-1]]):(x[[2]]+targetWidth+offset.y[[i-1]])])
+    bgSamples <- lapply(alignmentTargets, function(x) {
+      x1 <- (x[[1]]-targetWidth+offset.x[[i-1]])
+      x2 <- (x[[1]]+targetWidth+offset.x[[i-1]])
+      y1 <- (x[[2]]-targetWidth+offset.y[[i-1]])
+      y2 <- (x[[2]]+targetWidth+offset.y[[i-1]])
+      result <- tryCatch({
+        sample <- images$phase[[i-1]][x1:x2,y1:y2]
+      }, error = function(e) {
+        NULL
+      })
+      return(sample)
+    })
+    
+    nullMask <- unlist(lapply(phaseSamples, is.null)) | unlist(lapply(bgSamples, is.null))
+    
+    phaseSamples[nullMask] <- NULL
+    bgSamples[nullMask] <- NULL
     
     bgSamples <- lapply(bgSamples, function(x) filter_blur(x)^2 > 0.3)
     phaseSamples <- lapply(phaseSamples, function(x) filter_blur(x)^2 > 0.3)
