@@ -15,8 +15,8 @@ if (FALSE) {
 }
 
 if (FALSE) {
-  params$inputDir <- "~/Desktop/tbTest/solid/Time course/"
-  params$outputDir <- "~/Desktop/outputSolid_08172015"
+  params$inputDir <- "~/Desktop/TBData/solid/Time course/"
+  params$outputDir <- "~/Desktop/outputSolid_08182015"
   params$nFrames <- 20
   params$extension <- "tif"
   params$xy <- c("xy4","xy5","xy7","xy8")             # Single section to look at

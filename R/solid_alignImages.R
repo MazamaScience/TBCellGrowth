@@ -15,7 +15,7 @@
 solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace=50) {
   
   ptm <- proc.time()
-  cat("\nFinding alignment targets...")
+  cat("\nFinding alignment targets")
   
   # Is the xy pair in the given bounds?
   isInBounds <- function(bounds, xy) {
@@ -49,7 +49,12 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
   
   # Vectors detailing how much to shift images
   offset.x <- numeric(length(images$phase))
-  offset.y <- numeric(length(images$phase))  
+  offset.y <- numeric(length(images$phase))
+  
+  if (length(unique(alignmentTargets)) < 4) {
+    cat("\nNot enough alignment targets found, aborting alignment")
+    return(images)
+  }
   
   cat("\nFinding alignment offsets")
   

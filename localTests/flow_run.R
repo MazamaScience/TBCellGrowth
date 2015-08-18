@@ -7,14 +7,14 @@ if (FALSE) {
 # Input and output directories
 params$inputDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Time Course"
 params$backgroundDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Background"
-params$outputDir <- "~/Desktop/outputFlow_08142015"
+params$outputDir <- "~/Desktop/outputFlow_08172015"
 
 # Configure which dyes to use,
 params$xy <- c("xy01","xy02","xy03","xy04",
                "xy05","xy06","xy07","xy08",
                "xy09","xy10","xy11","xy12")             # Single section to look at
-params$channels <- c("c1","c4")         # One or more channels to look at, c1 required
-params$channelNames <- c("phase","green")    # Names of channels, 'phase' is required
+params$channels <- c("c1")         # One or more channels to look at, c1 required
+params$channelNames <- c("phase")    # Names of channels, 'phase' is required
 
 }
 
