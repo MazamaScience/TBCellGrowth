@@ -134,6 +134,8 @@ excelHyperlink <- function(url, text) {
 # and a vector of times / filenames
 writeExcel <- function(df, outputDir, channel, filenames) {
   
+  if (dim(df)[[2]] < 1) return()
+  
   write.csv(df, paste0(outputDir, "/", channel, "_noLinks.csv"))
   
   # Creates hyperlinks to specific images
