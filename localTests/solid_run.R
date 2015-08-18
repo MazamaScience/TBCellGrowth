@@ -19,11 +19,20 @@ if (FALSE) {
   params$outputDir <- "~/Desktop/outputSolid_08182015"
   params$nFrames <- 20
   params$extension <- "tif"
-  params$xy <- c("xy4","xy5","xy7","xy8")             # Single section to look at
+  params$xy <- c("xy2","xy3","xy4","xy5","xy7","xy8")             # Single section to look at
   params$channels <- c("c1","c3")         # One or more channels to look at, c1 required
   params$channelNames <- c("phase","red")    # Names of channels, 'phase' is required
   params$minTimespan <- 6
 }
+
+params$maxDistance <- 75
+params$startTime <- 0 # Time of first image
+params$timestep <- 3 # Timestep in hours
+params$distanceScale <- 0.43 # units: pixels / um
+
+params$numTargets <- 12 # How many target features to use for alignment
+params$targetWidth <- 50 # How large of a region the targets should be
+params$searchSpace <- 70 # How far left, top, right, down to search for alignment
  
 DEBUG <- FALSE
 
@@ -55,7 +64,7 @@ run <- function() {
     xy$phase <- lapply(xy$phase, solid_equalizePhase)
     cat(paste0("\nImages equalized in ", formatTime(ptm)))
     
-    test <- solid_alignImages(xy,
+    xy <- solid_alignImages(xy,
                             numTargets=params$numTargets,
                             targetWidth=params$targetWidth, 
                             searchSpace=params$searchSpace)
