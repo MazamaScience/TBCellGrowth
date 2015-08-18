@@ -69,12 +69,14 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
       x2 <- (x[[1]]+targetWidth+searchSpace+offset.x[[i-1]])
       y1 <- (x[[2]]-targetWidth-searchSpace+offset.y[[i-1]])
       y2 <- (x[[2]]+targetWidth+searchSpace+offset.y[[i-1]])
-      result <- tryCatch({
-        sample <- images$phase[[i]][x1:x2,y1:y2]
-      }, error = function(e) {
-        NULL
-      })
-      return(sample)
+      if (sum(c(x1,x2,y1,y2) < 0) > 0) return(NULL)
+      return(images$phase[[i]][x1:x2,y1:y2])
+#       result <- tryCatch({
+#         sample <- images$phase[[i]][x1:x2,y1:y2]
+#       }, error = function(e) {
+#         sample <- NULL
+#       })
+#       return(sample)
     })
     
     bgSamples <- lapply(alignmentTargets, function(x) {
@@ -82,12 +84,14 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
       x2 <- (x[[1]]+targetWidth+offset.x[[i-1]])
       y1 <- (x[[2]]-targetWidth+offset.y[[i-1]])
       y2 <- (x[[2]]+targetWidth+offset.y[[i-1]])
-      result <- tryCatch({
-        sample <- images$phase[[i-1]][x1:x2,y1:y2]
-      }, error = function(e) {
-        NULL
-      })
-      return(sample)
+      if (sum(c(x1,x2,y1,y2) < 0) > 0) return(NULL)
+      return(images$phase[[i-1]][x1:x2,y1:y2])
+#       result <- tryCatch({
+#         sample <- images$phase[[i-1]][x1:x2,y1:y2]
+#       }, error = function(e) {
+#         sample <- NULL
+#       })
+#       return(sample)
     })
     
     nullMask <- unlist(lapply(phaseSamples, is.null)) | unlist(lapply(bgSamples, is.null))
@@ -112,7 +116,7 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
         # Find the total difference between samples
         diffs <- unlist(mapply(function(x,x1) sum(abs(x-x1), na.rm=TRUE), bgSamples, phaseSubset, SIMPLIFY=FALSE))
         
-        sampleDiffs[ii,jj] <- min(diffs, na.rm=TRUE)
+        sampleDiffs[ii,jj] <- mean(diffs, na.rm=TRUE)
         
       }
     }
