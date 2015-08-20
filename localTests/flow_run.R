@@ -4,20 +4,23 @@ params <- list()
 # Massive run
 if (FALSE) {
   
-# Input and output directories
-params$inputDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Time Course"
-params$backgroundDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Background"
-params$outputDir <- "~/Desktop/outputFlow_08172015"
-
-# Configure which dyes to use,
-params$xy <- c("xy01","xy02","xy03","xy04",
-               "xy05","xy06","xy07","xy08",
-               "xy09","xy10","xy11","xy12")             # Single section to look at
-params$channels <- c("c1","c3","c4")         # One or more channels to look at, c1 required
-params$channelNames <- c("phase","red","green")    # Names of channels, 'phase' is required
-
-# How many frames to load
-params$nFrames <- 20 # How many frames to load
+  # Input and output directories
+  params$inputDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Time Course"
+  params$backgroundDir <- "~/Desktop//TBData//Kyle_data_2015_07_15//CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15//Background"
+  params$outputDir <- "~/Desktop/outputFlow_08172015"
+  
+  # Configure which dyes to use,
+  params$xy <- c("xy01","xy02","xy03","xy04",
+                 "xy05","xy06","xy07","xy08",
+                 "xy09","xy10","xy11","xy12")             # Single section to look at
+  params$channels <- c("c1","c3","c4")         # One or more channels to look at, c1 required
+  params$channelNames <- c("phase","red","green")    # Names of channels, 'phase' is required
+  
+  # How many frames to load
+  params$nFrames <- 20 # How many frames to load
+  
+  # What file extension to read
+  params$extension <- "tif"
 
 }
 
@@ -36,13 +39,17 @@ if (FALSE) {
   # How many frames to load
   params$nFrames <- 15 # How many frames to load
   
+  # What file extension to read
+  params$extension <- "jpg"
+  
+  xyName <- "xy06"
+  
 }
 
 
 
 
-# What file extension to read
-params$extension <- "tif"
+
 
 # How to scale phase and dye
 params$phaseMedian <- 0.4 # What value phase images should be equalized to
