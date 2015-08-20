@@ -13,8 +13,11 @@ params$outputDir <- "~/Desktop/outputFlow_08172015"
 params$xy <- c("xy01","xy02","xy03","xy04",
                "xy05","xy06","xy07","xy08",
                "xy09","xy10","xy11","xy12")             # Single section to look at
-params$channels <- c("c1")         # One or more channels to look at, c1 required
-params$channelNames <- c("phase")    # Names of channels, 'phase' is required
+params$channels <- c("c1","c3","c4")         # One or more channels to look at, c1 required
+params$channelNames <- c("phase","red","green")    # Names of channels, 'phase' is required
+
+# How many frames to load
+params$nFrames <- 20 # How many frames to load
 
 }
 
@@ -30,11 +33,13 @@ if (FALSE) {
   params$channels <- c("c1","c4")         # One or more channels to look at, c1 required
   params$channelNames <- c("phase","green")    # Names of channels, 'phase' is required
   
+  # How many frames to load
+  params$nFrames <- 15 # How many frames to load
+  
 }
 
 
-# How many frames to load
-params$nFrames <- 20 # How many frames to load
+
 
 # What file extension to read
 params$extension <- "tif"

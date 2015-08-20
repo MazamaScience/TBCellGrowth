@@ -15,13 +15,13 @@ if (FALSE) {
 }
 
 if (FALSE) {
-  params$inputDir <- "~/Desktop/TBData/solid/Time course/"
-  params$outputDir <- "~/Desktop/outputSolid_08182015"
-  params$nFrames <- 20
+  params$inputDir <- "/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/Custom plate 3.2, humidified gas, 7-6-15/Time Course/"
+  params$outputDir <- "~/Desktop/customPlate3.2_08182015"
+  params$nFrames <- 25
   params$extension <- "tif"
-  params$xy <- c("xy2","xy3","xy4","xy5","xy7","xy8")             # Single section to look at
-  params$channels <- c("c1","c3")         # One or more channels to look at, c1 required
-  params$channelNames <- c("phase","red")    # Names of channels, 'phase' is required
+  params$xy <- c("xy3","xy4","xy6","xy7","xy8")             # Single section to look at
+  params$channels <- c("c1","c2","c3")         # One or more channels to look at, c1 required
+  params$channelNames <- c("phase","green","red")    # Names of channels, 'phase' is required
   params$minTimespan <- 6
 }
 
@@ -63,11 +63,11 @@ run <- function() {
     ptm <- proc.time()
     xy$phase <- lapply(xy$phase, solid_equalizePhase)
     cat(paste0("\nImages equalized in ", formatTime(ptm)))
-    
-    xy <- solid_alignImages(xy,
-                            numTargets=params$numTargets,
-                            targetWidth=params$targetWidth, 
-                            searchSpace=params$searchSpace)
+#     
+#     xy <- solid_alignImages(xy,
+#                             numTargets=params$numTargets,
+#                             targetWidth=params$targetWidth, 
+#                             searchSpace=params$searchSpace)
     
     cat("\nLabeling phase images")
     
