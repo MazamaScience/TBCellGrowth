@@ -1,5 +1,43 @@
 
-params <- list()
+option_list <- list(
+  
+  # If TRUE debugging output will output to console instead of file
+  optparse::make_option(c("--debug"), default=FALSE),
+  
+  # File paths, all required
+  optparse::make_option(c("--inputDir")),
+  optparse::make_option(c("--outputDir")),
+  
+  # Comma separated string of xy regions, xy01,xy02,...,xyn
+  optparse::make_option(c("--xy")),
+  # Comma separated string of channels, c1,c2,...,cn
+  optparse::make_option(c("--channels"), default="c1"),
+  # Comma separated string of channel names, phase,green,...,red
+  optparse::make_option(c("--channelNames"), default="phase"),
+  
+  # How many frames to read. If argument is missing will read all frames
+  optparse::make_option(c("--nFrames")),
+  # File extension of images
+  optparse::make_option(c("--extension"), default="tif"),
+  
+  # Starting hour, usually 0
+  optparse::make_option(c("--startTime"), default=0),
+  # Number of hours between image aquisitions
+  optparse::make_option(c("--timestep"), default=3),
+  # How many frames a colony should be named to be included in output
+  optparse::make_option(c("--minTimespan"), default=5),
+  # pixels/micrometer
+  optparse::make_option(c("--distanceScale"), default=0.21)
+  
+)
+
+params <- optparse::parse_args(optparse::OptionParser(option_list=option_list))
+
+# Arguments passed as comma separated strings to vectors
+params$xy <- strsplit(params$xy,",")[[1]]
+params$channels <- strsplit(params$channels,",")[[1]]
+params$channelNames <- strsplit(params$channelNames,",")[[1]]
+
 
 ### TESTING
 if (FALSE) {
@@ -48,7 +86,7 @@ run <- function() {
     
     # Make directories and open file
     dir.create(outputDir)
-    if(!DEBUG) sink(file=paste0(outputDir,"run_output.txt"), type="output")
+    if(!params$debug) sink(file=paste0(outputDir,"run_output.txt"), type="output")
     
     regionTime <- proc.time()
     cat("\n---------------------------")
@@ -122,7 +160,7 @@ run <- function() {
     rm(dyeOverlap)
     rm(output)
     
-    if(!DEBUG) sink()
+    if(!params$debug) sink()
     
     
     #   # USEFUL FOR TESITNG
