@@ -1,5 +1,9 @@
 
+library(TBCellGrowth)
+
 option_list <- list(
+  
+  optparse::make_option(c("--startRun"), default=TRUE),
   
   # If TRUE debugging output will output to console instead of file
   optparse::make_option(c("--debug"), default=FALSE),
@@ -121,7 +125,7 @@ run <- function() {
     outputDir <- paste0(params$outputDir,"_",xyName,"/")
     
     # Make directories and open file
-    dir.create(outputDir)
+    dir.create(outputDir, showWarnings=FALSE)
     if(!params$debug) sink(file=paste0(outputDir,"run_output.txt"), type="output")
     
     regionTime <- proc.time()
@@ -243,4 +247,7 @@ run <- function() {
   }
 
   cat(paste0("\nComplete run finished in ", formatTime(ptmTotal)))
+  
 }
+
+if (params$startRun) run()

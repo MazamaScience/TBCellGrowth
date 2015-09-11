@@ -1,5 +1,9 @@
 
+library(TBCellGrowth)
+
 option_list <- list(
+  
+  optparse::make_option(c("--startRun"), default=TRUE),
   
   # If TRUE debugging output will output to console instead of file
   optparse::make_option(c("--debug"), default=FALSE),
@@ -16,7 +20,7 @@ option_list <- list(
   optparse::make_option(c("--channelNames"), default="phase"),
   
   # How many frames to read. If argument is missing will read all frames
-  optparse::make_option(c("--nFrames")),
+  optparse::make_option(c("--nFrames"), default=NA),
   # File extension of images
   optparse::make_option(c("--extension"), default="tif"),
   
@@ -172,4 +176,6 @@ run <- function() {
   cat(paste0("\nComplete run finished in ", formatTime(ptmTotal)))
 
 }
+
+if (params$startRun) run()
 

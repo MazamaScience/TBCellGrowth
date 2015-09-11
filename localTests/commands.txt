@@ -1,0 +1,4 @@
+
+
+### SOLID TEST
+RScript localTests/solid_run.R --inputDir=localData/solid/ --outputDir=~/Desktop/outputSolidTest_09112015 --xy=xy2 --channels=c1,c3 --channelNames=phase,red --extension=jpg
