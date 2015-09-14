@@ -9,10 +9,10 @@ solid_labelPhase <- function(image) {
   cat(".")
   
   # Blur image to reduce noise in edge finding
-  imageEdit <- filter_blur(image, 5)
+  # imageEdit <- filter_blur(image, 5)
   
   # Sobel edge finding implementation
-  imageEdit <- filter_sobel(imageEdit)
+  imageEdit <- filter_sobel(image)
   
   # Threshold sharp edges
   imageEdit <- imageEdit > 0.15

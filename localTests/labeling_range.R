@@ -8,22 +8,34 @@ loadImages_ <- function(dir) {
 
 labelImages_ <- function(image, eq) {
   
-#   i <- 1
+#   i <- 7
 #   image = images[[i]]
 #   eq = equalized[[i]]
 #  
   filtered <- filter_sobel(eq)
   
+  sharpness <- sd(filtered[filtered > mean(filtered > 0.1)])
+  # texture <- glcm(eq, statistics="dissimilarity")[,,1]
+  
   test <- eq + filtered
   test <- test ^ 2.5
   test <- test + filtered
-  test[test > 1] <- 1
-  test <- test > (0.2 + sd(filtered[filtered > 0.3]))
+  # test[test > 1] <- 1
+  test <- test > (sharpness * 2)
   
   test <- closingGreyScale(test, makeBrush(9, "disc"))
   
   test <- fillHull(test)
   test <- removeBlobs(test, 75)
+  
+  test <- erodeGreyScale(test, makeBrush(5, "disc"))
+  
+  test <- bwlabel(test)
+  
+  x1 <- eq
+  x1[test!=40] <- 0
+  
+  # return(test)
   
   return(overlayOutlines(eq, test))
 }
@@ -33,10 +45,12 @@ t1 <- unlist(lapply(equalized[1:4], function(x) {
   sd(x1[x1 > 0.5])
 }))
 
-test <- mapply(labelImages_, images, equalized, SIMPLIFY=FALSE)
+test <- mapply(labelImages_, images[1:10], equalized[1:10], SIMPLIFY=FALSE)
 
 unlist(lapply(c(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9), test))
 
+0.2 -> 0.4
+0.55 -> 0.9
 #  1    2  3  4  5  6  7  8 
 # .9   .5  x .8
 # 
@@ -45,6 +59,8 @@ compare <- function(im, label, index) {
   display(im[[index]])
   display(label[[index]])
 }
+
+
 
 images <- loadImages_("localData/solid_phase_samples/")
 equalized <- lapply(images, solid_equalizePhase)
