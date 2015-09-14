@@ -19,6 +19,8 @@ legend("topright",legend=c("maxValue","medianValue","minValue"),
        fill=c(rgb(0.8,0.8,0.8),rgb(0.6,0.6,0.6),"black"))
 
 
+
+
 images <- lapply(xy$red, function(x) x*5)
 
 test <- lapply(images, as.numeric)
