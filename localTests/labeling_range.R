@@ -6,6 +6,41 @@ loadImages_ <- function(dir) {
   return(lapply(files, function(x) readImage(x)@.Data))
 }
 
+labelImages_ <- function(image, eq) {
+  
+#   i <- 1
+#   image = images[[i]]
+#   eq = equalized[[i]]
+#  
+  filtered <- filter_sobel(eq)
+  
+  test <- eq + filtered
+  test <- test ^ 2.5
+  test <- test + filtered
+  test[test > 1] <- 1
+  test <- test > (0.2 + sd(filtered[filtered > 0.3]))
+  
+  test <- closingGreyScale(test, makeBrush(9, "disc"))
+  
+  test <- fillHull(test)
+  test <- removeBlobs(test, 75)
+  
+  return(overlayOutlines(eq, test))
+}
+
+t1 <- unlist(lapply(equalized[1:4], function(x) {
+  x1 <- filter_sobel(x)
+  sd(x1[x1 > 0.5])
+}))
+
+test <- mapply(labelImages_, images, equalized, SIMPLIFY=FALSE)
+
+unlist(lapply(c(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9), test))
+
+#  1    2  3  4  5  6  7  8 
+# .9   .5  x .8
+# 
+
 compare <- function(im, label, index) {
   display(im[[index]])
   display(label[[index]])
@@ -38,3 +73,8 @@ filtered <- lapply(t3, filter_sobel)
 # points(unlist(lapply(quan, function(x) x[[3]])))
 # points(unlist(lapply(quan, function(x) x[[4]])))
 # points(unlist(lapply(quan, function(x) x[[5]])))
+
+
+
+image <- (image - 0.24) * 5
+

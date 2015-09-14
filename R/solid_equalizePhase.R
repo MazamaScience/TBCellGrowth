@@ -28,7 +28,6 @@ solid_equalizePhase<- function(image) {
   # Shift and stretch the image so the new minimum is this 
   # minVal and the max is 1
   image <- image - minVal
-  image[image < 0] <- NA
   image <- image / max(image, na.rm=TRUE)
   
   # Make a new histogram
