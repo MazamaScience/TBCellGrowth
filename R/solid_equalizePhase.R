@@ -30,6 +30,8 @@ solid_equalizePhase<- function(image) {
   image <- image - minVal
   image <- image / max(image, na.rm=TRUE)
   
+  image[image < 0] <- NA
+  
   # Make a new histogram
   valueHist <- hist(image, breaks=40, plot=FALSE)
   
@@ -38,6 +40,8 @@ solid_equalizePhase<- function(image) {
   midVal <- valueHist$breaks[index]
   image <- image / (midVal * 2)
   image[image > 1] <- 1
+  
+  image[is.na(image)] <- 0
   
   cat(", b=")
   cat(round(1/(midVal*2),3))
