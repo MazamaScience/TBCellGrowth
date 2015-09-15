@@ -1,5 +1,6 @@
 
 library(TBCellGrowth)
+library(Methods)
 
 option_list <- list(
   
@@ -20,6 +21,8 @@ option_list <- list(
   # Comma separated string of channel names, phase,green,...,red
   optparse::make_option(c("--channelNames"), default="phase"),
   
+  # Which frame to start from
+  optparse::make_option(c("--startFrame"), default=1),
   # How many frames to read. If argument is missing will read all frames
   optparse::make_option(c("--nFrames")),
   # File extension of images
@@ -63,7 +66,7 @@ if (FALSE) {
   
   # What file extension to read
   params$extension <- "tif"
-
+  
 }
 
 # Testing run
@@ -121,7 +124,7 @@ run <- function() {
   
   # for output, handle each xy region at a time
   for (xyName in params$xy) {
-  
+    
     outputDir <- paste0(params$outputDir,"_",xyName,"/")
     
     # Make directories and open file
@@ -135,18 +138,19 @@ run <- function() {
     
     # Load images
     xy <- loadImages(params$inputDir, c(xyName), params$channels,
-                         params$channelNames, params$extension, n=params$nFrames)[[xyName]]
+                     params$channelNames, params$extension, n=params$nFrames,
+                     startFrame=params$startFrame)[[xyName]]
     
     # Load background images
     backgrounds <- loadImages(params$backgroundDir, c(xyName), params$channels,
                               params$channelNames, params$extension)[[xyName]]
     
     ### Merge backgrounds into images list
-  
+    
     for (dye in names(xy)) {
       xy[[dye]] <- c(backgrounds[[dye]], xy[[dye]]) 
     }
-  
+    
     # Clear large objects out of memory
     rm(backgrounds)
     rm(dye)
@@ -193,7 +197,7 @@ run <- function() {
     
     output <- generateBlobTimeseries(xy.labeled$phase, 
                                      minTimespan=params$minTimespan)
-  
+    
     # Equalize and label non-phase images
     for (channel in names(xy)[-(names(xy) == "phase")]) {
       ptm <- proc.time()
@@ -214,7 +218,7 @@ run <- function() {
     
     # Generate filenames from timestamps
     # Assuming hours < 1000
-    filenames <- params$startTime + ((0:(params$nFrames-1))*params$timestep)
+    filenames <- params$startTime + ((0:(length(xy$phase)-1))*params$timestep)
     filenames <- unlist(lapply(filenames, function(x) if(x<10) paste0("00",x) else if(x<100) paste0("0",x) else x))
     
     # Apply timesteps to row names of timeseries
@@ -232,7 +236,7 @@ run <- function() {
                             outputDir=outputDir,
                             distanceScale=params$distanceScale)
     
-  
+    
     cat("\n---------------------------")
     cat(paste0("\nFinished ",xyName, " in ", formatTime(regionTime)))
     cat("\n---------------------------")
@@ -245,7 +249,7 @@ run <- function() {
     if(!params$debug) sink()
     
   }
-
+  
   cat(paste0("\nComplete run finished in ", formatTime(ptmTotal)))
   
 }

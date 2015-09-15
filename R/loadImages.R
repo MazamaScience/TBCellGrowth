@@ -6,14 +6,14 @@
 #' @param channelNames a vector of names corresponding to the
 #' given channels
 #' @param ext file extension
-#' @param start index at which to start loading files
+#' @param startFrame index at which to start loading files
 #' @param n number of images to load into memory (defaults to all)
 #' @description This function uses the \pkg{EBImage::readimage} function
 #' to read in a series of images. Filenames for images are assumed to be
 #' ordered (e.g. with numeric indices). The return is a list of image
 #' matrices from the \code{.Data} slot of the EBImage Image object.
 
-loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), ext="tiff", start=1, n=NA) {
+loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), ext="tiff", startFrame=1, n=NA) {
   
   ptm <- proc.time()
   cat("\nLoading images")
@@ -26,7 +26,7 @@ loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), e
   times <- list.files(dataDir)
   
   # Jump to start
-  times <- times[start:length(times)]
+  times <- times[startFrame:length(times)]
   
   # Subset times if necessary
   if (!is.na(n)) {
