@@ -1,6 +1,6 @@
 
 library(TBCellGrowth)
-library(Methods)
+library(methods)
 
 option_list <- list(
   
