@@ -84,7 +84,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   ######################
   ######################
   
-  names <- as.list(read.csv("localData/names.csv", stringsAsFactors=F))[[1]]
+  names <- as.list(read.csv("data/names.csv", stringsAsFactors=F))[[1]]
   names <- unique(names[nchar(names) < 8])
   
   # Find all IDs that are in use
