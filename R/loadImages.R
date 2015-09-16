@@ -29,7 +29,7 @@ loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), e
   times <- times[startFrame:length(times)]
   
   # Subset times if necessary
-  if (!is.na(n)) {
+  if (n!="all") {
     times <- times[1:n]
   }
   
