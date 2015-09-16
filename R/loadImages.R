@@ -13,7 +13,7 @@
 #' ordered (e.g. with numeric indices). The return is a list of image
 #' matrices from the \code{.Data} slot of the EBImage Image object.
 
-loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), ext="tiff", startFrame=1, n=NA) {
+loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), ext="tiff", startFrame=1, n="all") {
   
   ptm <- proc.time()
   cat("\nLoading images")
