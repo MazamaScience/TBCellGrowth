@@ -7,7 +7,7 @@
 #' @return A \code{list} with elements \code{timeseries}, a dataframe of blob IDs 
 #' and blob sizes at each timestep (in pixels) and \code{centroids}, a \code{list}
 #' of dataimages with centroids, blob ID's and original integer labels for mapping
-#' output column names back to the original images.
+#' output column nameList back to the original images.
 
 generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   
@@ -18,7 +18,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   centroidsBefore <- getCentroids(images[[1]])
   
   # Initialize return timeseries output
-  output <- data.frame(t(data.frame(centroidsBefore$size,row.names=centroidsBefore$id)))
+  output <- data.frame(t(data.frame(centroidsBefore$size,row.nameList=centroidsBefore$id)))
   
   # Initialize list of centroid data.frame. We'll also be returning this so we can map
   # the timeseries back to the original images.
@@ -70,7 +70,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
     return(m)
   })
   sorted <- sort(sorted,TRUE)
-  output <- output[,names(sorted)]
+  output <- output[,nameList(sorted)]
   
   # Make analysis dataframe
   analysis <- output[-c(1:dim(output)[1]),]
@@ -80,33 +80,33 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   
   
   
-  # HUMAN READABLE NAMES
+  # HUMAN READABLE nameList
   ######################
   ######################
   
   # Find all IDs that are in use
   ids <- unique(unlist(lapply(centroids, function(x) as.character(x$id))))
   
-  # Make a dictionary mapping old ids to names
-  if (length(ids) > length(names)) {
-    tempNames <- names
-    times <- ceiling(length(ids) / length(names))
+  # Make a dictionary mapping old ids to nameList
+  if (length(ids) > length(nameList)) {
+    tempnameList <- nameList
+    times <- ceiling(length(ids) / length(nameList))
     for (ii in 1:times) {
-      names <- c(names, paste0(tempNames, "_", ii))
+      nameList <- c(nameList, paste0(tempnameList, "_", ii))
     }
   } 
-  newNames <- names[sample(1:length(names),length(ids))]
-  names(newNames) <- ids
+  newNames <- nameList[sample(1:length(nameList),length(ids))]
+  nameList(newNames) <- ids
   
-  # Apply new names to centroids
+  # Apply new nameList to centroids
   for (ii in 1:length(centroids)) {
     cen <- centroids[[ii]]
     ids <- as.character(cen$id)
     centroids[[ii]]$id <- unlist(newNames[ids])
   }
   
-  # Apply new names to timeseries
-  colnames(output) <- unlist(newNames[colnames(output)])
+  # Apply new nameList to timeseries
+  colnameList(output) <- unlist(newNames[colnameList(output)])
   
   ######################
   ######################
@@ -177,17 +177,17 @@ findSimilarGroups <- function(c1, c2, maxDistance) {
 appendOutput <- function(c1, output) {
   
   # find IDs that aren't already in output
-  newIDs <- c1[!(c1$id %in% colnames(output)),]
+  newIDs <- c1[!(c1$id %in% colnameList(output)),]
   
   # Create empty dataframe for new IDs
   newIDs.df <- data.frame(t(data.frame(rep(NA,dim(newIDs)[[1]]))))
-  colnames(newIDs.df) <- newIDs$id
+  colnameList(newIDs.df) <- newIDs$id
   
   # Bind current output with new IDs
   allIDs.df <- cbind(output, newIDs.df)
   
   # Create a new row with all of the new values
-  newRow <- data.frame(t(data.frame(c1$size, row.names=c1$id)))
+  newRow <- data.frame(t(data.frame(c1$size, row.nameList=c1$id)))
   
   # Add the new row with rbind.fill, which replaces missing values with NA
   return(data.frame(dplyr::rbind_all(list(output, newRow))))
