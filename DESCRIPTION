@@ -22,3 +22,4 @@ Description: A suite of functions for processing cell microscopy data,
     over many frames. Cell growth output is available as CSV as well as a
     variety of image overlays and animations.
 License: GPL-3
+LazyData: true
