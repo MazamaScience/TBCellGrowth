@@ -12,6 +12,7 @@
 #' @return a \code{list} of two lists, \code{phase} and \code{dyes},
 #' which will be the same lengths as the input.
 
+
 flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=30) {
   
   ptm <- proc.time()
@@ -65,13 +66,14 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
     
     sampleDiffs <- matrix(NA,nrow=1 + searchSpace*2,ncol=1 + searchSpace*2)
     
-    for (ii in 1:(searchSpace*2)) {
-      for (jj in 1:(searchSpace*2)) { 
+    for (ii in seq(1,searchSpace*2, by=3)) {
+      cat(".")
+      for (jj in seq(1,searchSpace*2, by=3)) { 
         
         x1 <- ii
-        x2 <- ii + searchSpace*2
+        x2 <- ii + targetWidth*2
         y1 <- jj
-        y2 <- jj + searchSpace*2
+        y2 <- jj + targetWidth*2
         phaseSubset <- lapply(phaseSamples, function(x) x[x1:x2,y1:y2])
         
         # Find the total difference between samples
@@ -114,5 +116,3 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
   return(images)
   
 }
-
-
