@@ -83,15 +83,18 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   # HUMAN READABLE NAMES
   ######################
   ######################
-
+  
   data(nameList, envir=environment())
   
   # Find all IDs that are in use
   ids <- unique(unlist(lapply(centroids, function(x) as.character(x$id))))
   
+  print(length(ids))
+  print(length(nameList))
+  
   # Make a dictionary mapping old ids to names
   if (length(ids) > length(nameList)) {
-    tempNames <- names
+    tempNames <- nameList
     times <- ceiling(length(ids) / length(nameList))
     for (ii in 1:times) {
       nameList <- c(nameList, paste0(tempNames, "_", ii))
