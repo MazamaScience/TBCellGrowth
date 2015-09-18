@@ -7,9 +7,9 @@
 
 # based on photoshop and imagejay implementation
 # http://imagejdocu.tudor.lu/doku.php?id=faq:technical:what_is_the_algorithm_used_in_find_edges
-filter_sobel <- function(image) {
+filter_sobel <- function(image, blur=7) {
   
-  image <- filter_blur(image, 7)
+  if (blur!=FALSE) image <- filter_blur(image, 7)
   
   # Shift up
   p1 <- cbind(rbind(image,0,0),0,0)
