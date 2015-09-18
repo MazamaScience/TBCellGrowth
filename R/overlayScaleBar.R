@@ -42,7 +42,7 @@ overlayScaleBar <- function(image, distanceScale, thresholds=c(10,50,100)) {
   barLength <- distance / distanceScale
   
   plotf <- function() {
-    text(dimx-(barLength/2)-10, dimy-20, paste(distance,"µm"), cex=barLength/100)
+    text(dimx-(barLength/2)-10, dimy-20, paste(distance,"\U00B5m"), cex=barLength/100) # \U00B5 = µ
     lines(c(dimx-barLength-10,dimx-10), rep(dimy-10,2), lwd=3)
   }
   
