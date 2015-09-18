@@ -89,9 +89,6 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   # Find all IDs that are in use
   ids <- unique(unlist(lapply(centroids, function(x) as.character(x$id))))
   
-  print(length(ids))
-  print(length(nameList))
-  
   # Make a dictionary mapping old ids to names
   if (length(ids) > length(nameList)) {
     tempNames <- nameList
