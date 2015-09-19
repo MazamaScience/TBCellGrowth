@@ -62,12 +62,12 @@ if (FALSE) {
 if (FALSE) {
   
   args <- c('--inputDir=/Volumes/MAZAMAMOB/data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15',
-            '--outputDir=~/desktop/test123',
+            '--outputDir=~/desktop/full_test_1',
             '--xy=xy01,xy02',
             '--dataDir=Time Course',
             '--channels=c1,c3',
             '--channelNames=phase,green',
-            '--minTimespan=10',
+            '--minTimespan=6',
             '--backgroundIndex=1',
             '--startFrame=1',
             '--nFrames=all')
@@ -126,7 +126,7 @@ run <- function() {
   # for output, handle each xy region at a time
   for (xyName in params$xy) {
     
-    outputDir <- paste0(outputDir, "/", xyName)
+    outputDir <- paste0(params$outputDir, "/", xyName)
     
     # Make directories and open file
     dir.create(outputDir, showWarnings=FALSE)
