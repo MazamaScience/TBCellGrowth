@@ -27,7 +27,7 @@ overlayVitalStats <- function(image, id, time, size, distanceScale) {
   plotf <- function() {
     text(5,8,paste0(time,"hr"),cex=1,adj=c(0,NA))
     text(5,20,paste0(id),cex=1,adj=c(0,NA))
-    text(5,32,paste0(size,"µm^2"),cex=1,adj=c(0,NA))
+    text(5,32,paste0(size,"\U00B5m^2"),cex=1,adj=c(0,NA)) # \U00B5 = µ
   }
   
   labels <- plotToOverlay(plotf, dimx, dimy)
