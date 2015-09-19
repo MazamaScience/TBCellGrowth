@@ -126,7 +126,7 @@ run <- function() {
   # for output, handle each xy region at a time
   for (xyName in params$xy) {
     
-    outputDir <- paste0(params$outputDir, "/", xyName)
+    outputDir <- paste0(params$outputDir, "/", xyName, "/")
     
     # Make directories and open file
     dir.create(outputDir, showWarnings=FALSE)
