@@ -48,10 +48,10 @@ if (FALSE) {
             '--dataDir=Experimental Images',
             '--channels=c1',
             '--channelNames=phase',
-            '--minTimespan=6',
+            '--minTimespan=3',
             '--backgroundIndex=2',
             '--startFrame=8',
-            '--nFrames=3')
+            '--nFrames=5')
   
   xyName <- "xy01"
   
@@ -104,7 +104,7 @@ if (params$nFrames != "all") {
 if (is.na(as.numeric(params$backgroundIndex))) stop("backgroundIndex must be an integer")
 
 params$dataDir <- paste0(params$inputDir, "/", params$dataDir)
-params$backgroundDir <- paste0(params$inputDir, "/Background/")
+params$backgroundDir <- paste0(params$inputDir, "/Background")
 
 if (!file.exists(params$inputDir)) stop("inputDir: directory does not exist")
 if (!file.exists(params$dataDir)) stop(paste0("dataDir: directory does not exist: '",params$dataDir,"'"))
@@ -126,11 +126,11 @@ run <- function() {
   # for output, handle each xy region at a time
   for (xyName in params$xy) {
     
-    outputDir <- paste0(params$outputDir, "_", xyName, "/")
+    outputDir <- paste0(params$outputDir, "_", xyName)
     
     # Make directories and open file
     dir.create(outputDir, showWarnings=FALSE)
-    if(!params$debug) sink(file=paste0(outputDir,"run_output.txt"), type="output")
+    if(!params$debug) sink(file=paste0(outputDir,"/run_output.txt"), type="output")
     
     regionTime <- proc.time()
     cat("\n---------------------------")
