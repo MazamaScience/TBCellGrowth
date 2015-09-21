@@ -25,7 +25,7 @@ option_list <- list(
   # Which frame to start from
   optparse::make_option(c("--startFrame"), default=1, type='integer'),
   # How many frames to read. If argument is missing will read all frames
-  optparse::make_option(c("--nFrames"), default="all"),
+  optparse::make_option(c("--nFrames"), default="all", type='character'),
   # File extension of images
   optparse::make_option(c("--extension"), default="tif", type='character'),
   
@@ -48,10 +48,10 @@ if (FALSE) {
             '--dataDir=Experimental Images',
             '--channels=c1',
             '--channelNames=phase',
-            '--minTimespan=6',
+            '--minTimespan=3',
             '--backgroundIndex=2',
             '--startFrame=8',
-            '--nFrames=3')
+            '--nFrames=5')
   
   xyName <- "xy01"
   
@@ -63,14 +63,14 @@ if (FALSE) {
   
   args <- c('--inputDir=/Volumes/MAZAMAMOB/data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15',
             '--outputDir=~/desktop/full_test_1',
-            '--xy=xy01,xy02',
+            '--xy=xy01',
             '--dataDir=Time Course',
             '--channels=c1,c3',
             '--channelNames=phase,green',
             '--minTimespan=6',
             '--backgroundIndex=1',
             '--startFrame=1',
-            '--nFrames=all')
+            '--nFrames=8')
   
   xyName <- "xy01"
   
@@ -93,18 +93,20 @@ params$searchSpace <- 110 # How far left, top, right, down to search for alignme
 #########
 ### CHECK PARAMETERS
 #########
+
 if (!("xy" %in% names(params))) stop("xy is a required parameter")
 if (!("inputDir" %in% names(params))) stop("inputDir is a required parameter")
 if (!("outputDir" %in% names(params))) stop("outputDir is a required parameter")
 
 if (params$nFrames != "all") {
+  params$nFrames <- strtoi(params$nFrames)
   if (params$nFrames <= params$minTimespan) stop ("nFrames must be greater than minTimespan")
 }
 
 if (is.na(as.numeric(params$backgroundIndex))) stop("backgroundIndex must be an integer")
 
 params$dataDir <- paste0(params$inputDir, "/", params$dataDir)
-params$backgroundDir <- paste0(params$inputDir, "/Background/")
+params$backgroundDir <- paste0(params$inputDir, "/Background")
 
 if (!file.exists(params$inputDir)) stop("inputDir: directory does not exist")
 if (!file.exists(params$dataDir)) stop(paste0("dataDir: directory does not exist: '",params$dataDir,"'"))
@@ -126,11 +128,11 @@ run <- function() {
   # for output, handle each xy region at a time
   for (xyName in params$xy) {
     
-    outputDir <- paste0(params$outputDir, "/", xyName, "/")
+    outputDir <- paste0(params$outputDir, "_", xyName)
     
     # Make directories and open file
     dir.create(outputDir, showWarnings=FALSE)
-    if(!params$debug) sink(file=paste0(outputDir,"run_output.txt"), type="output")
+    if(!params$debug) sink(file=paste0(outputDir,"/run_output.txt"), type="output")
     
     regionTime <- proc.time()
     cat("\n---------------------------")

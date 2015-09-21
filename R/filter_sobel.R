@@ -9,7 +9,7 @@
 
 # based on photoshop and imagejay implementation
 # http://imagejdocu.tudor.lu/doku.php?id=faq:technical:what_is_the_algorithm_used_in_find_edges
-filter_sobel <- function(image, blur=7, scalar=3) {
+filter_sobel <- function(image, blur=7, scalar=1) {
   
   if (blur!=FALSE) image <- filter_blur(image, 7)
   

@@ -52,13 +52,13 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   }
   
   prelength <- dim(output)[[2]]
-  postlength <- sum(apply(output, 2, function(x) sum(!is.na(x)) > minTimespan))
+  postlength <- sum(apply(output, 2, function(x) sum(!is.na(x)) >= minTimespan))
   
   cat(paste0("\n",postlength," blobs kept out of ",prelength," with minimum timespan of ",minTimespan," frames"))
   
   # Apply minimum timespan, only saving groups that are identified for at least
   # n images
-  output <- output[,apply(output, 2, function(x) sum(!is.na(x)) > minTimespan)]
+  output <- output[,apply(output, 2, function(x) sum(!is.na(x)) >= minTimespan)]
   
   cat("\nTimeseries sorted by slope of ln(timeseries)")
   
