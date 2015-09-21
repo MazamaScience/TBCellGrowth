@@ -9,7 +9,7 @@
 #' @return an image of equal or smaller dimensions to the input.
 
 flow_rotateImages <- function(images,
-                         searchSpace=seq(-2,2,by=0.2)) {
+                              searchSpace=seq(-2,2,by=0.2)) {
   
   ptm <- proc.time()
   cat("\nRotating images")
@@ -21,6 +21,7 @@ flow_rotateImages <- function(images,
   edges <- filter_sobel(background) > 0.5
   edges <- EBImage::fillHull(edges)
   
+  # TODO:  Can searchBorders be esimated from the angle and size of the image matrix?
   searchBorders <- 200
   
   # Checks the variation in image rows when rotated

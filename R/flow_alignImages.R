@@ -15,6 +15,9 @@
 
 flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=30) {
   
+  # TODO:  Should channelName be passed in as an argument?
+  channelName <- 'phase'
+  
   ptm <- proc.time()
   cat("\nFinding alignment targets...")
   
@@ -24,42 +27,62 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
     return((xy[1] > 0) & (xy[1] < bounds[[1]]) & (xy[2] > 0) & (xy[2] < bounds[[2]]))
   }
   
-  # First find some aligment targets
-  edges <- filter_sobel(images$phase[[1]])
+  # First find some aligment targets in the background image
+  edges <- filter_sobel(images[[channelName]][[1]])
   edges <- edges > 0.5
   edges <- EBImage::dilateGreyScale(edges, EBImage::makeBrush(7, 'disc'))
   edges <- EBImage::fillHull(edges)
   edges <- removeBlobs(edges, 500, 1000)
   edges <- EBImage::bwlabel(edges)
   
-  # Pick n random features to track
-  alignmentTargets <- sample(1:max(edges), numTargets, replace=TRUE)
+  # NOTE:  At this point, the 'edges' matrix consists of little blobs of integers swimming
+  # NOTE:  in a sea of zeros. Each blob of connected pixels will have a unique integer.
+
+  # Randomly pick features to track
+  targetIds <- sample(1:max(edges), numTargets, replace=FALSE)
+
+  # Create an empty list for the background samples
+  bgSamples <- list('list',length(targetIds))
+
+  # Define buffer around target centroid
+  buffer <- 50+targetWidth+searchSpace
   
-  # Find centroids of alignment targets
-  alignmentTargets <- lapply(alignmentTargets, function(x) data.frame(which(edges==x, arr.ind=TRUE)))
-  alignmentTargets <- lapply(alignmentTargets, function(x) round(c(mean(x$row), mean(x$col))))
+  bgIndex <- 1
+  for ( targetId in targetIds ) {
+    # Define a box centered on each target
+    targetCells <- data.frame(which(edges==targetId, arr.ind=TRUE))
+    targetX <- mean(targetCells$row)
+    targetY <- mean(targetCells$col)
+    left <- targetX - buffer
+    right <- targetX + buffer
+    top <- targetY + buffer
+    bottom <- targetY - buffer
+    # Skip targets whose search space falls out of bounds
+    if ( dim(edges)[1] < left || dim(edges)[1] > right || dim(edges)[2] < bottom || dim(edges[2]) > top) {
+      next
+    } else {
+      # Sample the first (background) image based on the alignment target
+      bgSamples[[bgIndex]] <- images[[channelName]][[1]][(targetX-targetWidth):(targetX+targetWidth),
+                                                         (targetY-targetWidth):(targetY+targetWidth)]
+      bgIndex <- bgIndex + 1
+    }
+  }
   
-  # Remove targets whose search space falls out of bounds
-  alignmentTargets <- 
-    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x-(50 + targetWidth + searchSpace)))))]
-  alignmentTargets <- 
-    alignmentTargets[unlist(lapply(alignmentTargets, function(x) isInBounds(dim(edges), (x+(50 + targetWidth + searchSpace)))))]
-  
-  # Sample the background image with alignment targets
-  bgSamples <- lapply(alignmentTargets, function(x) images$phase[[1]][(x[1]-targetWidth):(x[1]+targetWidth),
-                                                                      (x[2]-targetWidth):(x[2]+targetWidth)])
+  if (length(bgIndex) < 2) {
+    stop(paste0('Not enough targets for alignment: ',length(bgIndex)))
+  }
   
   # Vectors detailing how much to shift images
-  offset.x <- numeric(length(images$phase))
-  offset.y <- numeric(length(images$phase))  
+  offset.x <- numeric(length(images[[channelName]]))
+  offset.y <- numeric(length(images[[channelName]]))  
   
   cat("\nFinding alignment offsets")
   
-  for (i in 2:length(images$phase)) {
+  for (i in 2:length(images[[channelName]])) {
     
     cat(".")
     
-    image <- images$phase[[i]]
+    image <- images[[channelName]][[i]]
     
     phaseSamples <- lapply(alignmentTargets, function(x) image[(x[[1]]-targetWidth-searchSpace):(x[[1]]+targetWidth+searchSpace),
                                                                (x[[2]]-targetWidth-searchSpace):(x[[2]]+targetWidth+searchSpace)])
@@ -95,8 +118,8 @@ flow_alignImages <- function(images, numTargets=12, targetWidth=30, searchSpace=
   cropY <- max(abs(offset.y)) + 1
   cropX <- max(abs(offset.x)) + 1
   
-  dimx <- dim(images$phase[[1]])[[1]]
-  dimy <- dim(images$phase[[1]])[[2]]
+  dimx <- dim(images[[channelName]][[1]])[[1]]
+  dimy <- dim(images[[channelName]][[1]])[[2]]
   
   cat("\nAligning images")
   

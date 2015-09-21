@@ -1,53 +1,65 @@
 #' @export
 #' @title Load Image Data into a List
 #' @param dataDir path to the directory containing images
-#' @param xy the xy number to load e.g. "xy2"
-#' @param channels which channels to load for the given xy
-#' @param channelNames a vector of names corresponding to the
-#' given channels
+#' @param chamber name of the chamber whose images are loade e.g. "xy2"
+#' @param channels which channels to load for the given chamber
+#' @param channelNames a vector of names to be associated with the the given channels
 #' @param ext file extension
 #' @param startFrame index at which to start loading files
-#' @param n number of images to load into memory (defaults to all)
+#' @param n number of images to load into memory
 #' @description This function uses the \pkg{EBImage::readimage} function
 #' to read in a series of images. Filenames for images are assumed to be
-#' ordered (e.g. with numeric indices). The return is a list of image
-#' matrices from the \code{.Data} slot of the EBImage Image object.
+#' ordered (e.g. with numeric indices). The return is a multi-level list
+#' of image matrices obtained by reading in files with \code{EBImage::readImage()}
+#' and then extractign the \code{.Data} slot of the EBImage Image object.
+#' 
+#' The organizational structure is:
+#' 
+#' \code{images[[chamber]][[channel]][[timestep]]}
+#' 
+#' @return A list of image matrices.
 
-loadImages <- function(dataDir, xy, channels=c("c1"), channelNames=c("phase"), ext="tiff", startFrame=1, n="all") {
+loadImages <- function(dataDir, chamber, channels=c("c1"), channelNames=c("phase"), ext="tiff", startFrame=1, n=NULL) {
   
-  ptm <- proc.time()
-  cat("\nLoading images")
-  
+  # Simple function to return the data portion of an image
   readf <- function(im) {
     return(EBImage::readImage(im)@.Data)
   }
   
-  # List all time folders
-  times <- list.files(dataDir)
+  # Sanity check
+  if (is.null(dataDir) || is.null(chamber)) {
+    stop(paste0('dataDir and chamber must both be specified.'))
+  }
+  
+  # Get all time folders
+  if ( !file.exists(dataDir) ) {
+    stop(paste0('dataDir: "',dataDir,'" is not found.'))
+  } else {
+    timesteps <- list.files(dataDir)
+  }
   
   # Jump to start
-  times <- times[startFrame:length(times)]
+  timesteps <- timesteps[startFrame:length(timesteps)]
   
-  # Subset times if necessary
-  if (n!="all") {
-    times <- times[1:n]
+  # Subset timesteps if necessary
+  if ( !is.null(n) ) {
+    timesteps <- timesteps[1:n]
   }
   
   # Initialize images
   images <- list()
   
-  for (xyn in xy) {
-    images[[xyn]] <- list()
-    for (channel in channels) {
-      for (time in times) {
-        cat(".")
-        images[[xyn]][[channel]][[time]] <- round(readf(paste0(dataDir,"/",time,"/",xyn,channel,".",ext)),4)
+  images[[chamber]] <- list()
+  for (channel in channels) {
+    for (timestep in timesteps) {
+      filename <- paste0(dataDir,"/",timestep,"/",chamber,channel,".",ext)
+      if (getRunOptions('verbose')) {
+        message(paste0('Loading ',filename))
       }
+      images[[chamber]][[channel]][[timestep]] <- round(readf(filename),4)
     }
-    names(images[[xyn]]) <- channelNames
   }
-  
-  cat(paste0("\nImages loaded in ", formatTime(ptm)))
+  names(images[[chamber]]) <- channelNames
   
   return(images)
   

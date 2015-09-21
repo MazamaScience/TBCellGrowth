@@ -23,6 +23,9 @@ given channels}
 
 \item{n}{number of images to load into memory (defaults to all)}
 }
+\value{
+A list of image matrices.
+}
 \description{
 This function uses the \pkg{EBImage::readimage} function
 to read in a series of images. Filenames for images are assumed to be

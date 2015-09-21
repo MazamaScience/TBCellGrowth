@@ -1,6 +1,8 @@
 #' @export
 #' @title Sobel Edge Detection Filter
 #' @param image image matrix to detect edges on
+#' @param blur numeric blur radius used in filter_blur()
+#' @param scalar numeric scaling factor
 #' @description This is an implementation of the 3x3 sobel filter which 
 #' is used by Photoshop and EBImage. 
 #' @return an image of the same dimensions. 
