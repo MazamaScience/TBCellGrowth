@@ -25,7 +25,7 @@ option_list <- list(
   # Which frame to start from
   optparse::make_option(c("--startFrame"), default=1, type='integer'),
   # How many frames to read. If argument is missing will read all frames
-  optparse::make_option(c("--nFrames"), default="all"),
+  optparse::make_option(c("--nFrames"), default="all", type='character'),
   # File extension of images
   optparse::make_option(c("--extension"), default="tif", type='character'),
   
@@ -93,11 +93,13 @@ params$searchSpace <- 110 # How far left, top, right, down to search for alignme
 #########
 ### CHECK PARAMETERS
 #########
+
 if (!("xy" %in% names(params))) stop("xy is a required parameter")
 if (!("inputDir" %in% names(params))) stop("inputDir is a required parameter")
 if (!("outputDir" %in% names(params))) stop("outputDir is a required parameter")
 
 if (params$nFrames != "all") {
+  params$nFrames <- strtoi(params$nFrames)
   if (params$nFrames <= params$minTimespan) stop ("nFrames must be greater than minTimespan")
 }
 
