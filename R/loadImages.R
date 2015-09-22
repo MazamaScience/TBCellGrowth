@@ -1,7 +1,7 @@
 #' @export
 #' @title Load Image Data into a List
 #' @param dataDir path to the directory containing images
-#' @param chamber name of the chamber whose images are loade e.g. "xy2"
+#' @param chamber name of the chamber whose images are loaded e.g. "xy2"
 #' @param channels which channels to load for the given chamber
 #' @param channelNames a vector of names to be associated with the the given channels
 #' @param ext file extension
@@ -11,11 +11,11 @@
 #' to read in a series of images. Filenames for images are assumed to be
 #' ordered (e.g. with numeric indices). The return is a multi-level list
 #' of image matrices obtained by reading in files with \code{EBImage::readImage()}
-#' and then extractign the \code{.Data} slot of the EBImage Image object.
+#' and then extractng the \code{.Data} slot of the EBImage Image object.
 #' 
 #' The organizational structure is:
 #' 
-#' \code{images[[chamber]][[channel]][[timestep]]}
+#' \code{images[[channel]][[timestep]]}
 #' 
 #' @return A list of image matrices.
 
@@ -49,17 +49,16 @@ loadImages <- function(dataDir, chamber, channels=c("c1"), channelNames=c("phase
   # Initialize images
   images <- list()
   
-  images[[chamber]] <- list()
   for (channel in channels) {
     for (timestep in timesteps) {
       filename <- paste0(dataDir,"/",timestep,"/",chamber,channel,".",ext)
       if (getRunOptions('verbose')) {
-        message(paste0('Loading ',filename))
+        cat(paste0('\tLoading ',filename,'\n'))
       }
-      images[[chamber]][[channel]][[timestep]] <- round(readf(filename),4)
+      images[[channel]][[timestep]] <- round(readf(filename),4)
     }
   }
-  names(images[[chamber]]) <- channelNames
+  names(images) <- channelNames
   
   return(images)
   

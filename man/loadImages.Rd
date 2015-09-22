@@ -4,24 +4,23 @@
 \alias{loadImages}
 \title{Load Image Data into a List}
 \usage{
-loadImages(dataDir, xy, channels = c("c1"), channelNames = c("phase"),
-  ext = "tiff", startFrame = 1, n = "all")
+loadImages(dataDir, chamber, channels = c("c1"), channelNames = c("phase"),
+  ext = "tiff", startFrame = 1, n = NULL)
 }
 \arguments{
 \item{dataDir}{path to the directory containing images}
 
-\item{xy}{the xy number to load e.g. "xy2"}
+\item{chamber}{name of the chamber whose images are loaded e.g. "xy2"}
 
-\item{channels}{which channels to load for the given xy}
+\item{channels}{which channels to load for the given chamber}
 
-\item{channelNames}{a vector of names corresponding to the
-given channels}
+\item{channelNames}{a vector of names to be associated with the the given channels}
 
 \item{ext}{file extension}
 
 \item{startFrame}{index at which to start loading files}
 
-\item{n}{number of images to load into memory (defaults to all)}
+\item{n}{number of images to load into memory}
 }
 \value{
 A list of image matrices.
@@ -29,7 +28,12 @@ A list of image matrices.
 \description{
 This function uses the \pkg{EBImage::readimage} function
 to read in a series of images. Filenames for images are assumed to be
-ordered (e.g. with numeric indices). The return is a list of image
-matrices from the \code{.Data} slot of the EBImage Image object.
+ordered (e.g. with numeric indices). The return is a multi-level list
+of image matrices obtained by reading in files with \code{EBImage::readImage()}
+and then extractng the \code{.Data} slot of the EBImage Image object.
+
+The organizational structure is:
+
+\code{images[[channel]][[timestep]]}
 }
 

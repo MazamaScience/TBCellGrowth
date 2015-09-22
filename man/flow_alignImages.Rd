@@ -4,11 +4,11 @@
 \alias{flow_alignImages}
 \title{Align A Series of Flow Images}
 \usage{
-flow_alignImages(images, numTargets = 12, targetWidth = 30,
+flow_alignImages(imageList, numTargets = 12, targetWidth = 30,
   searchSpace = 30)
 }
 \arguments{
-\item{images}{a list of lists of images with channel names as keys.}
+\item{imageList}{list of images orgainzed as [[channel]][[timestep]]}
 
 \item{numTargets}{how many target features to compare}
 

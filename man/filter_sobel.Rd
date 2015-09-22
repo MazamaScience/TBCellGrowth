@@ -4,7 +4,7 @@
 \alias{filter_sobel}
 \title{Sobel Edge Detection Filter}
 \usage{
-filter_sobel(image, blur = 7, scalar = 3)
+filter_sobel(image, blur = 7, scalar = 1)
 }
 \arguments{
 \item{image}{image matrix to detect edges on}

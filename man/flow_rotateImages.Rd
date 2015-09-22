@@ -4,20 +4,26 @@
 \alias{flow_rotateImages}
 \title{Rotate an Image}
 \usage{
-flow_rotateImages(images, searchSpace = seq(-2, 2, by = 0.2))
+flow_rotateImages(imageList, searchSpace = seq(-2, 2, by = 0.2))
 }
 \arguments{
-\item{images}{a list of lists of images with channel names as keys.}
+\item{imageList}{list of images orgainzed as [[channel]][[timestep]]}
 
 \item{searchSpace}{a vector of rotation degrees to check.}
 }
 \value{
-an image of equal or smaller dimensions to the input.
+A imageList with images of equal or smaller dimensions to the input.
 }
 \description{
-Uses the EBImage rotate function to rotate a series
-of dye and phase images. An algorithm determines which degree value
-in the searchSpace will be applied. The image will also be cropped
-to remove the excess black space introduced by the rotate
+Uses the EBImage rotate function to rotate a list of images.
+The 'flow' images typically have horizontal lines of bright or dark pixels.
+As the background images is rotated through a series of angles, the row
+averages are calculated. The standard deviation of these row averages is
+the calculated and the rotation that maximizes this standard deviation
+is chosen as the optimal rotation. This will occur when while and dark
+lines are horizontally aligned.
+
+After rotation, images will be cropped to remove the excess black space
+introduced by the rotation.
 }
 

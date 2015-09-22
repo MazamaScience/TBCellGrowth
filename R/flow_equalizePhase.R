@@ -8,19 +8,17 @@
 
 flow_equalizePhase <- function(image, medianNew) {
   
-  cat("\n")
-  
-  cat("a=")
-  cat(round(min(image),3))
-  
   # Set darkest value to 0
-  image <- image - min(image)
+  imageMin <- min(image)
+  image <- image - imageMin
   
-  cat(", b=")
-  cat(round(medianNew/median(image),3))
+  # Scale image values so median matches new median
+  scaling <- medianNew / median(image)
+  image <- image * scaling
   
-  # Scale image values so median matched new median
-  image <- image * (medianNew / median(image))
+  if (getRunOptions('verbose')) {
+    cat(paste0('\timageMin = ',round(imageMin,3),', scaling = ',round(scaling,3),'\n'))
+  }
   
   return(image)
   
