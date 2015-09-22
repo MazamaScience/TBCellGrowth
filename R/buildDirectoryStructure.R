@@ -35,39 +35,46 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   
   # Add overlays to phase
   # These overlays will also serve as a background to other channels
-  #full_overlay <- mapply(overlayColor, "phase", phase, labeled$phase, SIMPLIFY=FALSE)
-  full_overlay <- mapply(overlayOutlines, phase, labeled$phase, col="yellow", SIMPLIFY=FALSE)
-  full_overlay <- lapply(full_overlay, overlayScaleBar, distanceScale)
-  
-  writeImages(full_overlay, outputDir, "fullFrame", "phase", filenames)
-  
-  cat(formatTime(ptm))
-  
-  # Write non phase channels
-  for (cName in names(labeled)[names(labeled) != "phase"]) {
-    ptm <- proc.time()
-    cat(paste0("\n",cName," "))
-    channel <- labeled[[cName]]
-    overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
-    writeImages(overlay, outputDir, "fullFrame", cName, filenames)
+  result <- try({
+    
+    full_overlay <- mapply(overlayOutlines, phase, labeled$phase, col="yellow", SIMPLIFY=FALSE)
+    # full_overlay <- lapply(full_overlay, overlayScaleBar, distanceScale)
+    writeImages(full_overlay, outputDir, "fullFrame", "phase", filenames)
+    
     cat(formatTime(ptm))
-  }
-  
-  # All dyes combined of there are enough channels
-  if (length(names(labeled)) > 2) {
-    ptm <- proc.time()
-    cat("\nallDyes ")
-    dir.create(paste0(outputDir, "/fullFrame/all"))
+    
+    # Write non phase channels
     for (cName in names(labeled)[names(labeled) != "phase"]) {
+      ptm <- proc.time()
+      cat(paste0("\n",cName," "))
       channel <- labeled[[cName]]
-      full_overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
+      overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
+      writeImages(overlay, outputDir, "fullFrame", cName, filenames)
+      cat(formatTime(ptm))
     }
-    writeImages(full_overlay, outputDir, "fullFrame", "all", filenames)
-    cat(formatTime(ptm))
+    
+    # All dyes combined of there are enough channels
+    if (length(names(labeled)) > 2) {
+      ptm <- proc.time()
+      cat("\nallDyes ")
+      dir.create(paste0(outputDir, "/fullFrame/all"))
+      for (cName in names(labeled)[names(labeled) != "phase"]) {
+        channel <- labeled[[cName]]
+        full_overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
+      }
+      writeImages(full_overlay, outputDir, "fullFrame", "all", filenames)
+      cat(formatTime(ptm))
+    }
+    
+    rm(full_overlay)
+    
+  }, silent=TRUE)
+  
+  if(class(result) == "try-error") {
+    print(result)
   }
   
-  rm(full_overlay)
-  
+
   ptm <- proc.time()
   cat("\nIndividual ids")
   
@@ -181,6 +188,8 @@ writeImages <- function(images, outputDir, id, channel, filenames) {
     file <- paste0(outputDir, "/", id, "/", channel, "/t_", filenames[[i]], ".jpg")
     EBImage::writeImage(images[[i]], file=file)
   }
-  createGif(paste0(outputDir, "/", id, "/", channel, "/"), paste0("g_",id,".gif"))
+  result <- try({
+    createGif(paste0(outputDir, "/", id, "/", channel, "/"), paste0("g_",id,".gif"))
+  })
 }
 
