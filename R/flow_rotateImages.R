@@ -24,12 +24,16 @@ flow_rotateImages <- function(imageList,
   
   # ----- Find background edges -----------------------------------------------
   
+  if (getRunOptions('verbose')) cat('\tFinding background edges ...\n')
+  
   edges <- filter_sobel(background) > 0.5
   edges <- EBImage::fillHull(edges)
 
   profilePoint('edges','seconds to find background edges')
   
   # ----- Check rotations -----------------------------------------------------
+  
+  if (getRunOptions('verbose')) cat('\tChecking rotations ...\n')
   
   # TODO:  Can searchBorders be esimated from the angle and size of the image matrix?
   searchBorders <- 200
@@ -72,6 +76,8 @@ flow_rotateImages <- function(imageList,
   }
   
   # ----- Rotate and crop -----------------------------------------------------
+  
+  if (getRunOptions('verbose')) cat('\tRotate and crop ...\n')
   
   rotateAndCrop <- function(x) {
     rotated <- EBImage::rotate(x, bestRotation)

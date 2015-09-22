@@ -1,36 +1,20 @@
-#
+#!/usr/bin/env Rscript
+
 # Jon's test script
 
 library(TBCellGrowth)
-
-#   $ startRun       : logi TRUE
-#   $ debug          : logi TRUE
-#   $ inputDir       : chr "../TBCellGrowth_tests/data/fluid"
-#   $ outputDir      : chr "~/BOP"
-#   $ dataDir        : chr "../TBCellGrowth_tests/data/fluid/Time Course"
-#   $ backgroundIndex: int 1
-#   $ xy             : chr "xy06"
-#   $ channels       : chr "c1"
-#   $ channelNames   : chr "phase"
-#   $ startFrame     : int 1
-#   $ nFrames        : chr "all"
-#   $ extension      : chr "jpg"
-#   $ startTime      : int 0
-#   $ timestep       : int 3
-#   $ minTimespan    : int 6
-#   $ distanceScale  : num 0.21
-#   $ help           : logi FALSE
-#   $ phaseMedian    : num 0.4
-#   $ numTargets     : num 10
-#   $ targetWidth    : num 30
-#   $ searchSpace    : num 110
-#   $ backgroundDir  : chr "../TBCellGrowth_tests/data/fluid/Background/"
+library(methods)
 
 # ----- Set up params ---------------------------------------------------------
 
-opt <- list(inputDir='../TBCellGrowth_tests/data/fluid',
-            dataDir='../TBCellGrowth_tests/data/fluid/Time\ Course',
-            backgroundDir='../TBCellGrowth_tests/data/fluid/Background',
+# opt <- list(inputDir='../TBCellGrowth_tests/data/fluid',
+#             dataDir='../TBCellGrowth_tests/data/fluid/Time\ Course',
+#             backgroundDir='../TBCellGrowth_tests/data/fluid/Background',
+#             extension='jpg',
+opt <- list(inputDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15',
+            dataDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course',
+            backgroundDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background',
+            extension='tif',
             outputDir='~/BOP',
             verbose=TRUE,
             profile=TRUE,
@@ -40,8 +24,7 @@ opt <- list(inputDir='../TBCellGrowth_tests/data/fluid',
             channels='c1',
             channelNames='phase',
             startFrame=1,
-            nFrames=NULL,
-            extension='jpg',
+            nFrames=6,
             startTime=0,
             timestep=3,
             minTimespan=6,
@@ -89,12 +72,21 @@ profileStart()
   
   # Merge backgrounds into imageList
   for (channel in names(imageList)) {
+    
     imageList[[channel]] <- c(backgrounds[[channel]], imageList[[channel]])
     names(imageList[[channel]])[1] <- '000'
+    
+    # Sanity check -- all dimensions should be the same
+    dims <- lapply(imageList[[channel]], dim)
+    if ( length(unique(dims)) > 1 ) {
+      stop(paste0('The channel named "',channel,'" has ',length(unique(dims)),' different image dimensions.'))
+    }
+    
   }
   
   # Clear large objects from memory
   rm(backgrounds)
+  
   
   profilePoint('loadImages','seconds to load images')
   
@@ -150,89 +142,89 @@ profileStart()
   }
   
   
-  # ----- Create Artifact mask ------------------------------------------------
-  
-  artifactMask <- flow_createArtifactMask(imageList$phase[[1]], TRUE)
-  
-  
-  
-  cat("\nFinding regions to ignore...")
-  ptm <- proc.time()
-  
-  # Interpret ignore regions as pixels
-  ignoredRegions <- flow_findIgnore(opt$ignore[[chamber]], dim(imageList$phase[[1]]))
-  # Find dark line areas to ignore
-  darkLines <- flow_findDarkLines(imageList$phase[[1]])
-  # Combine these two into a final ignore list
-  ignoredRegions <- rbind(ignoredRegions, darkLines)
-  
-  cat(paste0("\nIgnored regions found in ", formatTime(ptm)))
-  
-  # At this point we no longer need backgrounds
-  for (channel in names(imageList)) {
-    imageList[[channel]][[1]] <- NULL
-  }
-  
-  cat("\nLabeling phase images")
-  ptm <- proc.time()
-  
-  xy.labeled <- list()
-  xy.labeled$phase <- lapply(imageList$phase, flow_labelPhase, artifactMask, ignoredRegions)
-  
-  cat(paste0("\nPhase images labeled in ", formatTime(ptm)))
-  
-  output <- generateBlobTimeseries(xy.labeled$phase, 
-                                   minTimespan=opt$minTimespan)
-  
-  # Equalize and label non-phase images
-  for (channel in names(imageList)[-(names(imageList) == "phase")]) {
-    ptm <- proc.time()
-    cat(paste0("\nEqualizing ",channel,", formula (image-a)*"))
-    imageList[[channel]] <- lapply(imageList[[channel]], flow_equalizeDye, artifactMask)
-    cat(paste0("\nLabeling ",channel))
-    xy.labeled[[channel]] <- mapply(flow_labelDye, imageList[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
-    cat(paste0("\n", channel, " equalized and labeled in ", formatTime(ptm)))
-  }
-  
-  dyeOverlap <- list()
-  for (channel in names(imageList)[-(names(imageList) == "phase")]) {
-    ptm <- proc.time()
-    cat(paste0("\nFinding ",channel, " overlap"))
-    dyeOverlap[[channel]] <- findDyeOverlap(xy.labeled[[channel]], xy.labeled$phase, output)
-    cat(paste0("\n", channel, " overlap found in ", formatTime(ptm)))
-  }
-  
-  # Generate filenames from timestamps
-  # Assuming hours < 1000
-  filenames <- opt$startTime + ((0:(length(imageList$phase)-1))*opt$timestep)
-  filenames <- unlist(lapply(filenames, function(x) if(x<10) paste0("00",x) else if(x<100) paste0("0",x) else x))
-  
-  # Apply timesteps to row names of timeseries
-  rownames(output$timeseries) <- filenames
-  # Apply timesteps to overlap row names
-  for (channel in names(dyeOverlap)) {
-    rownames(dyeOverlap[[channel]]) <- filenames
-  }
-  
-  buildDirectoryStructure(output, 
-                          phase=imageList$phase, 
-                          labeled=xy.labeled,
-                          dyeOverlap=dyeOverlap,
-                          filenames=filenames,
-                          outputDir=outputDir,
-                          distanceScale=opt$distanceScale)
-  
-  
-  cat("\n---------------------------")
-  cat(paste0("\nFinished ",chamber, " in ", formatTime(regionTime)))
-  cat("\n---------------------------")
-  
-  rm(imageList)
-  rm(xy.labeled)
-  rm(dyeOverlap)
-  rm(output)
-  
-###  if(!opt$debug) sink()
-  
-###}
-
+#   # ----- Create Artifact mask ------------------------------------------------
+#   
+#   artifactMask <- flow_createArtifactMask(imageList$phase[[1]], TRUE)
+#   
+#   
+#   
+#   cat("\nFinding regions to ignore...")
+#   ptm <- proc.time()
+#   
+#   # Interpret ignore regions as pixels
+#   ignoredRegions <- flow_findIgnore(opt$ignore[[chamber]], dim(imageList$phase[[1]]))
+#   # Find dark line areas to ignore
+#   darkLines <- flow_findDarkLines(imageList$phase[[1]])
+#   # Combine these two into a final ignore list
+#   ignoredRegions <- rbind(ignoredRegions, darkLines)
+#   
+#   cat(paste0("\nIgnored regions found in ", formatTime(ptm)))
+#   
+#   # At this point we no longer need backgrounds
+#   for (channel in names(imageList)) {
+#     imageList[[channel]][[1]] <- NULL
+#   }
+#   
+#   cat("\nLabeling phase images")
+#   ptm <- proc.time()
+#   
+#   xy.labeled <- list()
+#   xy.labeled$phase <- lapply(imageList$phase, flow_labelPhase, artifactMask, ignoredRegions)
+#   
+#   cat(paste0("\nPhase images labeled in ", formatTime(ptm)))
+#   
+#   output <- generateBlobTimeseries(xy.labeled$phase, 
+#                                    minTimespan=opt$minTimespan)
+#   
+#   # Equalize and label non-phase images
+#   for (channel in names(imageList)[-(names(imageList) == "phase")]) {
+#     ptm <- proc.time()
+#     cat(paste0("\nEqualizing ",channel,", formula (image-a)*"))
+#     imageList[[channel]] <- lapply(imageList[[channel]], flow_equalizeDye, artifactMask)
+#     cat(paste0("\nLabeling ",channel))
+#     xy.labeled[[channel]] <- mapply(flow_labelDye, imageList[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
+#     cat(paste0("\n", channel, " equalized and labeled in ", formatTime(ptm)))
+#   }
+#   
+#   dyeOverlap <- list()
+#   for (channel in names(imageList)[-(names(imageList) == "phase")]) {
+#     ptm <- proc.time()
+#     cat(paste0("\nFinding ",channel, " overlap"))
+#     dyeOverlap[[channel]] <- findDyeOverlap(xy.labeled[[channel]], xy.labeled$phase, output)
+#     cat(paste0("\n", channel, " overlap found in ", formatTime(ptm)))
+#   }
+#   
+#   # Generate filenames from timestamps
+#   # Assuming hours < 1000
+#   filenames <- opt$startTime + ((0:(length(imageList$phase)-1))*opt$timestep)
+#   filenames <- unlist(lapply(filenames, function(x) if(x<10) paste0("00",x) else if(x<100) paste0("0",x) else x))
+#   
+#   # Apply timesteps to row names of timeseries
+#   rownames(output$timeseries) <- filenames
+#   # Apply timesteps to overlap row names
+#   for (channel in names(dyeOverlap)) {
+#     rownames(dyeOverlap[[channel]]) <- filenames
+#   }
+#   
+#   buildDirectoryStructure(output, 
+#                           phase=imageList$phase, 
+#                           labeled=xy.labeled,
+#                           dyeOverlap=dyeOverlap,
+#                           filenames=filenames,
+#                           outputDir=outputDir,
+#                           distanceScale=opt$distanceScale)
+#   
+#   
+#   cat("\n---------------------------")
+#   cat(paste0("\nFinished ",chamber, " in ", formatTime(regionTime)))
+#   cat("\n---------------------------")
+#   
+#   rm(imageList)
+#   rm(xy.labeled)
+#   rm(dyeOverlap)
+#   rm(output)
+#   
+# ###  if(!opt$debug) sink()
+#   
+# ###}
+# 

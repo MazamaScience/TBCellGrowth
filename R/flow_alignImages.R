@@ -24,9 +24,11 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
     return((xy[1] > 0) & (xy[1] < bounds[[1]]) & (xy[2] > 0) & (xy[2] < bounds[[2]]))
   }
   
-  if (getRunOptions('verbose')) cat('\tfinding aligment targets ...\n')
+  # ----- Create background blobs -------------------------------------------
+  
+  if (getRunOptions('verbose')) cat('\tCreating background blobs ...\n')
 
-  # First find some aligment targets in the background image
+  # Fubd edges in the background image
   edges <- filter_sobel(imageList[[channel]][[1]])
   edges <- edges > 0.5
   edges <- EBImage::dilateGreyScale(edges, EBImage::makeBrush(7, 'disc'))
@@ -34,7 +36,7 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
   edges <- removeBlobs(edges, 500, 1000)
   edges <- EBImage::bwlabel(edges)
   
-  profilePoint('edges','seconds to find background edges')
+  profilePoint('edges','seconds to create background blobs')
   
   if (getRunOptions('debug_image')) {
     chamber <- getRunOptions('chambers')[1] # TODO:  Is getRunOption('chambers') always singular?
@@ -45,6 +47,8 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
   
   # NOTE:  At this point, the 'edges' matrix consists of little blobs of integers swimming
   # NOTE:  in a sea of zeros. Each blob of connected pixels will have a unique integer.
+  
+  # ----- Picking alignment targets -------------------------------------------
   
   # Randomly pick features to track
   targetIds <- sample(1:max(edges), numTargets, replace=FALSE)
@@ -89,6 +93,11 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
   if (length(bgSamples) < 2) {
     stop(paste0('Not enough targets for alignment: ',length(bgIndex)))
   }
+
+  profilePoint('alignment','seconds to pick alignment targets')
+  
+  
+  # ----- Find alignment offsets ----------------------------------------------
   
   # Vectors detailing how much to shift images
   offset.x <- numeric(length(imageList[[channel]]))
@@ -98,8 +107,6 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
   
   for (i in 2:length(imageList[[channel]])) {
     
-    if (getRunOptions('verbose')) cat(paste0(names(imageList[[channel]][i])))
-    
     image <- imageList[[channel]][[i]]
     
     phaseSamples <- lapply(targetCentroids, function(x) image[(x[[1]]-targetWidth-searchSpace):(x[[1]]+targetWidth+searchSpace),
@@ -108,7 +115,6 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
     sampleDiffs <- matrix(NA,nrow=1 + searchSpace*2,ncol=1 + searchSpace*2)
     
     for (ii in seq(1,searchSpace*2, by=3)) {
-      cat(".")
       for (jj in seq(1,searchSpace*2, by=3)) { 
         
         x1 <- ii
@@ -130,9 +136,18 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
     offset.x[[i]] <- bestFit[[1]] - searchSpace - 1
     offset.y[[i]] <- bestFit[[2]] - searchSpace - 1
     
+    if (getRunOptions('verbose')) cat(paste0('\t',names(imageList[[channel]])[i],' x=',offset.x[[i]],', y=',offset.y[[i]],'\n'))
+    
   }
   
-  # Crop images based on offset
+  profilePoint('alignment','seconds to calculate alignemnt offsets')
+  
+  
+  # ----- Crop images ---------------------------------------------------------
+  
+  if (getRunOptions('verbose')) cat('\tcropping images ...\n')
+
+    # Crop images based on offset
   cropY <- max(abs(offset.y)) + 1
   cropX <- max(abs(offset.x)) + 1
   
@@ -149,6 +164,8 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
     }
   }
   
-  return(imageList)
+  profilePoint('alignment','seconds to crop images')
+
+    return(imageList)
   
 }

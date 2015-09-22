@@ -21,9 +21,14 @@
 
 loadImages <- function(dataDir, chamber, channels=c("c1"), channelNames=c("phase"), ext="tiff", startFrame=1, n=NULL) {
   
+  # NOTE:  Suppress warnings to avoid seeing:
+  # NOTE:
+  # NOTE:  1: In readTIFF(x, all = all, ...) :
+  # NOTE:    TIFFReadDirectory: Unknown field with tag 65325 (0xff2d) encountered
+  
   # Simple function to return the data portion of an image
   readf <- function(im) {
-    return(EBImage::readImage(im)@.Data)
+    return(suppressWarnings(EBImage::readImage(im)@.Data))
   }
   
   # Sanity check
