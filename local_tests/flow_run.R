@@ -42,16 +42,16 @@ option_list <- list(
 
 if (FALSE) {
   
-  args <- c('--inputDir=/Volumes/MAZAMAMOB/data/CellAsic, RvC, limiting PI, 9-1-15',
-            '--outputDir=~/desktop/test234',
-            '--xy=xy02',
+  args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, limiting PI, 9-1-15',
+            '--outputDir=~/desktop/Analysis',
+            '--xy=xy01,xy02,xy03,xy04,xy05,xy06,xy07,xy08,xy09,xy10,xy11,xy12',
             '--dataDir=Experimental Images',
             '--channels=c1',
             '--channelNames=phase',
-            '--minTimespan=8',
+            '--minTimespan=3',
             '--backgroundIndex=2',
             '--startFrame=8',
-            '--nFrames=20')
+            '--nFrames=6')
   
   xyName <- "xy01"
   
@@ -88,7 +88,7 @@ params$phaseMedian <- 0.4 # What value phase images should be equalized to
 # Image alignment
 params$numTargets <- 10 # How many target features to use for alignment
 params$targetWidth <- 30 # How large of a region the targets should be
-params$searchSpace <- 110 # How far left, top, right, down to search for alignment
+params$searchSpace <- 115 # How far left, top, right, down to search for alignment
 
 #########
 ### CHECK PARAMETERS
