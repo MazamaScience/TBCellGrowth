@@ -40,6 +40,7 @@ setRunOptions <- function(opt) {
   # Guarantee that some options exist
   TBCellGrowthEnv$RunOptions[['verbose']] <- ifelse(is.logical(opt$verbose),opt$verbose,FALSE)
   TBCellGrowthEnv$RunOptions[['profile']] <- ifelse(is.logical(opt$profile),opt$profile,FALSE)
+  TBCellGrowthEnv$RunOptions[['debug_images']] <- ifelse(is.logical(opt$debug_images),opt$debug_images,FALSE)
 }
 
 #' @keywords environment

@@ -44,14 +44,14 @@ if (FALSE) {
   
   args <- c('--inputDir=/Volumes/MAZAMAMOB/data/CellAsic, RvC, limiting PI, 9-1-15',
             '--outputDir=~/desktop/test234',
-            '--xy=xy01',
+            '--xy=xy02',
             '--dataDir=Experimental Images',
             '--channels=c1',
             '--channelNames=phase',
-            '--minTimespan=3',
+            '--minTimespan=8',
             '--backgroundIndex=2',
             '--startFrame=8',
-            '--nFrames=5')
+            '--nFrames=20')
   
   xyName <- "xy01"
   
@@ -120,6 +120,11 @@ params$channelNames <- strsplit(params$channelNames,",")[[1]]
 
 if (!params$startRun) print(params)
 
+params$debug_image = FALSE
+
+setRunOptions(params)
+profileStart()
+
 run <- function() {
   
   ptmTotal <- proc.time()
@@ -140,13 +145,13 @@ run <- function() {
     cat("\n---------------------------")
     
     # Load images
-    xy <- loadImages(params$dataDir, c(xyName), params$channels,
+    xy <- loadImages(params$dataDir, xyName, params$channels,
                      params$channelNames, params$extension, n=params$nFrames,
-                     startFrame=params$startFrame)[[xyName]]
+                     startFrame=params$startFrame)
     
     # Load background images
     backgrounds <- loadImages(params$backgroundDir, c(xyName), params$channels,
-                              params$channelNames, params$extension, startFrame=params$backgroundIndex, n=1)[[xyName]]
+                              params$channelNames, params$extension, startFrame=params$backgroundIndex, n=1)
     
     ### Merge backgrounds into images list
     
