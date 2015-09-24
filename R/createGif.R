@@ -10,9 +10,13 @@
 
 createGif <- function(dir, filename, ext="jpg", framerate=2, rescale=80) {
   delay <- 100 / framerate
-  os = Sys.info()['sysname'][[1]]
-  if (os=="Darwin") system(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' "', dir, '"*.', ext, ' "', dir, '"/', filename))
-  if (os=="Windows") shell(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' "', dir, '"*.', ext, ' "', dir, '"/', filename))
+  os <- Sys.info()['sysname'][[1]]
+  inPath <- normalizePath(path.expand(paste0(dir, '/*.', ext)))
+  outPath <- normalizePath(path.expand(paste0(dir, '/', filename)))
+  inPath <- gsub(" ", "\\\\ ", inPath)
+  outPath <- gsub(" ", "\\\\ ", outPath)
+  if (os=="Darwin") system(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' ', inPath, ' ', outPath))
+  if (os=="Windows") shell(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' ', inPath, ' ', outPath))
 }
 
 # Accepts a list of matrices and creates a gif

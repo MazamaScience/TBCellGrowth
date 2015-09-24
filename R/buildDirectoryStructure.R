@@ -39,7 +39,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
     
     full_overlay <- mapply(overlayOutlines, phase, labeled$phase, col="yellow", SIMPLIFY=FALSE)
     # full_overlay <- lapply(full_overlay, overlayScaleBar, distanceScale)
-    writeImages(full_overlay, outputDir, "fullFrame", "phase", filenames)
+    writeImages(images=full_overlay, outputDir=outputDir, id="fullFrame", channel="phase", filenames)
     
     cat(formatTime(ptm))
     
@@ -78,11 +78,13 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   ptm <- proc.time()
   cat("\nIndividual ids")
   
+  dir.create(paste0(outputDir, "/individual"))
+  
   for (id in names(output$timeseries)) {
     
     cat(".")
     
-    dir.create(paste0(outputDir,"/",id))
+    dir.create(paste0(outputDir,"/individual/",id))
     
     sizes <- numeric(length(filenames))
     for (ii in 1:length(output$centroids)) {
@@ -104,14 +106,14 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
     color_phase <- mapply(overlayVitalStats, color_phase, id, filenames, sizes, distanceScale, SIMPLIFY=FALSE)
     color_phase <- mapply(overlayNeighborsIDs, color_phase, cropped_phase$labelFull, id, output$centroids, SIMPLIFY=FALSE)
 
-    writeImages(color_phase, outputDir, id, "phase", filenames)
+    writeImages(color_phase, paste0(outputDir,"/individual"), id, "phase", filenames)
 
     # Write non phase channels
     for (cName in names(labeled)[names(labeled) != "phase"]) {
       channel <- labeled[[cName]]
       cropped_dye <- cropImageByID(id, output, phase, channel)$labelFull
       color_dye <- mapply(overlayOutlines, color_phase, cropped_dye, col=cName, thick=FALSE, SIMPLIFY=FALSE)
-      writeImages(color_dye, outputDir, id, cName, filenames)
+      writeImages(color_dye,  paste0(outputDir,"/individual"), id, cName, filenames)
     }
 
   }
@@ -147,7 +149,7 @@ writeExcel <- function(df, outputDir, channel, filenames) {
   
   # Creates hyperlinks to specific images
   cellHyperlinks <- function(id) {
-    oDir <- paste0(id, "/", channel)
+    oDir <- paste0("individual/", id, "/", channel)
     cols <- df[id]
     for (i in 1:length(cols[[1]])) {
       filename <- paste0(oDir, "/t_", filenames[[i]], ".jpg")
@@ -158,7 +160,7 @@ writeExcel <- function(df, outputDir, channel, filenames) {
   
   # Create hyperlinks on blob names
   colHyperlinks <- function(id) {
-    oDir <- paste0(id, "/", channel)
+    oDir <- paste0("individual/", id, "/", channel)
     return(excelHyperlink(paste0(oDir),id))
   }
   

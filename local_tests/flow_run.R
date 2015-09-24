@@ -48,10 +48,10 @@ if (FALSE) {
             '--dataDir=Experimental Images',
             '--channels=c1',
             '--channelNames=phase',
-            '--minTimespan=3',
+            '--minTimespan=5',
             '--backgroundIndex=2',
             '--startFrame=8',
-            '--nFrames=6')
+            '--nFrames=8')
   
   xyName <- "xy01"
   

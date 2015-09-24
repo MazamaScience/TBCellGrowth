@@ -9,9 +9,9 @@
 #' @return An image \code{matrix} of size equal to the input image
 #' 
 
-removeBlobs <- function(image, minSize=0, maxSize=Inf) {
+removeBlobs <- function(image, minSize=0, maxSize=Inf, label=TRUE) {
   # Label blobs
-  image <- EBImage::bwlabel(image)
+  if (label) image <- EBImage::bwlabel(image)
   # Save dimensions
   dims <- dim(image)
   # Unravel matrix and count the occurances of each label
