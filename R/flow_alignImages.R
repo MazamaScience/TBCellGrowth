@@ -96,6 +96,8 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
 
   profilePoint('alignment','seconds to pick alignment targets')
   
+  bgSamples <- lapply(bgSamples, filter_sobel, FALSE, 3)
+  
   
   # ----- Find alignment offsets ----------------------------------------------
   

@@ -42,16 +42,16 @@ option_list <- list(
 
 if (FALSE) {
   
-  args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, limiting PI, 9-1-15',
+  args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, limiting PI 2, 9-16-15',
             '--outputDir=~/desktop/Analysis',
             '--xy=xy01,xy02,xy03,xy04,xy05,xy06,xy07,xy08,xy09,xy10,xy11,xy12',
             '--dataDir=Experimental Images',
-            '--channels=c1',
-            '--channelNames=phase',
-            '--minTimespan=5',
+            '--channels=c1,c3',
+            '--channelNames=phase,red',
+            '--minTimespan=10',
             '--backgroundIndex=2',
             '--startFrame=8',
-            '--nFrames=8')
+            '--nFrames=12')
   
   xyName <- "xy01"
   
@@ -210,7 +210,7 @@ run <- function() {
     for (channel in names(xy)[-(names(xy) == "phase")]) {
       ptm <- proc.time()
       cat(paste0("\nEqualizing ",channel,", formula (image-a)*"))
-      xy[[channel]] <- lapply(xy[[channel]], flow_equalizeDye, artifactMask)
+      xy[[channel]] <- flow_equalizeDyeTEST(xy[[channel]], artifactMask)
       cat(paste0("\nLabeling ",channel))
       xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
       cat(paste0("\n", channel, " equalized and labeled in ", formatTime(ptm)))
