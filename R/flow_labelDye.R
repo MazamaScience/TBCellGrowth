@@ -9,15 +9,17 @@
 
 flow_labelDye <- function(image, phase.labeled, artifactMask) {
   
+  test = filter_sobel(image)
+  
   imageEdit <- image
-# 
-#   cat(".")
-#   
-#   imageEdit <- image
-#   imageEdit[phase.labeled<1] <- 0
-#   
-#   # Threshold
-#   imageEdit <- imageEdit > 0.9
+
+  cat(".")
+  
+  imageEdit <- image
+  imageEdit[phase.labeled<1] <- 0
+  
+  # Threshold
+  imageEdit <- imageEdit > 0.9
   
   # Dilate groups slightly too large for more inclusive labeling
   imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(7, shape="disc"))

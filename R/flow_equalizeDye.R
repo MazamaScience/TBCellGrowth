@@ -40,29 +40,50 @@
 
 ### TEST
 flow_equalizeDye <- function(images, artifactMask) {
+
+  images <- lapply(images, filter_blur, 11)
   
-  # Find median of each image
-  medians <- unlist(lapply(images, median))
-  
-  # Set each median to be the 0.1 and set the median to 0
-  ims <- mapply(function(im,m) return(im*(0.1/m) - 0.1), images, medians, SIMPLIFY=FALSE)
-  
-  # Mask out artifacts
-  ims <- lapply(ims, function(im) {
-    im[artifactMask] <- mean(im)
+  images <- lapply(images, function(im) {
+    im[artifactMask] = NA
     return(im)
   })
   
-  # Brighten images based on SD
-  ims <- lapply(ims, function(im) {
-    return(im > ( mean(im) + 3*sd(im) ))
+  t1 <- unlist(lapply(images, median, na.rm=TRUE))
+  t2 <- 0.6 / t1
+  t3 <- mapply(function(x,y) return((x*y)), images, t2, SIMPLIFY=FALSE)
+  t4 <- lapply(t3, function(x) ((x-0.5)*6)^4)
+  
+  t4 <- lapply(t4, function(im) {
+    im[artifactMask] = median(im, na.rm=TRUE)
+    return(im)
   })
   
-  # Remove noise
-  ims <- lapply(ims, function(im) {
-    return(removeBlobs(im, 30))
-  })
+  return(t4)
   
-  return(ims)
+
+  
+#   # Find median of each image
+#   medians <- unlist(lapply(images, median))
+#   
+#   # Set each median to be the 0.1 and set the median to 0
+#   ims <- mapply(function(im,m) return(im*(0.1/m) - 0.1), images, medians, SIMPLIFY=FALSE)
+#   
+#   # Mask out artifacts
+#   ims <- lapply(ims, function(im) {
+#     im[artifactMask] <- mean(im)
+#     return(im)
+#   })
+#   
+#   # Brighten images based on SD
+#   ims <- lapply(ims, function(im) {
+#     return(im > ( mean(im) + 3*sd(im) ))
+#   })
+#   
+#   # Remove noise
+#   ims <- lapply(ims, function(im) {
+#     return(removeBlobs(im, 30))
+#   })
+#   
+#   return(ims)
   
 }

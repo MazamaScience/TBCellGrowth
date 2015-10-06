@@ -41,19 +41,23 @@ option_list <- list(
   # Should the image be cropped into a center rectangle
   optparse::make_option(c("--cropRect"), default=FALSE),
   # Crop bounds
-  optparse::make_option(c("--cropRectX"), default=1000),
-  optparse::make_option(c("--cropRectY"), default=750)
+  optparse::make_option(c("--cropRectX"), default=2000),
+  optparse::make_option(c("--cropRectY"), default=1500)
   
 )
 
 if (FALSE) {
   
-  args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, limiting PI 2, 9-16-15',
+#   'CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15'
+#   'CellAsic, RvC, limiting PI, 9-1-15'
+#   'CellAsic, RvC, limiting PI 2, 9-16-15'
+   
+  args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15',
             '--outputDir=~/desktop/Analysis',
             '--xy=xy01,xy02,xy03,xy04,xy05,xy06,xy07,xy08,xy09,xy10,xy11,xy12',
-            '--dataDir=Experimental Images',
-            '--channels=c1,c3',
-            '--channelNames=phase,red',
+            '--dataDir=Time Course',
+            '--channels=c1,c3,c4',
+            '--channelNames=phase,green,red',
             '--minTimespan=10',
             '--backgroundIndex=1',
             '--startFrame=8',
@@ -219,8 +223,8 @@ run <- function() {
     # Equalize and label non-phase images
     for (channel in names(xy)[-(names(xy) == "phase")]) {
       ptm <- proc.time()
-      cat(paste0("\nEqualizing ",channel,", formula (image-a)*"))
-      xy[[channel]] <- flow_equalizeDyeTEST(xy[[channel]], artifactMask)
+      # cat(paste0("\nEqualizing ",channel,", formula (image-a)*"))
+      xy[[channel]] <- flow_equalizeDye(xy[[channel]], artifactMask)
       cat(paste0("\nLabeling ",channel))
       xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
       cat(paste0("\n", channel, " equalized and labeled in ", formatTime(ptm)))

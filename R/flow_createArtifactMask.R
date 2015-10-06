@@ -14,7 +14,7 @@ flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   cat("\nMaking artifact mask...")
   
   # Find harshest edges
-  edges <- filter_sobel(bg, blur=FALSE, 3)
+  edges <- filter_sobel(bg, blur=FALSE, 1)
   edges <- edges > 0.7
   # Expand to close circles
   edges <- EBImage::dilateGreyScale(edges, EBImage::makeBrush(9, 'disc'))
@@ -22,9 +22,9 @@ flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   edges <- EBImage::fillHull(edges)
   edges <- EBImage::erodeGreyScale(edges, EBImage::makeBrush(5, 'disc'))
   
-  
+  # edges <- expandEdges(edges, 3, 1)
   # Label blobs
-  labeled <- EBImage::bwlabel(edges)
+  # labeled <- EBImage::bwlabel(edges)
 
   # Remove dark / bright lines
 #   for (i in 1:max(labeled)) {
@@ -33,6 +33,8 @@ flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
 #   }
 #   
   edges <- removeBlobs(edges, 250)
+  
+  
   
   cat(paste0("\nArtifact mask created in ", formatTime(ptm)))
   
