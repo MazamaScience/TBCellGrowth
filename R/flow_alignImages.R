@@ -13,7 +13,7 @@
 #' which will be the same lengths as the input.
 
 
-flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpace=30) {
+flow_alignImages <- function(imageList, numTargets=12, targetWidth=50, searchSpace=30) {
   
   # TODO:  Should channel be passed in as an argument?
   channel <- 'phase'
@@ -33,7 +33,7 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
   edges <- edges > 0.5
   edges <- EBImage::dilateGreyScale(edges, EBImage::makeBrush(7, 'disc'))
   edges <- EBImage::fillHull(edges)
-  edges <- removeBlobs(edges, 500, 1000)
+  edges <- removeBlobs(edges, 15000)
   edges <- EBImage::bwlabel(edges)
   
   profilePoint('edges','seconds to create background blobs')
@@ -45,13 +45,17 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
     profilePoint('saveImages','seconds to save images')
   }
   
+  # find squares
+  centroids <- getCentroids(edges)
+  centroids <- centroids[(centroids$xmax - centroids$xmin) < 300,]
+  
   # NOTE:  At this point, the 'edges' matrix consists of little blobs of integers swimming
   # NOTE:  in a sea of zeros. Each blob of connected pixels will have a unique integer.
   
   # ----- Picking alignment targets -------------------------------------------
   
   # Randomly pick features to track
-  targetIds <- sample(1:max(edges), numTargets, replace=FALSE)
+  targetIds <- sample(centroids$index, min(dim(centroids)[[1]], numTargets), replace=FALSE)
   
   # Create an empty list for the background samples
   targetCentroids <- list()
@@ -96,7 +100,7 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=30, searchSpa
 
   profilePoint('alignment','seconds to pick alignment targets')
   
-  bgSamples <- lapply(bgSamples, filter_sobel, FALSE, 3)
+  # bgSamples <- lapply(bgSamples, filter_sobel, FALSE, 3)
   
   
   # ----- Find alignment offsets ----------------------------------------------

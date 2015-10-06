@@ -36,7 +36,13 @@ option_list <- list(
   # How many frames a colony should be named to be included in output
   optparse::make_option(c("--minTimespan"), default=5, type='integer'),
   # pixels/micrometer
-  optparse::make_option(c("--distanceScale"), default=0.21, type='double')
+  optparse::make_option(c("--distanceScale"), default=0.21, type='double'),
+  
+  # Should the image be cropped into a center rectangle
+  optparse::make_option(c("--cropRect"), default=FALSE),
+  # Crop bounds
+  optparse::make_option(c("--cropRectX"), default=1000),
+  optparse::make_option(c("--cropRectY"), default=750)
   
 )
 
@@ -49,9 +55,10 @@ if (FALSE) {
             '--channels=c1,c3',
             '--channelNames=phase,red',
             '--minTimespan=10',
-            '--backgroundIndex=2',
+            '--backgroundIndex=1',
             '--startFrame=8',
-            '--nFrames=12')
+            '--nFrames=12',
+            '--cropRect=TRUE')
   
   xyName <- "xy01"
   
@@ -86,8 +93,8 @@ params <- optparse::parse_args(optparse::OptionParser(option_list=option_list))
 params$phaseMedian <- 0.4 # What value phase images should be equalized to
 
 # Image alignment
-params$numTargets <- 10 # How many target features to use for alignment
-params$targetWidth <- 30 # How large of a region the targets should be
+params$numTargets <- 5 # How many target features to use for alignment
+params$targetWidth <- 50 # How large of a region the targets should be
 params$searchSpace <- 115 # How far left, top, right, down to search for alignment
 
 #########
@@ -162,6 +169,9 @@ run <- function() {
     # Clear large objects out of memory
     rm(backgrounds)
     rm(dye)
+    
+    # Apply crop rectangle
+    if (params$cropRect) xy <- lapply(xy, function(x) lapply(x, applyCropRect, params$cropRectX, params$cropRectY))
     
     # Equalize phase images
     cat("\nEqualizing phase images, formula (image-a)*b")
