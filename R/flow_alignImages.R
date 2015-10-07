@@ -47,7 +47,7 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=50, searchSpa
   
   # find squares
   centroids <- getCentroids(edges)
-  centroids <- centroids[(centroids$xmax - centroids$xmin) < 300,]
+  centroids <- centroids[(centroids$xmax - centroids$xmin) < 450,]
   
   # NOTE:  At this point, the 'edges' matrix consists of little blobs of integers swimming
   # NOTE:  in a sea of zeros. Each blob of connected pixels will have a unique integer.

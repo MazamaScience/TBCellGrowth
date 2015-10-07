@@ -15,7 +15,7 @@ flow_createArtifactMask <- function(bg, maskDarkLines=FALSE) {
   
   # Find harshest edges
   edges <- filter_sobel(bg, blur=FALSE, 1)
-  edges <- edges > 0.7
+  edges <- edges > 0.4
   # Expand to close circles
   edges <- EBImage::dilateGreyScale(edges, EBImage::makeBrush(9, 'disc'))
   # Fill holes
