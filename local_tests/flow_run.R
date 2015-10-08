@@ -52,7 +52,7 @@ if (FALSE) {
 #   'CellAsic, RvC, limiting PI, 9-1-15'
 #   'CellAsic, RvC, limiting PI 2, 9-16-15'
    
-  args <- c('--inputDir=/Volumes/MAZAMAMOB/data/CellAsic, RvC, limiting PI, 9-1-15',
+  args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, limiting PI, 9-1-15',
             '--outputDir=~/desktop/Analysis',
             '--xy=xy01,xy02,xy03,xy04,xy05,xy06,xy07,xy08,xy09,xy10,xy11,xy12',
             '--dataDir=Experimental images',
@@ -64,7 +64,7 @@ if (FALSE) {
             '--nFrames=12',
             '--cropRect=TRUE')
   
-  xyName <- "xy02"
+  xyName <- "xy01"
   
   params <- optparse::parse_args(optparse::OptionParser(option_list=option_list), args=args)
   
@@ -219,6 +219,23 @@ run <- function() {
     
     output <- generateBlobTimeseries(xy.labeled$phase, 
                                      minTimespan=params$minTimespan)
+    
+    # Equalize dye images
+    for (channel in names(xy)[-(names(xy) == "phase")]) {
+      ptm <- proc.time()
+      cat(paste0("\nEqualizing ",channel))
+      xy[[channel]] <- flow_equalizeDye(xy[[channel]], artifactMask)
+      cat(paste0("\n", channel, " equalized in ", formatTime(ptm)))
+    }
+    
+    # Label dye images
+    for (channel in names(xy)[-(names(xy) == "phase")]) {
+      ptm <- proc.time()
+      cat(paste0("\nLabeling ",channel))
+      xy.labeled[[channel]] <- mapply(flow_labelDye, xy[[channel]], xy.labeled$phase, SIMPLIFY=FALSE)
+      cat(paste0("\n", channel, " labeled in ", formatTime(ptm)))
+    }
+    
     
     # Equalize and label non-phase images
     for (channel in names(xy)[-(names(xy) == "phase")]) {
