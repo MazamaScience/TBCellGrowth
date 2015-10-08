@@ -30,8 +30,8 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=50, searchSpa
 
   # Fubd edges in the background image
   edges <- filter_sobel(imageList[[channel]][[1]])
-  edges <- edges > 0.5
-  edges <- EBImage::dilateGreyScale(edges, EBImage::makeBrush(7, 'disc'))
+  edges <- edges > 0.3
+  edges <- EBImage::dilateGreyScale(edges, EBImage::makeBrush(11, 'disc'))
   edges <- EBImage::fillHull(edges)
   edges <- removeBlobs(edges, 15000)
   edges <- EBImage::bwlabel(edges)

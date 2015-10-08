@@ -41,8 +41,8 @@ option_list <- list(
   # Should the image be cropped into a center rectangle
   optparse::make_option(c("--cropRect"), default=FALSE),
   # Crop bounds
-  optparse::make_option(c("--cropRectX"), default=2000),
-  optparse::make_option(c("--cropRectY"), default=1500)
+  optparse::make_option(c("--cropRectX"), default=2500),
+  optparse::make_option(c("--cropRectY"), default=2000)
   
 )
 
@@ -233,8 +233,8 @@ run <- function() {
       dir.create(paste0(outputDir, "/eqDye", channel))
       dir.create(paste0(outputDir, "/eqDyeOverlay", channel))
       
-      outlined <- mapply(overlayOutlines, xy[[channel]], xy.labeled[["phase"]], "yellow", SIMPLIFY=FALSE)
-      outlined <- mapply(overlayOutlines, outlined, xy.labeled[[channel]], "blue", SIMPLIFY=FALSE)
+      outlined <- mapply(overlayColor, "green", xy[[channel]], xy.labeled[[channel]], SIMPLIFY=FALSE)
+      outlined <- mapply(overlayOutlines, outlined, xy.labeled[["phase"]], "yellow", SIMPLIFY=FALSE)
       outlined <- mapply(overlayOutlines, outlined, list(artifactMask), "red", SIMPLIFY=FALSE)
       for (i in 1:length(outlined)) {
         EBImage::writeImage(outlined[[i]],  paste0(outputDir, "/eqDyeOverlay", channel,"/im",i,".jpg"))
@@ -244,48 +244,48 @@ run <- function() {
       }
       
     }
-    
-    # For debugging, write dye images
-    
-    dyeOverlap <- list()
-    for (channel in names(xy)[-(names(xy) == "phase")]) {
-      ptm <- proc.time()
-      cat(paste0("\nFinding ",channel, " overlap"))
-      dyeOverlap[[channel]] <- findDyeOverlap(xy.labeled[[channel]], xy.labeled$phase, output)
-      cat(paste0("\n", channel, " overlap found in ", formatTime(ptm)))
-    }
-    
-    # Generate filenames from timestamps
-    # Assuming hours < 1000
-    filenames <- params$startTime + ((0:(length(xy$phase)-1))*params$timestep)
-    filenames <- unlist(lapply(filenames, function(x) if(x<10) paste0("00",x) else if(x<100) paste0("0",x) else x))
-    
-    # Apply timesteps to row names of timeseries
-    rownames(output$timeseries) <- filenames
-    # Apply timesteps to overlap row names
-    for (channel in names(dyeOverlap)) {
-      rownames(dyeOverlap[[channel]]) <- filenames
-    }
-    
-    buildDirectoryStructure(output, 
-                            phase=xy$phase, 
-                            labeled=xy.labeled,
-                            dyeOverlap=dyeOverlap,
-                            filenames=filenames,
-                            outputDir=outputDir,
-                            distanceScale=params$distanceScale)
-    
-    
-    cat("\n---------------------------")
-    cat(paste0("\nFinished ",xyName, " in ", formatTime(regionTime)))
-    cat("\n---------------------------")
-    
-    rm(xy)
-    rm(xy.labeled)
-    rm(dyeOverlap)
-    rm(output)
-    
-    if(!params$debug) sink()
+#     
+#     # For debugging, write dye images
+#     
+#     dyeOverlap <- list()
+#     for (channel in names(xy)[-(names(xy) == "phase")]) {
+#       ptm <- proc.time()
+#       cat(paste0("\nFinding ",channel, " overlap"))
+#       dyeOverlap[[channel]] <- findDyeOverlap(xy.labeled[[channel]], xy.labeled$phase, output)
+#       cat(paste0("\n", channel, " overlap found in ", formatTime(ptm)))
+#     }
+#     
+#     # Generate filenames from timestamps
+#     # Assuming hours < 1000
+#     filenames <- params$startTime + ((0:(length(xy$phase)-1))*params$timestep)
+#     filenames <- unlist(lapply(filenames, function(x) if(x<10) paste0("00",x) else if(x<100) paste0("0",x) else x))
+#     
+#     # Apply timesteps to row names of timeseries
+#     rownames(output$timeseries) <- filenames
+#     # Apply timesteps to overlap row names
+#     for (channel in names(dyeOverlap)) {
+#       rownames(dyeOverlap[[channel]]) <- filenames
+#     }
+#     
+#     buildDirectoryStructure(output, 
+#                             phase=xy$phase, 
+#                             labeled=xy.labeled,
+#                             dyeOverlap=dyeOverlap,
+#                             filenames=filenames,
+#                             outputDir=outputDir,
+#                             distanceScale=params$distanceScale)
+#     
+#     
+#     cat("\n---------------------------")
+#     cat(paste0("\nFinished ",xyName, " in ", formatTime(regionTime)))
+#     cat("\n---------------------------")
+#     
+#     rm(xy)
+#     rm(xy.labeled)
+#     rm(dyeOverlap)
+#     rm(output)
+#     
+#     if(!params$debug) sink()
     
   }
   
