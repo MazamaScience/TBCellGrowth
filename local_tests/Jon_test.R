@@ -142,15 +142,22 @@ profileStart()
   }
   
   
-#   # ----- Create Artifact mask ------------------------------------------------
-#   
-#   artifactMask <- flow_createArtifactMask(imageList$phase[[1]], TRUE)
-#   
-#   
-#   
-#   cat("\nFinding regions to ignore...")
-#   ptm <- proc.time()
-#   
+  # ----- Create Artifact mask ------------------------------------------------
+  
+  if (getRunOptions('verbose')) cat('Creating artifact mask ...\n')
+  
+  artifactMask <- flow_createArtifactMask(imageList[[channel]][[1]], TRUE)
+  
+  if (getRunOptions('debug_image')) {
+    file <- paste0(outputDir,'/',chamber,'_',channel,'_artifact_mask.jpg')
+    EBImage::writeImage(imageList[[channel]][[1]], file)
+  }
+  
+  
+  # ----- Finding regions to ignore -------------------------------------------
+  
+  if (getRunOptions('verbose')) cat('Finding reginos to ignore ...\n')
+  
 #   # Interpret ignore regions as pixels
 #   ignoredRegions <- flow_findIgnore(opt$ignore[[chamber]], dim(imageList$phase[[1]]))
 #   # Find dark line areas to ignore
