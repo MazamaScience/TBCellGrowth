@@ -21,7 +21,7 @@ opt <- list(inputDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & p
             dataDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course',
             backgroundDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background',
             extension='tif',
-            outputDir='/nethome/jcallahan/Projects/Sherman/Results',
+            outputDir='~/TBResults',
             verbose=TRUE,
             profile=TRUE,
             debug_image=TRUE,
@@ -33,7 +33,7 @@ opt <- list(inputDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & p
             nFrames=6,
             startTime=0,
             timestep=3,
-            minTimespan=6,
+            minTimespan=3, # normally 6
             distanceScale=0.21,
             help=FALSE,
             phaseMedian=0.4,
@@ -179,8 +179,6 @@ for (channel in names(imageList)) {
   imageList[[channel]][[1]] <- NULL
 }
 
-# TODO:  Probably want timing inside of flow_labelPhase()
-
 labeledImageList <- list()
 labeledImageList$phase <- lapply(imageList$phase, flow_labelPhase, artifactMask, ignoredRegions)
 
@@ -196,11 +194,10 @@ if (getRunOptions('debug_image')) {
 
 if (getRunOptions('verbose')) cat('Generating timeseries ...\n')
 
+output <- generateBlobTimeseries(labeledImageList$phase, 
+                                 minTimespan=opt$minTimespan)
 
-#   
-#   output <- generateBlobTimeseries(labeledImageList$phase, 
-#                                    minTimespan=opt$minTimespan)
-#   
+
 #   # Equalize and label non-phase images
 #   for (channel in names(imageList)[-(names(imageList) == "phase")]) {
 #     ptm <- proc.time()

@@ -46,12 +46,12 @@ getCentroids <- function(image) {
     id[[i]] <- generateID(x[[i]],y[[i]],size[[i]])
     index[[i]] <- i
     
-  }
-  
-  
+  } 
   
   # Create a dataframe
-  df <- data.frame(x=x,y=y,xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax,size=size,id=id,index=index)
+  ###df <- data.frame(x=x,y=y,xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax,size=size,id=id,index=index)
+  df <- data.frame(x,y,xmin,xmax,ymin,ymax,size,id,index,
+                   stringsAsFactors=FALSE)
   
   # Remove blobs that are of size 0
   df <- df[size>0,]
