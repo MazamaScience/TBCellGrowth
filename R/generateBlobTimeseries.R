@@ -40,6 +40,8 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
     # For those continued group, give them the ID's from the previous frame
     centroidsAfter <- updateCentroidIDs(centroidsAfter, groups)
     
+    # TODO:  Can we replace the entire appendOutput function with merge(...)?
+
     # Add frame to output
     output <- appendOutput(centroidsAfter, output)
     
@@ -191,9 +193,11 @@ appendOutput <- function(c1, output) {
   # Create a new row with all of the new values
   newRow <- data.frame(t(data.frame(c1$size, row.names=c1$id)))
   
-  # Add the new row with rbind.fill, which replaces missing values with NA
-  return(data.frame(dplyr::rbind_all(list(output, newRow))))
-  
+  #### Add the new row with rbind.fill, which replaces missing values with NA
+  ###return(data.frame(dplyr::rbind_all(list(output, newRow))))
+
+  # Append the new row (dataframe), retaining all columns and rows, inserting NA where necessary
+  return(merge(output,newRow,all=TRUE,sort=FALSE))
 }
 
 

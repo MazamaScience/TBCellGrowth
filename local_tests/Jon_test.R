@@ -1,21 +1,24 @@
-#!/usr/bin/env Rscript
+### #!/usr/bin/env Rscript
 
 # Jon's test script
 
 library(TBCellGrowth)
-library(methods)
+### library(methods)
 
 # ----- Set up params ---------------------------------------------------------
 
-# opt <- list(inputDir='../TBCellGrowth_tests/data/fluid',
-#             dataDir='../TBCellGrowth_tests/data/fluid/Time\ Course',
-#             backgroundDir='../TBCellGrowth_tests/data/fluid/Background',
-#             extension='jpg',
-opt <- list(inputDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15',
-            dataDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course',
-            backgroundDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background',
+### Jon's desktop with portable drive
+#opt <- list(inputDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15',
+#            dataDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course',
+#            backgroundDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background',
+#            extension='tif',
+#            outputDir='~/BOP',
+### shell06.sbri.org
+opt <- list(inputDir='/nearline/sherman-ngs/KM_Temp_Imaging/Microfluidics/BSL3/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15',
+            dataDir='/nearline/sherman-ngs/KM_Temp_Imaging/Microfluidics/BSL3/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course',
+            backgroundDir='/nearline/sherman-ngs/KM_Temp_Imaging/Microfluidics/BSL3/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background',
             extension='tif',
-            outputDir='~/BOP',
+            outputDir='/nethome/jcallahan/Projects/Sherman/Results',
             verbose=TRUE,
             profile=TRUE,
             debug_image=TRUE,
