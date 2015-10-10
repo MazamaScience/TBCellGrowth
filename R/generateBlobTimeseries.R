@@ -10,10 +10,7 @@
 #' output column names back to the original images.
 
 generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
-  
-  ptm <- proc.time()
-  cat("\nMaking timeseries")
-  
+    
   # Get centroids for first frame (assuming empty background frame is in images[[1]])
   centroidsBefore <- getCentroids(images[[1]])
   
@@ -31,6 +28,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   for (i in 2:length(images)) {
     
     cat(".")
+    if (getRunOptions('verbose')) cat('\tTracking ...\n')
     
     centroidsAfter <- getCentroids(images[[i]])
     

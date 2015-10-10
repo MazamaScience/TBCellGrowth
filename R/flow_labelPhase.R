@@ -9,7 +9,8 @@
 
 flow_labelPhase <- function(image, artifactMask, ignore) {
   
-  cat(".")
+  if (getRunOptions('verbose')) cat('\tLabeling ...\n')
+  
 #   
 #   image[image > 1] <- 1
 #   
