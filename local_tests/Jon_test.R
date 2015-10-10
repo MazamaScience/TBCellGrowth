@@ -1,9 +1,9 @@
-#!/usr/bin/env Rscript
+### #!/usr/bin/env Rscript
 
 # Jon's test script
 
 library(TBCellGrowth)
-library(methods)
+### library(methods)
 
 # ----- Set up params ---------------------------------------------------------
 
@@ -21,7 +21,7 @@ opt <- list(inputDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & p
             dataDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course',
             backgroundDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background',
             extension='tif',
-            outputDir='~/BOP',
+            outputDir='/nethome/jcallahan/Projects/Sherman/Results',
             verbose=TRUE,
             profile=TRUE,
             debug_image=TRUE,
