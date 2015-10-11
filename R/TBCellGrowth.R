@@ -126,5 +126,12 @@ profileEnd <- function(message=NULL) {
   if (TBCellGrowthEnv$RunOptions$profile && !is.null(message)) {
     message(paste(round(elapsed,4), message))
   }
+  # Print out all timers if desired
+  if (getRunOptions('verbose')) {
+    for (name in names(TBCellGrowthEnv$ProfileSecs)) {
+      elapsed <- TBCellGrowthEnv$ProfileSecs[[name]]
+      message(paste('\t',round(elapsed,4),'seconds on',name,'\n'))
+    }
+  }
   return(invisible(elapsed))
 }

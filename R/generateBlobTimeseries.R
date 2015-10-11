@@ -11,19 +11,17 @@
 
 generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
     
-  # Get centroids for first frame (assuming empty background frame is in images[[1]])
-  centroidsBefore <- getCentroids(images[[1]])
-  
-  ###DF <- data.frame(t(data.frame(centroidsBefore$size,row.names=centroidsBefore$id)))
-  
   # NOTE:  Include a timestep column so that we can sort if we have to.
   # NOTE:  The documentation for merge.data.frame() says that for 'sort=FALSE'
   # NOTE:  rows are returned "in an inspecified order".
   
+  # Get centroids for first frame (assuming empty background frame is in images[[1]])
+  centroidsBefore <- getCentroids(images[[1]])
+  
   # Initialize return timeseries dataframe with sizes from the first timestep
   sizeMatrix <- matrix(c(1,centroidsBefore$size),nrow=1)
   colnames(sizeMatrix) <- c('timestep',centroidsBefore$id)
-  DF <- as.data.frame(sizeMatrix)
+  DF <- as.data.frame(sizeMatrix,stringsAsFactors=FALSE)
   
   # Initialize list of centroid data.frame. We'll also be returning this so we can map
   # the timeseries back to the original images
@@ -48,12 +46,10 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
     # Create a new row as a dataframe
     sizeMatrix <- matrix(c(i,centroidsAfter$size),nrow=1)
     colnames(sizeMatrix) <- c('timestep',centroidsAfter$id)
-    newRowDF <- as.data.frame(sizeMatrix)
+    newRowDF <- as.data.frame(sizeMatrix,stringsAsFactors=FALSE)
     
     # Append the new row (dataframe), retaining all columns and rows, inserting NA where necessary
     DF <- merge(DF,newRowDF,all=TRUE,sort=FALSE)
-    
-    ###DF <- appendOutput(centroidsAfter, DF)
     
     # Save centroids
     centroids[[i]] <- centroidsAfter
@@ -64,10 +60,6 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   }
   
   profilePoint('generateBlobTimeseries','seconds to track blobs')   
-  
-  #### Remove blobs with short timespans (likely artifacts)
-  ###prelength <- dim(DF)[[2]]
-  ###postlength <- sum(apply(DF, 2, function(x) sum(!is.na(x)) >= minTimespan))
   
   # Sanity check -- sort rows just in case they got messed up somehow
   rownames(DF) <- DF$timestep
@@ -188,36 +180,6 @@ findSimilarGroups <- function(c1, c2, maxDistance) {
   return(df)
   
 }
-
-
-###############################################################################
-
-# # update the output with a new timestep and 
-# appendOutput <- function(c1, DF) {
-#   
-#   # find IDs that aren't already in DF
-#   newIDs <- c1[!(c1$id %in% colnames(DF)),]
-#   
-#   # Create empty dataframe for new IDs
-#   newIDs.df <- data.frame(t(data.frame(rep(NA,dim(newIDs)[[1]]))))
-#   colnames(newIDs.df) <- newIDs$id
-#   
-#   # Bind current DF with new IDs
-#   allIDs.df <- cbind(DF, newIDs.df)
-#   
-#   # Create a new row with all of the new values
-#   newRow <- data.frame(t(data.frame(c1$size, row.names=c1$id)))
-#   
-# ###  # Add the new row with rbind.fill, which replaces missing values with NA
-# ###  return(data.frame(dplyr::rbind_all(list(DF, newRow))))
-# 
-#   sizeMatrix <- matrix(c(1,c1$size),nrow=1)
-#   colnames(sizeMatrix) <- c('timestep',c1$id)
-#   XXX <- as.data.frame(sizeMatrix)
-#   
-#   # Append the new row (dataframe), retaining all columns and rows, inserting NA where necessary
-#   return(merge(DF,XXX,all=TRUE,sort=FALSE))
-# }
 
 
 ###############################################################################

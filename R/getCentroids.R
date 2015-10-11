@@ -49,7 +49,6 @@ getCentroids <- function(image) {
   } 
   
   # Create a dataframe
-  ###df <- data.frame(x=x,y=y,xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax,size=size,id=id,index=index)
   df <- data.frame(x,y,xmin,xmax,ymin,ymax,size,id,index,
                    stringsAsFactors=FALSE)
   
