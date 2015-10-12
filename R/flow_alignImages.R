@@ -71,7 +71,7 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=50, searchSpa
   bgIndex <- 1
   for ( targetId in targetIds ) {
     # Define a box centered on each target
-    targetCells <- data.frame(which(edges==targetId, arr.ind=TRUE))
+    targetCells <- data.frame(which(edges==targetId, arr.ind=TRUE),stringsAsFactors=FALSE)
     targetX <- mean(targetCells$row)
     targetY <- mean(targetCells$col)
     left <- targetX - buffer

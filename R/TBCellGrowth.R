@@ -80,6 +80,7 @@ getProfileSecs <- function() {
 profileStart <- function() {
   TBCellGrowthEnv$ProfileStart <- Sys.time()
   TBCellGrowthEnv$ProfileTimepoint <- Sys.time()
+  TBCellGrowthEnv$ProfileSecs <- list()
 }
 
 #' @keywords environment
@@ -105,7 +106,7 @@ profilePoint <- function(name='unknown', message=NULL) {
   }
   # Print out a message if desired
   if (TBCellGrowthEnv$RunOptions$profile && !is.null(message)) {
-    message(paste(round(elapsed,4), message))
+    cat(paste(sprintf("%7.1f",elapsed),message,'\n'))
   }
   return(invisible(elapsed))
 }
@@ -124,13 +125,13 @@ profileEnd <- function(message=NULL) {
   elapsed <- as.numeric( difftime(now, TBCellGrowthEnv$ProfileStart, units='secs') )
   # Print out a message if desired
   if (TBCellGrowthEnv$RunOptions$profile && !is.null(message)) {
-    message(paste(round(elapsed,4), message))
+    cat(paste(sprintf("%7.1f",elapsed),message,'\n'))
   }
   # Print out all timers if desired
   if (getRunOptions('verbose')) {
     for (name in names(TBCellGrowthEnv$ProfileSecs)) {
       elapsed <- TBCellGrowthEnv$ProfileSecs[[name]]
-      message(paste('\t',round(elapsed,4),'seconds on',name,'\n'))
+      cat(paste('\t',sprintf("%7.1f",elapsed),'seconds on',name,'\n'))
     }
   }
   return(invisible(elapsed))

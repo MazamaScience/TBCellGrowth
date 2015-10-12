@@ -28,7 +28,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   centroids <- vector("list", length(images))
   centroids[[1]] <- centroidsBefore
   
-  if (getRunOptions('verbose')) cat('\tTracking blobs ...\n')
+  if (getRunOptions('verbose')) cat('\tTracking 1 ...\n')
   
   # Now track blobs between each pair of images
   for (i in 2:length(images)) {

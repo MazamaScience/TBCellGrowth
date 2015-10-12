@@ -38,7 +38,7 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
   alignmentTargets <- sample(1:max(edges), numTargets, replace=TRUE)
   
   # Find centroids of alignment targets
-  alignmentTargets <- lapply(alignmentTargets, function(x) data.frame(which(edges==x, arr.ind=TRUE)))
+  alignmentTargets <- lapply(alignmentTargets, function(x) data.frame(which(edges==x, arr.ind=TRUE),stringsAsFactors=FALSE))
   alignmentTargets <- lapply(alignmentTargets, function(x) round(c(mean(x$row), mean(x$col))))
   
   # Remove targets whose search space falls out of bounds

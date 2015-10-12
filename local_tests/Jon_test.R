@@ -26,14 +26,14 @@ opt <- list(inputDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & p
             profile=TRUE,
             debug_image=TRUE,
             backgroundIndex=1,
-            chambers=c('xy06','xy07','xy08'),
+            chambers=c('xy06'),
             channels='c1',
             channelNames='phase',
             startFrame=1,
-            nFrames=15, # normally 30
+            nFrames=5, # normally 30
             startTime=0,
             timestep=3,
-            minTimespan=6, # normally 6
+            minTimespan=3, # normally 6
             distanceScale=0.21,
             help=FALSE,
             phaseMedian=0.4,
@@ -42,14 +42,19 @@ opt <- list(inputDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & p
             searchSpace=110)
 
 
+# Divert all output to the transcript
+transcriptFile <- file(paste0(opt$outputDir,'/TRANSCRIPT.txt'))
+sink(transcriptFile,type='output')
+sink(transcriptFile,type='message')
+
 # Store run options internally
 setRunOptions(opt)
 
-# Begin profiling
-profileStart()
-
 # for output, handle each xy region at a time
 for (chamber in opt$chambers) {
+  
+  # Begin profiling
+  profileStart()
   
   if (getRunOptions('verbose')) {
     cat(paste0('\nProcessing chamber "',chamber,'" on ',Sys.time(),' ------------------------------\n\n'))
@@ -57,7 +62,7 @@ for (chamber in opt$chambers) {
   
   # ----- Create output directories -------------------------------------------
   
-  outputDir <- paste0(opt$outputDir, "/", chamber, "/")
+  outputDir <- paste0(opt$outputDir, "/", chamber)
   
   # Make directories and open file
   dir.create(outputDir, showWarnings=FALSE)
@@ -65,7 +70,7 @@ for (chamber in opt$chambers) {
   
   # ----- Load images ---------------------------------------------------------
   
-  if (getRunOptions('verbose')) cat('Loading images ...\n')
+  if (getRunOptions('verbose')) cat('\tLoading images ...\n')
   
   backgrounds <- loadImages(opt$backgroundDir, chamber, opt$channels,
                             opt$channelNames, opt$extension, startFrame=opt$backgroundIndex, n=1)
@@ -96,7 +101,7 @@ for (chamber in opt$chambers) {
   
   # ----- Equalise phase images -----------------------------------------------
   
-  if (getRunOptions('verbose')) cat('Equalizing images ...\n')
+  if (getRunOptions('verbose')) cat('\tEqualizing images ...\n')
   
   for (channel in names(imageList)) {
     if (channel == 'phase') {
@@ -116,7 +121,7 @@ for (chamber in opt$chambers) {
   
   # ----- Rotate images -------------------------------------------------------
   
-  if (getRunOptions('verbose')) cat('Rotating images ...\n')
+  if (getRunOptions('verbose')) cat('\tRotating images ...\n')
   
   imageList <- flow_rotateImages(imageList)
   
@@ -130,7 +135,7 @@ for (chamber in opt$chambers) {
   
   # ----- Align images --------------------------------------------------------
   
-  if (getRunOptions('verbose')) cat('Aligning images ...\n')
+  if (getRunOptions('verbose')) cat('\tAligning images ...\n')
   
   imageList <- flow_alignImages(imageList,
                                 numTargets=opt$numTargets,
@@ -147,7 +152,7 @@ for (chamber in opt$chambers) {
   
   # ----- Create artifact mask ------------------------------------------------
   
-  if (getRunOptions('verbose')) cat('Creating artifact mask ...\n')
+  if (getRunOptions('verbose')) cat('\tCreating artifact mask ...\n')
   
   artifactMask <- flow_createArtifactMask(imageList[['phase']][[1]], TRUE)
   
@@ -156,7 +161,7 @@ for (chamber in opt$chambers) {
   
   # ----- Ignore certain regions ----------------------------------------------
   
-  if (getRunOptions('verbose')) cat('Ignoring regions ...\n')
+  if (getRunOptions('verbose')) cat('\tIgnoring regions ...\n')
   
   # Interpret ignore regions as pixels
   ignoredRegions <- flow_findIgnore(opt$ignore[[chamber]], dim(imageList[['phase']][[1]]))
@@ -170,7 +175,7 @@ for (chamber in opt$chambers) {
   
   # ----- Label colonies --------------------------------------------------------
   
-  if (getRunOptions('verbose')) cat('Labeling images ...\n')
+  if (getRunOptions('verbose')) cat('\tLabeling images ...\n')
   
   # At this point we no longer need backgrounds
   for (channel in names(imageList)) {
@@ -190,7 +195,7 @@ for (chamber in opt$chambers) {
   
   # ----- Generate timeseries ---------------------------------------------------
   
-  if (getRunOptions('verbose')) cat('Generating timeseries ...\n')
+  if (getRunOptions('verbose')) cat('\tGenerating timeseries ...\n')
   
   output <- generateBlobTimeseries(labeledImageList[['phase']], 
                                    minTimespan=opt$minTimespan)
@@ -198,7 +203,7 @@ for (chamber in opt$chambers) {
   
   # ----- Equalize and label non-phase images -----------------------------------
   
-  if (getRunOptions('verbose')) cat('Equalize and label non-phase images ...\n')
+  if (getRunOptions('verbose')) cat('\tEqualizing and labeling non-phase images ...\n')
   
   for (channel in names(imageList)[-(names(imageList) == "phase")]) { # TODO:  Improve this logic
     if (getRunOptions('verbose')) cat(paste0("\tEqualizing ",channel," ...\n"))
@@ -209,7 +214,9 @@ for (chamber in opt$chambers) {
     profilePoint('flow_labelPhase','seconds to create labeled dye images')   
   }
   
-  if (getRunOptions('verbose')) cat('Equalize non-\'phase\' images ...\n')
+  profilePoint('non_phase','seconds to equalize and label non-phase images')   
+
+  if (getRunOptions('verbose')) cat('\tFinding overlaps for non-\'phase\' images ...\n')
   
   # TODO:  Should this be inside the previous loop?
   dyeOverlap <- list()
@@ -219,7 +226,13 @@ for (chamber in opt$chambers) {
     profilePoint('overlap','seconds to findn dye overlaps')   
   }
   
+  profilePoint('non_phase','seconds to find dye image overlaps')   
   
+  
+  # ----- Create output -------------------------------------------------------
+
+  if (getRunOptions('verbose')) cat('\tCreating output csv and images ...\n')
+
   # Generate filenames from timestamps
   # Assuming hours < 1000
   hours <- opt$startTime + ((0:(length(imageList[['phase']])-1))*opt$timestep)
@@ -240,11 +253,12 @@ for (chamber in opt$chambers) {
                           outputDir=outputDir,
                           distanceScale=opt$distanceScale)
   
-  #   
-  #   cat("\n---------------------------")
-  #   cat(paste0("\nFinished ",chamber, " in ", formatTime(regionTime)))
-  #   cat("\n---------------------------")
-  #   
+  # Profiling handled inside buildDirectoryStructure()
+  ###profilePoint('output','seconds to build directory structure')   
+  
+  
+  # ----- Cleanup -------------------------------------------------------------
+  
   rm(imageList)
   rm(labeledImageList)
   rm(dyeOverlap)
@@ -252,9 +266,17 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) {
     profileEnd(paste0('seconds total for chamber ',chamber,'\n'))
-    cat('--------------------------------------------------------------------------------\n\n')
+    cat(paste0('\nFinished chamber "',chamber,'" at ',Sys.time(),' --------------------------------\n\n'))
   }
   
 }
+
+# Restore normal output
+sink(type='message')
+sink()
+
+###############################################################################
+# END
+###############################################################################
 
 
