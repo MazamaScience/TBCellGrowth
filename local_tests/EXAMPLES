@@ -1,5 +1,5 @@
 # Not much growth but we can go all the way through (phase only)
-./Jon_test.R --inputDir="/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15" --outputDir="~/TBResults/June29" --chambers="xy01,xy06" --channels="c1" --channelNames="phase" --nFrames=8 &
+./Jon_test.R --inputDir="/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15" --outputDir="~/TBResults/June29" --chambers="xy01,xy06" --channels="c1" --channelNames="phase" --nFrames=8 --verbose &
 
 # Rapid growth 
 ./Jon_test.R --inputDir="/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, limiting PI, 9-1-15" --dataDir="Experimental images" --outputDir="~/TBResults/Sep01" --chambers="xy01,xy02,xy03,xy04,xy05,xy06" --channels="c1,c3" --channelNames="phase,red" --nFrames=20 --startFrame=8 --backgroundIndex=2 --verbose &

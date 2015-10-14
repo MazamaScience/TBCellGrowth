@@ -40,24 +40,24 @@ parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) {
   
   option_list <- list(    
     # File paths, all required
-    optparse::make_option(c("--inputDir"), default='', help="Absolute path of the input directory [default \"%default\"]"),
-    optparse::make_option(c("--outputDir"), default='', help="Absolute path of the output directory [default \"%default\"]"),
-    optparse::make_option(c("--dataDir"), default="Time Course", help="Relative path of the data directory within inputDir [default \"%default\"]"),
-    optparse::make_option(c("--backgroundDir"), default="Background", help="Relative path of the background directory within inputDir [default \"%default\"]"),
-    optparse::make_option(c("--backgroundIndex"), default=1, help="Background index [default \"%default\"]"),
+    optparse::make_option(c("--inputDir"), default='', type='character', help="Absolute path of the input directory [default \"%default\"]"),
+    optparse::make_option(c("--outputDir"), default='', type='character', help="Absolute path of the output directory [default \"%default\"]"),
+    optparse::make_option(c("--dataDir"), default="Time Course", type='character', help="Relative path of the data directory within inputDir [default \"%default\"]"),
+    optparse::make_option(c("--backgroundDir"), default="Background", type='character', help="Relative path of the background directory within inputDir [default \"%default\"]"),
+    optparse::make_option(c("--backgroundIndex"), default=1, type='integer', help="Background index [default \"%default\"]"),
     # Image information
-    optparse::make_option(c("--extension"), default="tif", help="File extension of input images [default \"%default\"]"),
-    optparse::make_option(c("--startTime"), default=0, help="Starting hour [default %default]"),
-    optparse::make_option(c("--timestep"), default=3, help="Hours between image acquisition [default %default]"),
-    optparse::make_option(c("--distanceScale"), default=0.21, help="pixels/micrometer [default %default]"),
+    optparse::make_option(c("--extension"), default="tif", type='character', help="File extension of input images [default \"%default\"]"),
+    optparse::make_option(c("--startTime"), default=0, type='integer', help="Starting hour [default %default]"),
+    optparse::make_option(c("--timestep"), default=3, type='integer', help="Hours between image acquisition [default %default]"),
+    optparse::make_option(c("--distanceScale"), default=0.21, type='integer', help="pixels/micrometer [default %default]"),
     # Chambers and channels
-    optparse::make_option(c("--chambers"), default='xy01,xy02', help="Comma separate string of chamber ids [default \"%default\"]"),
-    optparse::make_option(c("--channels"), default="c1", help="Comma separate string of channel ids [default \"%default\"]"),
-    optparse::make_option(c("--channelNames"), default="phase", help="Comma separate string of channel names [default \"%default\"]"),    
+    optparse::make_option(c("--chambers"), default='xy01,xy02', type='character', help="Comma separate string of chamber ids [default \"%default\"]"),
+    optparse::make_option(c("--channels"), default="c1", type='character', help="Comma separate string of channel ids [default \"%default\"]"),
+    optparse::make_option(c("--channelNames"), default="phase", type='character', help="Comma separate string of channel names [default \"%default\"]"),    
     # Optimization
-    optparse::make_option(c("--startFrame"), default=1, help="Which image frame to start from [default %default]"),
+    optparse::make_option(c("--startFrame"), default=1, type='integer', help="Which image frame to start from [default %default]"),
     optparse::make_option(c("--nFrames"), default="all", help="Number of frames to read [default \"%default\"]"),
-    optparse::make_option(c("--minTimespan"), default=5, help="Minimum number of frames in which a colony must be recognized [default %default]"),    
+    optparse::make_option(c("--minTimespan"), default=5, type='integer', help="Minimum number of frames in which a colony must be recognized [default %default]"),    
     # TODO:  What's the difference between backgroundIndex and startFrame    
 #     # Adjustable parameters
 #     optparse::make_option(c("--phaseMedian"), default=0.4, help="Median value after equalization [default %default]"),
@@ -100,10 +100,15 @@ validateRunOptions <- function(opt) {
   opt$profile <- TRUE
   opt$debug_images <- TRUE
   
+  # Convert type
+  
   # ----- Validate important parameters ---------------------------------------
   
   if (opt$nFrames != "all") {
-    if (opt$nFrames <= opt$minTimespan) stop ("nFrames must be greater than minTimespan")
+    opt$nFrames <- as.numeric(opt$nFrames)
+    if (opt$nFrames <= opt$minTimespan) {
+      stop(paste0("nFrames[",opt$nFrames,"] must be greater than minTimespan[",opt$minTimespan,"]"))
+    }
   }
   
   if (!is.numeric(opt$backgroundIndex)) stop("backgroundIndex must be an integer")
