@@ -38,7 +38,7 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=50, searchSpa
   
   profilePoint('edges','seconds to create background blobs')
   
-  if (getRunOptions('debug_image')) {
+  if (getRunOptions('debug_images')) {
     chamber <- getRunOptions('chambers')[1] # TODO:  Is getRunOption('chambers') always singular?
     file <- paste0(getRunOptions('outputDir'),'/',chamber,'_',channel,'_000_alignEdges.jpg')
     EBImage::writeImage(edges, file)

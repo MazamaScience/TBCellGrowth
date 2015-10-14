@@ -29,6 +29,8 @@ flow_labelDye <- function(image, phase.labeled, artifactMask) {
   imageEdit <- EBImage::bwlabel(imageEdit)
   
   phase.labeled[imageEdit < 1] <- 0
+
+  profilePoint('label','seconds to label dye image')
   
   return(phase.labeled)
    

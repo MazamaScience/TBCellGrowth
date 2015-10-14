@@ -4,17 +4,17 @@
 \alias{flow_equalizeDye}
 \title{Normalize Dye Image Values}
 \usage{
-flow_equalizeDye(images, artifactMask)
+flow_equalizeDye(image, artifactMask)
 }
 \arguments{
-\item{artifactMask}{a mask of non biological features to ignore. See \link{flow_createArtifactMask}.}
-
 \item{image}{the image matrix to modify.}
+
+\item{artifactMask}{a mask of non biological features to ignore. See \link{flow_createArtifactMask}.}
 }
 \value{
-an image of the same dimensions.
+An image of the same dimensions.
 }
 \description{
-Normalize a given dye image. TODO More info here
+Normalize a given dye image. TODO:  More info here
 }
 

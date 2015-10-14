@@ -1,54 +1,30 @@
-### #!/usr/bin/env Rscript
+#!/usr/bin/env Rscript
+#
+# Executable script for processing flow images
 
-# Jon's test script
 
+###############################################################################
+# Initialize
+###############################################################################
+
+# Required packages
+library(methods)
 library(TBCellGrowth)
-### library(methods)
 
-# ----- Set up params ---------------------------------------------------------
+# Utility functions (for parsing and validating arguments)
+source('utils_exec.R')
 
-###
-# opt <- list(inputDir='../TBCellGrowth_tests/data/fluid',
-#             dataDir='../TBCellGrowth_tests/data/fluid/Time\ Course',
-#             backgroundDir='../TBCellGrowth_tests/data/fluid/Background',
-#             extension='jpg',
-### Mazama Mobile drive
-# opt <- list(inputDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15',
-#             dataDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course',
-#             backgroundDir='/Volumes/MAZAMAMOB/Data/Kyle_data_2015_07_15/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background',
-### Mazama Data1 drive
-opt <- list(inputDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15',
-            dataDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Time Course',
-            backgroundDir='/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15/Background',
-            extension='tif',
-            outputDir='~/TBResults',
-            verbose=TRUE,
-            profile=TRUE,
-            debug_image=TRUE,
-            backgroundIndex=1,
-            chambers=c('xy06'),
-            channels='c1',
-            channelNames='phase',
-            startFrame=1,
-            nFrames=5, # normally 30
-            startTime=0,
-            timestep=3,
-            minTimespan=3, # normally 6
-            distanceScale=0.21,
-            help=FALSE,
-            phaseMedian=0.4,
-            numTargets=10,
-            targetWidth=30,
-            searchSpace=110)
-
+# Obtain and validate command line arguments
+opt <- parseCommandLineArguments()
 
 # Divert all output to the transcript
 transcriptFile <- file(paste0(opt$outputDir,'/TRANSCRIPT.txt'))
 sink(transcriptFile,type='output')
 sink(transcriptFile,type='message')
 
-# Store run options internally
-setRunOptions(opt)
+###############################################################################
+# Process images
+###############################################################################
 
 # for output, handle each xy region at a time
 for (chamber in opt$chambers) {
@@ -73,11 +49,12 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) cat('\tLoading images ...\n')
   
   backgrounds <- loadImages(opt$backgroundDir, chamber, opt$channels,
-                            opt$channelNames, opt$extension, startFrame=opt$backgroundIndex, n=1)
+                            opt$channelNames, opt$extension,
+                            startFrame=opt$backgroundIndex, n=1)
   
   imageList <- loadImages(opt$dataDir, chamber, opt$channels,
-                          opt$channelNames, opt$extension, n=opt$nFrames,
-                          startFrame=opt$startFrame)
+                          opt$channelNames, opt$extension,
+                          startFrame=opt$startFrame, n=opt$nFrames)
   
   # Merge backgrounds into imageList
   for (channel in names(imageList)) {
@@ -89,6 +66,7 @@ for (chamber in opt$chambers) {
     dims <- lapply(imageList[[channel]], dim)
     if ( length(unique(dims)) > 1 ) {
       stop(paste0('The channel named "',channel,'" has ',length(unique(dims)),' different image dimensions.'))
+      # TODO:  Don't just quit at this point.
     }
     
   }
@@ -103,17 +81,12 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tEqualizing images ...\n')
   
-  for (channel in names(imageList)) {
-    if (channel == 'phase') {
-      imageList[[channel]] <- lapply(imageList[[channel]], flow_equalizePhase, opt$phaseMedian)
-    } else {
-      stop(paste0('This script does not handle channels named "',channel,'".'))
-    }
-  }
+  # Assume that we always have phase
+  imageList[['phase']] <- lapply(imageList[['phase']], flow_equalizePhase, opt$phaseMedian)
   
-  profilePoint('flow_equalizePhase','seconds to equalize images')
+  profilePoint('flow_equalizePhase','seconds to equalize phase images')
   
-  if (getRunOptions('debug_image')) {
+  if (getRunOptions('debug_images')) {
     saveImageList(imageList,opt$outputDir,chamber,'A_equalized')    
     profilePoint('saveImages','seconds to save images')
   }
@@ -127,7 +100,7 @@ for (chamber in opt$chambers) {
   
   ###profilePoint('flow_rotatePhase','seconds to rotate images')
   
-  if (getRunOptions('debug_image')) {
+  if (getRunOptions('debug_images')) {
     saveImageList(imageList,opt$outputDir,chamber,'B_rotated')    
     profilePoint('saveImages','seconds to save images')
   }
@@ -144,7 +117,7 @@ for (chamber in opt$chambers) {
   
   # Profiling handled inside flow_alignImages()
   
-  if (getRunOptions('debug_image')) {
+  if (getRunOptions('debug_images')) {
     saveImageList(imageList,opt$outputDir,chamber,'C_aligned')    
     profilePoint('saveImages','seconds to save images')
   }
@@ -187,7 +160,7 @@ for (chamber in opt$chambers) {
   
   profilePoint('flow_labelPhase','seconds to create labeled images')   
   
-  if (getRunOptions('debug_image')) {
+  if (getRunOptions('debug_images')) {
     saveImageList(labeledImageList,opt$outputDir,chamber,'D_labeled')    
     profilePoint('saveImages','seconds to save images')
   }
@@ -203,15 +176,19 @@ for (chamber in opt$chambers) {
   
   # ----- Equalize and label non-phase images -----------------------------------
   
+  # NOTE:  This is done here because labeling depends on the 'phase' labels.
+  
   if (getRunOptions('verbose')) cat('\tEqualizing and labeling non-phase images ...\n')
   
   for (channel in names(imageList)[-(names(imageList) == "phase")]) { # TODO:  Improve this logic
     if (getRunOptions('verbose')) cat(paste0("\tEqualizing ",channel," ...\n"))
-    imageList[[channel]] <- lapply(imageList[[channel]], flow_equalizeDye, artifactMask)
-    profilePoint('flow_equalizeDye','seconds to equalize dye images')
-    if (getRunOptions('verbose')) cat(paste0("\tLabeling ",channel," ...\n"))
-    labeledImageList[[channel]] <- mapply(flow_labelDye, imageList[[channel]], labeledImageList[['phase']], SIMPLIFY=FALSE)
-    profilePoint('flow_labelPhase','seconds to create labeled dye images')   
+    for (i in 1:length(imageList[[channel]])) {
+      imageList[[channel]][[i]] <- flow_equalizeDye(imageList[[channel]][[i]], artifactMask)
+      # Profiling handled inside flow_equalizeDye
+      if (getRunOptions('verbose')) cat(paste0("\tLabeling ",channel," ...\n"))
+      labeledImageList[[channel]][[i]] <- flow_labelDye(imageList[[channel]][[i]], labeledImageList[['phase']][[i]])
+      # Profiling handled inside flow_equalizeDye
+    }
   }
   
   profilePoint('non_phase','seconds to equalize and label non-phase images')   

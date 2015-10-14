@@ -48,7 +48,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
       if (getRunOptions('verbose')) cat(paste0('\tWriting ',cName,' ...\n'))
       channel <- labeled[[cName]]
       overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
-      writeImages(overlay, outputDir, "/fullFrame", cName, filenames)
+      writeImages(overlay, outputDir, id="fullFrame", cName, filenames)
       profilePoint('saveImages',paste('seconds to save outlined',cName,'images'))
     }
     
@@ -127,7 +127,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
     writeExcel(timeseriesList[[cName]], outputDir, cName, filenames)
   }
 
-  cat(paste0("\nFull directory built in ", formatTime(directoryTime)))
+  cat(paste0("\tFull directory built in ", formatTime(directoryTime),'\n'))
   
 }
 
