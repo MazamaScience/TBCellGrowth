@@ -1,3 +1,46 @@
+################################################################################
+# HINT:  How to set up a CIDR cluster session with more memory.
+#
+# email from Erik Swanson:
+#
+# We have Linux control groups enabled, so jobs will be killed if they use more 
+# than 1 GB of memory on the cluster node.  Our cluster nodes are configured with 
+# 250000MB memory in SLURM, so I suggest you use a variation of the command below 
+# and adjust the number cores to match the amount of memory you think the job will 
+# need.  This command will request an interactive session and use all the memory 
+# and cores on one node.  If you change “-n=16” to “-n=2”, then the job will get 2 
+# CPUs and ~32 GB of memory.  You can also use these flags with the sbatch command.
+#
+# $ srun --mem-per-cpu=15625 -n16 -N1 --pty --preserve-env $SHELL
+#
+# man page:  srun [OPTIONS...]  executable [args...]
+#
+################################################################################
+
+
+################################################################################
+# Examples to be run on CIDR shell06
+################################################################################
+
+# Not much growth but we can go all the way through (phase only)
+srun --mem-per-cpu=15626 -n2 -N1 --pty --preserve-env ./Jon_test.R \
+--inputDir="/nearline/sherman-ngs/KM_Temp_Imaging/Microfluidics/BSL3/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15" \
+--outputDir="/nethome/jcallahan/Projects/Sherman/Results/Jun29" \
+--chambers="xy01" \
+--channels="c1" --channelNames="phase" \
+--nFrames="8" \
+--verbose &
+
+
+################################################################################
+################################################################################
+################################################################################
+
+
+################################################################################
+# Examples to be run on the Mazama Science desktop machine
+################################################################################
+
 # Not much growth but we can go all the way through (phase only)
 ./Jon_test.R --inputDir="/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15" --outputDir="~/TBResults/June29" --chambers="xy01,xy06" --channels="c1" --channelNames="phase" --nFrames=8 --verbose &
 

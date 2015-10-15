@@ -35,7 +35,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   
   # Add overlays to phase
   # These overlays will also serve as a background to other channels
-  result <- try({
+#  result <- try({
     
     full_overlay <- mapply(overlayOutlines, phase, labeled$phase, col="yellow", SIMPLIFY=FALSE)
     # full_overlay <- lapply(full_overlay, overlayScaleBar, distanceScale)
@@ -67,11 +67,11 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
     
     rm(full_overlay)
     
-  }, silent=TRUE)
-  
-  if (class(result) == "try-error") {
-    print(result)
-  }
+#  }, silent=TRUE)
+#  
+#  if (class(result) == "try-error") {
+#    print(result)
+#  }
   
 
   ptm <- proc.time()
@@ -192,8 +192,8 @@ writeImages <- function(images, outputDir, id, channel, filenames) {
     file <- paste0(outputDir, "/", id, "/", channel, "/t_", filenames[[i]], ".jpg")
     EBImage::writeImage(images[[i]], file=file)
   }
-  result <- try({
+#  result <- try({
     createGif(paste0(outputDir, "/", id, "/", channel), paste0("g_",id,".gif"))
-  })
+#  })
 }
 
