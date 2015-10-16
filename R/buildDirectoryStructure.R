@@ -11,6 +11,7 @@
 #' image lists. Usually timesteps.
 #' @param outputDir the directory to build the file structure
 #' @param distanceScale the distance conversion in um/pixel
+#' @param chamber the current chamber id
 #' @description write a lot more here TODO
 #' @return none
 
