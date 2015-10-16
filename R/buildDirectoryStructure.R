@@ -15,7 +15,7 @@
 #' @return none
 
 buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filenames, 
-                                    outputDir="output", distanceScale=NULL) { 
+                                    outputDir="output", distanceScale=NULL, chamber="") { 
   
   # Merge timeseries together
   timeseriesList <- lapply(dyeOverlap, function(x) x)
@@ -124,7 +124,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   # ----- Create excel files --------------------------------------------------
 
   for (cName in names(labeled)) {
-    writeExcel(timeseriesList[[cName]], outputDir, cName, filenames)
+    writeExcel(timeseriesList[[cName]], outputDir, cName, filenames, chamber=chamber)
   }
 
   cat(paste0("\tFull directory built in ", formatTime(directoryTime),'\n'))
@@ -142,11 +142,11 @@ excelHyperlink <- function(url, text) {
 
 # Accepts a table of values, the output directory, the current dye color,
 # and a vector of times / filenames
-writeExcel <- function(df, outputDir, channel, filenames) {
+writeExcel <- function(df, outputDir, channel, filenames, chamber) {
   
   if (dim(df)[[2]] < 1) return()
   
-  write.csv(df, paste0(outputDir, "/", channel, "_noLinks.csv"))
+  write.csv(df, paste0(outputDir, "/", channel, "_", chamber, "_noLinks.csv"))
   
   # Creates hyperlinks to specific images
   cellHyperlinks <- function(id) {
@@ -177,7 +177,7 @@ writeExcel <- function(df, outputDir, channel, filenames) {
 
   rownames(df) <- lapply(filenames, timeHyperlinks)
   
-  write.csv(df, paste0(outputDir, "/", channel, ".csv"))
+  write.csv(df, paste0(outputDir, "/", channel, "_", chamber, ".csv"))
   
  
   

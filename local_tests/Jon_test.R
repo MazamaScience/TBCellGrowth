@@ -228,7 +228,8 @@ for (chamber in opt$chambers) {
                           dyeOverlap=dyeOverlap,
                           filenames=filenames,
                           outputDir=outputDir,
-                          distanceScale=opt$distanceScale)
+                          distanceScale=opt$distanceScale,
+                          chamber=chamber)
   
   # Profiling handled inside buildDirectoryStructure()
   ###profilePoint('output','seconds to build directory structure')   
