@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript
+#!/depot/R/3.2.1/bin/Rscript
 #
 # Executable script for processing flow images
 
@@ -228,8 +228,7 @@ for (chamber in opt$chambers) {
                           dyeOverlap=dyeOverlap,
                           filenames=filenames,
                           outputDir=outputDir,
-                          distanceScale=opt$distanceScale,
-                          chamber=chamber)
+                          distanceScale=opt$distanceScale)
   
   # Profiling handled inside buildDirectoryStructure()
   ###profilePoint('output','seconds to build directory structure')   

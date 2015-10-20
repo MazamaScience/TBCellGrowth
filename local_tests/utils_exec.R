@@ -58,6 +58,7 @@ parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) {
     optparse::make_option(c("--startFrame"), default=1, type='integer', help="Which image frame to start from [default %default]"),
     optparse::make_option(c("--nFrames"), default="all", help="Number of frames to read [default \"%default\"]"),
     optparse::make_option(c("--minTimespan"), default=5, type='integer', help="Minimum number of frames in which a colony must be recognized [default %default]"),    
+    # TODO:  What's the difference between backgroundIndex and startFrame    
 #     # Adjustable parameters
 #     optparse::make_option(c("--phaseMedian"), default=0.4, help="Median value after equalization [default %default]"),
 #     optparse::make_option(c("--numTargets"), default=10, help="Number of target features used for alignment [default %default]"),
