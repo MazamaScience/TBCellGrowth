@@ -76,13 +76,19 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   
 
   ptm <- proc.time()
-  if (getRunOptions('verbose')) cat("\tSaving images for ndividual ids ...\n")
+  if (getRunOptions('verbose')) cat("\tSaving images for individual ids ...\n")
   
   dir.create(paste0(outputDir, "/individual"), showWarnings=FALSE, recursive=TRUE)
   
+  counter <- 0
+  coloniesCount <- length(names(output$timeseries))
   for (id in names(output$timeseries)) {
     
-    if (getRunOptions('verbose')) cat('.')
+    counter <- counter + 1
+    if (getRunOptions('verbose')) {
+      pct <- round(100*(counter/coloniesCount))
+      if ( (pct %% 10) == 0 ) cat(paste0('\t',pct,'%\n'))
+    }
     
     dir.create(paste0(outputDir,"/individual/",id), showWarnings=FALSE, recursive=TRUE)
     

@@ -17,10 +17,8 @@ source('utils_exec.R')
 # Obtain and validate command line arguments
 opt <- parseCommandLineArguments()
 
-# Divert all output to the transcript
-transcriptFile <- file(paste0(opt$outputDir,'/TRANSCRIPT.txt'))
-sink(transcriptFile,type='output')
-sink(transcriptFile,type='message')
+# Create overall directory
+dir.create(opt$outputDir, showWarnings=FALSE)
 
 ###############################################################################
 # Process images
@@ -32,17 +30,21 @@ for (chamber in opt$chambers) {
   # Begin profiling
   profileStart()
   
+  # ----- Create output directories -------------------------------------------
+  
+  chamberOutputDir <- paste0(opt$outputDir, "/", chamber)
+  
+  # Make directories and open file
+  dir.create(chamberOutputDir, showWarnings=FALSE)
+  
+  # Divert all output to the transcript
+  transcriptFile <- file(paste0(chamberOutputDir,'/TRANSCRIPT.txt'))
+  sink(transcriptFile,type='output')
+  sink(transcriptFile,type='message')
+  
   if (getRunOptions('verbose')) {
     cat(paste0('\nProcessing chamber "',chamber,'" on ',Sys.time(),' ------------------------------\n\n'))
   }
-  
-  # ----- Create output directories -------------------------------------------
-  
-  outputDir <- paste0(opt$outputDir, "/", chamber)
-  
-  # Make directories and open file
-  dir.create(outputDir, showWarnings=FALSE)
-  
   
   # ----- Load images ---------------------------------------------------------
   
@@ -87,7 +89,7 @@ for (chamber in opt$chambers) {
   profilePoint('flow_equalizePhase','seconds to equalize phase images')
   
   if (getRunOptions('debug_images')) {
-    saveImageList(imageList,opt$outputDir,chamber,'A_equalized')    
+    saveImageList(imageList,chamberOutputDir,chamber,'A_equalized')    
     profilePoint('saveImages','seconds to save images')
   }
   
@@ -101,7 +103,7 @@ for (chamber in opt$chambers) {
   ###profilePoint('flow_rotatePhase','seconds to rotate images')
   
   if (getRunOptions('debug_images')) {
-    saveImageList(imageList,opt$outputDir,chamber,'B_rotated')    
+    saveImageList(imageList,chamberOutputDir,chamber,'B_rotated')    
     profilePoint('saveImages','seconds to save images')
   }
   
@@ -118,7 +120,7 @@ for (chamber in opt$chambers) {
   # Profiling handled inside flow_alignImages()
   
   if (getRunOptions('debug_images')) {
-    saveImageList(imageList,opt$outputDir,chamber,'C_aligned')    
+    saveImageList(imageList,chamberOutputDir,chamber,'C_aligned')    
     profilePoint('saveImages','seconds to save images')
   }
   
@@ -161,7 +163,7 @@ for (chamber in opt$chambers) {
   profilePoint('flow_labelPhase','seconds to create labeled images')   
   
   if (getRunOptions('debug_images')) {
-    saveImageList(labeledImageList,opt$outputDir,chamber,'D_labeled')    
+    saveImageList(labeledImageList,chamberOutputDir,chamber,'D_labeled')    
     profilePoint('saveImages','seconds to save images')
   }
   
@@ -227,7 +229,7 @@ for (chamber in opt$chambers) {
                           labeled=labeledImageList,
                           dyeOverlap=dyeOverlap,
                           filenames=filenames,
-                          outputDir=outputDir,
+                          outputDir=chamberOutputDir,
                           distanceScale=opt$distanceScale)
   
   # Profiling handled inside buildDirectoryStructure()
@@ -246,11 +248,11 @@ for (chamber in opt$chambers) {
     cat(paste0('\nFinished chamber "',chamber,'" at ',Sys.time(),' --------------------------------\n\n'))
   }
   
-}
+  # Restore normal output
+  sink(type='message')
+  sink()
 
-# Restore normal output
-sink(type='message')
-sink()
+}
 
 ###############################################################################
 # END
