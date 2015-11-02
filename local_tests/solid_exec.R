@@ -50,31 +50,9 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tLoading images ...\n')
   
-  backgrounds <- loadImages(opt$backgroundDir, chamber, opt$channels,
-                            opt$channelNames, opt$extension,
-                            startFrame=opt$backgroundIndex, n=1)
-  
   imageList <- loadImages(opt$dataDir, chamber, opt$channels,
                           opt$channelNames, opt$extension,
                           startFrame=opt$startFrame, n=opt$nFrames)
-  
-  # Merge backgrounds into imageList
-  for (channel in names(imageList)) {
-    
-    imageList[[channel]] <- c(backgrounds[[channel]], imageList[[channel]])
-    names(imageList[[channel]])[1] <- '000'
-    
-    # Sanity check -- all dimensions should be the same
-    dims <- lapply(imageList[[channel]], dim)
-    if ( length(unique(dims)) > 1 ) {
-      stop(paste0('The channel named "',channel,'" has ',length(unique(dims)),' different image dimensions.'))
-      # TODO:  Don't just quit at this point.
-    }
-    
-  }
-  
-  # Clear large objects from memory
-  rm(backgrounds)
   
   profilePoint('loadImages','seconds to load images')
   
@@ -93,60 +71,24 @@ for (chamber in opt$chambers) {
     profilePoint('saveImages','seconds to save images')
   }
   
-  
-  # ----- Rotate images -------------------------------------------------------
-  
-  if (getRunOptions('verbose')) cat('\tRotating images ...\n')
-  
-  imageList <- flow_rotateImages(imageList)
-  
-  ###profilePoint('flow_rotatePhase','seconds to rotate images')
-  
-  if (getRunOptions('debug_images')) {
-    saveImageList(imageList,chamberOutputDir,chamber,'B_rotated')    
-    profilePoint('saveImages','seconds to save images')
-  }
-  
-  
+
+  ### TODO should these imagetypes be aligned?
   # ----- Align images --------------------------------------------------------
-  
-  if (getRunOptions('verbose')) cat('\tAligning images ...\n')
-  
-  imageList <- flow_alignImages(imageList,
-                                numTargets=opt$numTargets,
-                                targetWidth=opt$targetWidth, 
-                                searchSpace=opt$searchSpace)
-  
-  # Profiling handled inside flow_alignImages()
-  
-  if (getRunOptions('debug_images')) {
-    saveImageList(imageList,chamberOutputDir,chamber,'C_aligned')    
-    profilePoint('saveImages','seconds to save images')
-  }
-  
-  
-  # ----- Create artifact mask ------------------------------------------------
-  
-  if (getRunOptions('verbose')) cat('\tCreating artifact mask ...\n')
-  
-  artifactMask <- flow_createArtifactMask(imageList[['phase']][[1]], TRUE)
-  
-  profilePoint('flow_createArtifactMask','seconds to create artifact mask')
-  
-  
-  # ----- Ignore certain regions ----------------------------------------------
-  
-  if (getRunOptions('verbose')) cat('\tIgnoring regions ...\n')
-  
-  # Interpret ignore regions as pixels
-  ignoredRegions <- flow_findIgnore(opt$ignore[[chamber]], dim(imageList[['phase']][[1]]))
-  # Find dark line areas in the to ignore
-  darkLines <- flow_findDarkLines(imageList[['phase']][[1]])
-  # Combine these two into a final ignore list
-  ignoredRegions <- rbind(ignoredRegions, darkLines)
-  
-  profilePoint('ignoreRegions','seconds to create ignored regions')   
-  
+#   
+#   if (getRunOptions('verbose')) cat('\tAligning images ...\n')
+#   
+#   imageList <- flow_alignImages(imageList,
+#                                 numTargets=opt$numTargets,
+#                                 targetWidth=opt$targetWidth, 
+#                                 searchSpace=opt$searchSpace)
+#   
+#   # Profiling handled inside flow_alignImages()
+#   
+#   if (getRunOptions('debug_images')) {
+#     saveImageList(imageList,chamberOutputDir,chamber,'C_aligned')    
+#     profilePoint('saveImages','seconds to save images')
+#   }
+#   
   
   # ----- Label colonies --------------------------------------------------------
   
@@ -158,7 +100,7 @@ for (chamber in opt$chambers) {
   }
   
   labeledImageList <- list()
-  labeledImageList[['phase']] <- lapply(imageList[['phase']], flow_labelPhase, artifactMask, ignoredRegions)
+  labeledImageList[['phase']] <- lapply(imageList[['phase']], solid_labelPhase)
   
   profilePoint('flow_labelPhase','seconds to create labeled images')   
   
