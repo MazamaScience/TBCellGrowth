@@ -32,12 +32,12 @@ if (FALSE) {
   args <- c('--inputDir=/Volumes/MAZAMAMOB/Data/Alginate well plate, 10-16-15',
             '--dataDir=Images',
             '--outputDir=~/Desktop/TBResults/Nov02Test1',
-            '--chambers=xy01',
+            '--chambers=xy06',
             '--channels=c1',
             '--channelNames=phase',
             '--minTimespan=5',
-            '--nFrames=all',
-            '--startFrame=13',
+            '--nFrames=20',
+            '--startFrame=1',
             '--verbose')
   
   opt <- solid_parseCommandLineArguments(args)

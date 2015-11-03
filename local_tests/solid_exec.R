@@ -94,11 +94,6 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tLabeling images ...\n')
   
-  # At this point we no longer need backgrounds
-  for (channel in names(imageList)) {
-    imageList[[channel]][[1]] <- NULL
-  }
-  
   labeledImageList <- list()
   labeledImageList[['phase']] <- lapply(imageList[['phase']], solid_labelPhase)
   
@@ -201,5 +196,18 @@ for (chamber in opt$chambers) {
 ###############################################################################
 # END
 ###############################################################################
+
+if (FALSE) {
+  
+  outlined <- mapply(overlayOutlines, imageList[['phase']], labeledImageList[['phase']], col="yellow", SIMPLIFY=FALSE)
+  
+  for (i in 1:length(outlined)) {
+    im <- outlined[[i]]
+    if (i<10) i = paste0("0",i)
+    writeImage(im, paste0("im",i,".jpg"), quality=60)
+  }
+
+}
+
 
 

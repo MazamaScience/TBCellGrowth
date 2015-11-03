@@ -10,23 +10,24 @@ solid_labelPhase <- function(image) {
   
   image[image > 1] <- 1
   
-  imageEdit <- filter_sobel(image, FALSE, 2)
+  edges <- filter_sobel(image, FALSE, 2)
   
-  imageEdit <- EBImage::closingGreyScale(imageEdit, EBImage::makeBrush(7))
+  imageEdit <- EBImage::closingGreyScale(edges, EBImage::makeBrush(7))
   
   imageEdit <- imageEdit > 0.5
   
-  imageEdit[EBImage::equalize(image) > 0.95] <- 0
+  imageEdit[EBImage::equalize(image) > 0.98] <- 0
   
-  imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(3))
+  # imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(3))
+  imageEdit <- EBImage::closingGreyScale(imageEdit, EBImage::makeBrush(7))
   
-  imageEdit <- removeBlobs(imageEdit, 50)
+  imageEdit <- removeBlobs(imageEdit, 45)
   
   imageEdit <- EBImage::bwlabel(imageEdit)
   
-  imageEdit[EBImage::equalize(image) > 0.95] <- 0
+  imageEdit[EBImage::equalize(image) > 0.98] <- 0
   
-  imageEdit <- removeBlobs(imageEdit, 50, label=FALSE)
+  imageEdit <- removeBlobs(imageEdit, 60, label=FALSE)
   
   # For checking results during development
   if (FALSE) {
