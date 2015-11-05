@@ -6,56 +6,42 @@
 
 solid_labelPhase <- function(image) {
 
-  cat(".")
+  if (getRunOptions('verbose')) cat('\tLabeling ...\n')
   
-  # Blur image to reduce noise in edge finding
-  # imageEdit <- filter_blur(image, 5)
+  image[image > 1] <- 1
   
-  # Sobel edge finding implementation
-  imageEdit <- filter_sobel(image)
+  edges <- filter_sobel(image, FALSE, 2)
   
-  # Threshold sharp edges
-  imageEdit <- imageEdit > 0.15
+  imageEdit <- EBImage::closingGreyScale(edges, EBImage::makeBrush(7))
   
-  # Dilate and expand to join found edges
-  imageEdit <- EBImage::closingGreyScale(imageEdit, EBImage::makeBrush(9, shape='disc'))
-
-  imageEdit <- expandEdges(imageEdit, 4, 1)
-
-  imageEdit <- EBImage::fillHull(imageEdit)
+  imageEdit <- imageEdit > 0.5
   
-  imageEdit <- expandEdges(imageEdit, 4, 0)
-
-  imageEdit <- EBImage::erodeGreyScale(imageEdit, EBImage::makeBrush(3, shape='disc'))
+  imageEdit[EBImage::equalize(image) > 0.98] <- 0
   
-  # Mask out dark areas from original image to separate groups
-  # imageEdit[image < 0.35] <- 0
+  # imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(3))
+  imageEdit <- EBImage::closingGreyScale(imageEdit, EBImage::makeBrush(7))
   
-  # Dilate again to further join nearby blobs
-  # imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(5, shape='disc'))
+  imageEdit <- removeBlobs(imageEdit, 45)
   
-  # Fill centers of blobs since we only found edges
-  imageEdit <- EBImage::fillHull(imageEdit)
-  
-  # Remove small blobs
-  imageEdit <- removeBlobs(imageEdit, 75)
-  
-  # Label images
   imageEdit <- EBImage::bwlabel(imageEdit)
   
+  imageEdit[EBImage::equalize(image) > 0.98] <- 0
   
-  # imageEdit[image < 0.35] <- 0
+  imageEdit <- removeBlobs(imageEdit, 60, label=FALSE)
   
-  # imageEdit <- EBImage::fillHull(imageEdit)
+  # For checking results during development
+  if (FALSE) {
+    display(overlayOutlines(image, imageEdit))
+  }
   
   return(imageEdit)
   
 }
-
-expandEdges <- function(im, width, val) {
-  im[1:width,10:(dim(im)[2]-10)] <- val
-  im[10:(dim(im)[1]-10),1:width] <- val
-  im[(dim(im)[1]-width):(dim(im)[1]),10:(dim(im)[2]-10)] <- val
-  im[10:(dim(im)[1]),(dim(im)[2]-width):(dim(im)[2])] <- val
-  return(im)
-}
+# 
+# expandEdges <- function(im, width, val) {
+#   im[1:width,10:(dim(im)[2]-10)] <- val
+#   im[10:(dim(im)[1]-10),1:width] <- val
+#   im[(dim(im)[1]-width):(dim(im)[1]),10:(dim(im)[2]-10)] <- val
+#   im[10:(dim(im)[1]),(dim(im)[2]-width):(dim(im)[2])] <- val
+#   return(im)
+# }
