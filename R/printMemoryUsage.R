@@ -5,22 +5,22 @@
 
 printMemoryUsage <- function() {
 
+  # Get names from the global environment
+  objectNames <- ls(globalenv())
+  
   # Create an object to store the sizes
-  DELETEME <- 0
-  DELETEME <- rep(0,length(ls()))
-  names(DELETEME) <- ls()
-
-  objNames <- ls()
+  objectSizes <- rep(0, length(objectNames))
+  names(objectSizes) <- objectNames
 
   # Because we are using get(), this has to be in a loop
-  for (i in 1:length(DELETEME)) {
-    DELETEME[i] <- as.numeric(object.size(get(objNames[i])))
+  for (name in objectNames) {
+    objectSizes[name] <- as.numeric(object.size(get(name)))
   }
 
   # Sort and print to stdout
-  DELETEME <- round(sort(DELETEME/1e6),1)
-  for (i in 1:length(DELETEME)) {
-    cat(paste0('\t',sprintf("%8.1f",DELETEME[i]),' MB : ',names(DELETEME)[i],'\n'))
+  objectSizes <- round(sort(objectSizes/1e6),1)
+  for (name in objectNames) {
+    cat(paste0('\t',sprintf("%8.1f",objectSizes[name]),' MB : ',name,'\n'))
   }
 
 }

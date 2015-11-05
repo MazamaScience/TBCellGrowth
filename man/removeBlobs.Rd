@@ -12,6 +12,8 @@ removeBlobs(image, minSize = 0, maxSize = Inf, label = TRUE)
 \item{minSize}{lower threshold for removal}
 
 \item{maxSize}{upper threshold for removal}
+
+\item{label}{logical flag specifying whether to label images}
 }
 \value{
 An image \code{matrix} of size equal to the input image

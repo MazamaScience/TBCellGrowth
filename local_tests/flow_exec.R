@@ -1,4 +1,4 @@
-#!/depot/R/3.2.1/bin/Rscript
+#!/usr/bin/Rscript ###!/depot/R/3.2.1/bin/Rscript
 #
 # Executable script for processing flow images
 
@@ -11,11 +11,12 @@
 library(methods)
 library(TBCellGrowth)
 
+print(getwd())
 # Utility functions (for parsing and validating arguments)
 source('utils_exec.R')
 
 # Obtain and validate command line arguments
-opt <- parseCommandLineArguments()
+opt <- flow_parseCommandLineArguments()
 
 # Create overall directory
 dir.create(opt$outputDir, showWarnings=FALSE)
@@ -78,6 +79,11 @@ for (chamber in opt$chambers) {
   
   profilePoint('loadImages','seconds to load images')
   
+  if (getRunOptions('verbose')) {
+    cat(paste0('Images loaded, memory footprint below:[\n\n'))
+    printMemoryUsage()
+  }
+
   
   # ----- Equalise phase images -----------------------------------------------
   
