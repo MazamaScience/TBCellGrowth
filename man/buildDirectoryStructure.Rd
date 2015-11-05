@@ -5,7 +5,7 @@
 \title{Builds A Directory of Image With Excel UI}
 \usage{
 buildDirectoryStructure(output, phase, labeled, dyeOverlap, filenames,
-  outputDir = "output", distanceScale = NULL)
+  outputDir = "output", distanceScale = NULL, chamber = "")
 }
 \arguments{
 \item{output}{a List with timeseries and centroids from
@@ -25,6 +25,8 @@ image lists. Usually timesteps.}
 \item{outputDir}{the directory to build the file structure}
 
 \item{distanceScale}{the distance conversion in um/pixel}
+
+\item{chamber}{the current chamber id}
 }
 \value{
 none

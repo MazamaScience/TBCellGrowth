@@ -4,9 +4,11 @@
 \alias{applyCropRect}
 \title{Crop an Image}
 \usage{
-applyCropRect(im, width, height)
+applyCropRect(image, width, height)
 }
 \arguments{
+\item{image}{an image matrix}
+
 \item{width}{twice the individual width border}
 
 \item{height}{twice the individual height border}
