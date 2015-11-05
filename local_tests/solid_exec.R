@@ -62,7 +62,7 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) cat('\tEqualizing images ...\n')
   
   # Assume that we always have phase
-  imageList[['phase']] <- lapply(imageList[['phase']], flow_equalizePhase, opt$phaseMedian)
+  imageList[[1]] <- lapply(imageList[[1]], flow_equalizePhase, opt$phaseMedian)
   
   profilePoint('flow_equalizePhase','seconds to equalize phase images')
   
@@ -95,7 +95,7 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) cat('\tLabeling images ...\n')
   
   labeledImageList <- list()
-  labeledImageList[['phase']] <- lapply(imageList[['phase']], solid_labelPhase)
+  labeledImageList[[1]] <- lapply(imageList[[1]], solid_labelPhase)
   
   profilePoint('flow_labelPhase','seconds to create labeled images')   
   
@@ -109,7 +109,7 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tGenerating timeseries ...\n')
   
-  output <- generateBlobTimeseries(labeledImageList[['phase']], 
+  output <- generateBlobTimeseries(labeledImageList[[1]], 
                                    minTimespan=opt$minTimespan)
   
   
@@ -119,13 +119,13 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tEqualizing and labeling non-phase images ...\n')
   
-  for (channel in names(imageList)[-(names(imageList) == "phase")]) { # TODO:  Improve this logic
+  for (channel in names(imageList)[-1]) { # TODO:  Improve this logic
     if (getRunOptions('verbose')) cat(paste0("\tEqualizing ",channel," ...\n"))
     for (i in 1:length(imageList[[channel]])) {
       imageList[[channel]][[i]] <- flow_equalizeDye(imageList[[channel]][[i]], artifactMask)
       # Profiling handled inside flow_equalizeDye
       if (getRunOptions('verbose')) cat(paste0("\tLabeling ",channel," ...\n"))
-      labeledImageList[[channel]][[i]] <- flow_labelDye(imageList[[channel]][[i]], labeledImageList[['phase']][[i]])
+      labeledImageList[[channel]][[i]] <- flow_labelDye(imageList[[channel]][[i]], labeledImageList[[1]][[i]])
       # Profiling handled inside flow_equalizeDye
     }
   }
@@ -136,9 +136,9 @@ for (chamber in opt$chambers) {
   
   # TODO:  Should this be inside the previous loop?
   dyeOverlap <- list()
-  for (channel in names(imageList)[-(names(imageList) == "phase")]) { # TODO:  Improve this logic
+  for (channel in names(imageList)[-1]) { # TODO:  Improve this logic
     if (getRunOptions('verbose')) cat(paste0("\tFinding ",channel, " overlap ...\n"))
-    dyeOverlap[[channel]] <- findDyeOverlap(labeledImageList[[channel]], labeledImageList[['phase']], output)
+    dyeOverlap[[channel]] <- findDyeOverlap(labeledImageList[[channel]], labeledImageList[[1]], output)
     profilePoint('overlap','seconds to findn dye overlaps')   
   }
   
@@ -151,7 +151,7 @@ for (chamber in opt$chambers) {
   
   # Generate filenames from timestamps
   # Assuming hours < 1000
-  hours <- opt$startTime + ((0:(length(imageList[['phase']])-1))*opt$timestep)
+  hours <- opt$startTime + ((0:(length(imageList[[1]])-1))*opt$timestep)
   filenames <- stringr::str_sub(paste0('000',hours),-3)
   
   # Apply timesteps to row names of timeseries
@@ -162,7 +162,7 @@ for (chamber in opt$chambers) {
   }
   
   buildDirectoryStructure(output, 
-                          phase=imageList[['phase']], 
+                          phase=imageList[[1]], 
                           labeled=labeledImageList,
                           dyeOverlap=dyeOverlap,
                           filenames=filenames,
@@ -199,7 +199,7 @@ for (chamber in opt$chambers) {
 
 if (FALSE) {
   
-  outlined <- mapply(overlayOutlines, imageList[['phase']], labeledImageList[['phase']], col="yellow", SIMPLIFY=FALSE)
+  outlined <- mapply(overlayOutlines, imageList[[1]], labeledImageList[[1]], col="yellow", SIMPLIFY=FALSE)
   
   for (i in 1:length(outlined)) {
     im <- outlined[[i]]
