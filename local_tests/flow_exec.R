@@ -78,12 +78,8 @@ for (chamber in opt$chambers) {
   rm(backgrounds)
   
   profilePoint('loadImages','seconds to load images')
+  if (getRunOptions('verbose')) printMemoryUsage()
   
-  if (getRunOptions('verbose')) {
-    cat(paste0('Images loaded, memory footprint below:[\n\n'))
-    printMemoryUsage()
-  }
-
   
   # ----- Equalise phase images -----------------------------------------------
   
@@ -151,7 +147,7 @@ for (chamber in opt$chambers) {
   # Combine these two into a final ignore list
   ignoredRegions <- rbind(ignoredRegions, darkLines)
   
-  profilePoint('ignoreRegions','seconds to create ignored regions')   
+  ###profilePoint('ignoreRegions','seconds to create ignored regions')   
   
   
   # ----- Label colonies --------------------------------------------------------
@@ -164,7 +160,11 @@ for (chamber in opt$chambers) {
   }
   
   labeledImageList <- list()
-  labeledImageList[['phase']] <- lapply(imageList[['phase']], flow_labelPhase, artifactMask, ignoredRegions)
+  labeledImageList[['phase']] <- list()
+  for (i in 1:length(imageList[['phase']])) {    
+    if (getRunOptions('verbose')) cat(paste0('\tLabeling ',i,' ...\n'))
+    labeledImageList[['phase']][[i]] <- flow_labelPhase(imageList[['phase']][[i]], artifactMask, ignoredRegions)
+  }
   
   profilePoint('flow_labelPhase','seconds to create labeled images')   
   
@@ -178,8 +178,15 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tGenerating timeseries ...\n')
   
-  output <- generateBlobTimeseries(labeledImageList[['phase']], 
-                                   minTimespan=opt$minTimespan)
+  timeseriesList <- generateBlobTimeseries(labeledImageList[['phase']], 
+                                           minTimespan=opt$minTimespan)
+  
+  profilePoint('generateBlobTimeseries','seconds to track blobs and build timeseries')   
+  
+  if (getRunOptions('verbose')) {
+    cat(paste0('Phase timeseries generated ---------------------------------\n\n'))
+    printMemoryUsage()
+  }
   
   
   # ----- Equalize and label non-phase images -----------------------------------
@@ -188,49 +195,59 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tEqualizing and labeling non-phase images ...\n')
   
-  for (channel in names(imageList)[-(names(imageList) == "phase")]) { # TODO:  Improve this logic
-    if (getRunOptions('verbose')) cat(paste0("\tEqualizing ",channel," ...\n"))
+  # NOTE:  The "phase" channel is always first
+  for (channel in opt$channelNames[-1]) {
+    
+    if (getRunOptions('verbose')) cat(paste0("\tEqualizing and labeling ",channel," ...\n"))
+    
     for (i in 1:length(imageList[[channel]])) {
+      # equalize
       imageList[[channel]][[i]] <- flow_equalizeDye(imageList[[channel]][[i]], artifactMask)
-      # Profiling handled inside flow_equalizeDye
-      if (getRunOptions('verbose')) cat(paste0("\tLabeling ",channel," ...\n"))
-      labeledImageList[[channel]][[i]] <- flow_labelDye(imageList[[channel]][[i]], labeledImageList[['phase']][[i]])
-      # Profiling handled inside flow_equalizeDye
+      profilePoint('equalizeDye','seconds to equalize dye image')
+      # label
+      labeledImageList[[channel]][[i]] <- flow_labelDye(imageList[[channel]][[i]],
+                                                        labeledImageList[['phase']][[i]],
+                                                        labelingThreshold=0.9)
+      profilePoint('label','seconds to label dye image')
     }
+    
   }
   
-  profilePoint('non_phase','seconds to equalize and label non-phase images')   
-
   if (getRunOptions('verbose')) cat('\tFinding overlaps for non-\'phase\' images ...\n')
   
-  # TODO:  Should this be inside the previous loop?
+  # Find dye overlaps
   dyeOverlap <- list()
-  for (channel in names(imageList)[-(names(imageList) == "phase")]) { # TODO:  Improve this logic
+  # NOTE:  The "phase" channel is always first
+  for (channel in opt$channelNames[-1]) {    
     if (getRunOptions('verbose')) cat(paste0("\tFinding ",channel, " overlap ...\n"))
-    dyeOverlap[[channel]] <- findDyeOverlap(labeledImageList[[channel]], labeledImageList[['phase']], output)
-    profilePoint('overlap','seconds to findn dye overlaps')   
+    dyeOverlap[[channel]] <- findDyeOverlap(labeledImageList[[channel]], timeseriesList)
+    profilePoint('overlap','seconds to find dye overlaps')   
   }
   
-  profilePoint('non_phase','seconds to find dye image overlaps')   
+  profilePoint('overlap','seconds to find dye image overlaps') 
   
+  if (getRunOptions('verbose')) {
+    cat(paste0('Dye channels handled ---------------------------------------\n\n'))
+    printMemoryUsage()
+  }
   
   # ----- Create output -------------------------------------------------------
-
+  
   if (getRunOptions('verbose')) cat('\tCreating output csv and images ...\n')
-
+  
   # Generate filenames from timestamps
   # Assuming hours < 1000
   hours <- opt$startTime + ((0:(length(imageList[['phase']])-1))*opt$timestep)
   filenames <- stringr::str_sub(paste0('000',hours),-3)
   
   # Apply timesteps to row names of timeseries
-  rownames(output$timeseries) <- filenames
+  rownames(timeseriesList$timeseries) <- filenames
   # Apply timesteps to overlap row names
   for (channel in names(dyeOverlap)) {
     rownames(dyeOverlap[[channel]]) <- filenames
   }
   
-  buildDirectoryStructure(output, 
+  buildDirectoryStructure(timeseriesList, 
                           phase=imageList[['phase']], 
                           labeled=labeledImageList,
                           dyeOverlap=dyeOverlap,
@@ -247,19 +264,19 @@ for (chamber in opt$chambers) {
   rm(imageList)
   rm(labeledImageList)
   rm(dyeOverlap)
-  rm(output)
+  rm(timeseriesList)
   
   if (getRunOptions('verbose')) {
     profileEnd(paste0('seconds total for chamber ',chamber,'\n'))
     cat(paste0('\nFinished chamber "',chamber,'" at ',Sys.time(),' --------------------------------\n\n'))
     printMemoryUsage()
   }
-
+  
   
   # Restore normal output
   sink(type='message')
   sink()
-
+  
 } # END of chamber loop
 
 ###############################################################################

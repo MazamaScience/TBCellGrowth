@@ -1,37 +1,29 @@
 #' @export
 #' @title Identify and Label Florescent Dye
 #' @param image an image matrix to search for dye
-#' @param phase.labeled a list of labeled phase images from
-#' \link{flow_labelPhase}
-#' @param artifactMask a mask of non biological features to ignore. See \link{flow_createArtifactMask}.
+#' @param phase.labeled a labeled phase image from \link{flow_labelPhase}
+#' @param labelingThreshold threshold value for detection [0-1]
 #' @description Searches an image for dark cell colonies and incrementally labels each blob.
 #' @return A \code{matrix} of integer labeled blobs.
 
-flow_labelDye <- function(image, phase.labeled, artifactMask) {
+flow_labelDye <- function(image, phase.labeled, labelingThreshold=0.9) {
   
-  test = filter_sobel(image)
-  
-  imageEdit <- image
-
-  cat(".")
-  
-  imageEdit <- image
-  imageEdit[phase.labeled<1] <- 0
+  # Mask out portions of the dye image that are not associated with a phase.labeled blob
+  image[phase.labeled < 1] <- 0
   
   # Threshold
-  imageEdit <- imageEdit > 0.9
+  image <- image > labelingThreshold
   
   # Dilate groups slightly too large for more inclusive labeling
-  imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(7, shape="disc"))
-  imageEdit <- EBImage::erodeGreyScale(imageEdit, EBImage::makeBrush(5, shape="disc"))
+  image <- EBImage::dilateGreyScale(image, EBImage::makeBrush(7, shape="disc"))
+  image <- EBImage::erodeGreyScale(image, EBImage::makeBrush(5, shape="disc"))
   
-  # Now we have dye labels
-  imageEdit <- EBImage::bwlabel(imageEdit)
+  # Create dye labels
+  dye.labeled <- EBImage::bwlabel(image)
   
-  phase.labeled[imageEdit < 1] <- 0
+  # Use the labeled dye colonies to create a mask for the phase.labeled image
+  phase.labeled[dye.labeled < 1] <- 0
 
-  profilePoint('label','seconds to label dye image')
-  
   return(phase.labeled)
    
 }

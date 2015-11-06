@@ -4,15 +4,14 @@
 \alias{flow_labelDye}
 \title{Identify and Label Florescent Dye}
 \usage{
-flow_labelDye(image, phase.labeled, artifactMask)
+flow_labelDye(image, phase.labeled, labelingThreshold = 0.9)
 }
 \arguments{
 \item{image}{an image matrix to search for dye}
 
-\item{phase.labeled}{a list of labeled phase images from
-\link{flow_labelPhase}}
+\item{phase.labeled}{a labeled phase image from \link{flow_labelPhase}}
 
-\item{artifactMask}{a mask of non biological features to ignore. See \link{flow_createArtifactMask}.}
+\item{labelingThreshold}{threshold value for detection [0-1]}
 }
 \value{
 A \code{matrix} of integer labeled blobs.

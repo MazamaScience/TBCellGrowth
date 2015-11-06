@@ -63,6 +63,15 @@ loadImages <- function(dataDir, chamber, channels=c("c1"), channelNames=c("phase
       images[[channel]][[timestep]] <- round(readf(filename),4)
     }
   }
+  
+  # NOTE:  The first channel will always be called "phase" throughout the package, regardless of the
+  # NOTE:  channelNames passed in. If the user passes in "phase1" or "phase2" this will only
+  # NOTE:  be used in the final creation of directories.
+  # NOTE:
+  # NOTE:  The dye names, however, will be used as passed in.
+  
+  # Override first channelName
+  channelNames[1] <- "phase"
   names(images) <- channelNames
   
   return(images)

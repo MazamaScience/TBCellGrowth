@@ -9,11 +9,8 @@ flow_equalizeDye <- function(image, artifactMask) {
   
   dyeMedian <- getRunOptions('dyeMedian')
 
-  if (getRunOptions('verbose')) cat('\tBlurring dye image ...\n')
-  
   # Get rid of noise by blurring
   image <- filter_blur(image,11)
-  profilePoint('blur','seconds to blur dye image')
   
   # Apply artifact mask
   image[artifactMask] <- NA
@@ -24,8 +21,6 @@ flow_equalizeDye <- function(image, artifactMask) {
   
   # Set artifacts to the median value
   image[artifactMask] <- median(image, na.rm=TRUE)
-  
-  profilePoint('equalize','seconds to equalize dye image')
   
   return(image)
   

@@ -4,16 +4,16 @@
 #' @param minTimespan remove blobs from output which aren't found in at least
 #' n sequential images
 #' @param maxDistance the cutoff for distance between two blobs
-#' @return A \code{list} with elements \code{timeseries}, a dataframe of blob IDs 
-#' and blob sizes at each timestep (in pixels) and \code{centroids}, a \code{list}
-#' of dataimages with centroids, blob ID's and original integer labels for mapping
-#' output column names back to the original images
+#' @return A \code{list} with elements \code{timeseries}: a dataframe of blob IDs 
+#' and blob sizes at each timestep (in pixels), and \code{centroids}: a \code{list}
+#' of dataframes, one for each timestep, with centroids, blob ID's (human names) 
+#' and original integer labels for mapping output column names back to the original images.
 
 generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
     
   # NOTE:  Include a timestep column so that we can sort if we have to.
   # NOTE:  The documentation for merge.data.frame() says that for 'sort=FALSE'
-  # NOTE:  rows are returned "in an inspecified order".
+  # NOTE:  rows are returned "in an unspecified order".
   
   # Get centroids for first frame (assuming empty background frame is in images[[1]])
   centroidsBefore <- getCentroids(images[[1]])
@@ -58,9 +58,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
     centroidsBefore <- centroidsAfter
     
   }
-  
-  profilePoint('generateBlobTimeseries','seconds to track blobs')   
-  
+    
   # Sanity check -- sort rows just in case they got messed up somehow
   rownames(DF) <- DF$timestep
   DF <- DF[sort(DF$timestep),]
@@ -73,7 +71,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   DF <- DF[,apply(DF, 2, function(x) sum(!is.na(x)) >= minTimespan)]  
   goodBlobCount <- ncol(DF) - 1 # omit 'timespan'
   
-  if (getRunOptions('verbose')) cat(paste0('\tRetaining',goodBlobCount,' of ',allBlobCount,' blobs found in at least ',minTimespan,' frames\n'))
+  if (getRunOptions('verbose')) cat(paste0('\tRetaining ',goodBlobCount,' of ',allBlobCount,' blobs found in at least ',minTimespan,' frames\n'))
   
   # Sort DF by linear growth slope
   sorted <- apply(log(DF), 2, function(x) { 
@@ -85,8 +83,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   sorted <- sort(sorted,TRUE)
   DF <- DF[,names(sorted)]
   
-  profilePoint('generateBlobTimeseries','seconds to build timeseries')   
-  
+
   # ----- Add human column names ----------------------------------------------
 
   # TODO:  We should be able to avoid loading the names
@@ -115,7 +112,8 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
   
   # Apply new names to timeseries dataframe
   colnames(DF) <- newNames[colnames(DF)]
-  
+    
+
   # ----- return --------------------------------------------------------------
   
   return(list(

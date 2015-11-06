@@ -52,13 +52,13 @@ srun --mem-per-cpu=15626 -n2 -N1 --pty --preserve-env ./flow_exec.R \
 --inputDir="/Volumes/MazamaData1/Data/TBData/CellAsic, RvC Phage Delivery of GFP, 9-23-15" \
 --dataDir="Experimental Images" \
 --outputDir="~/TBResults/Sep23" \
---chambers="xy01" \
+--chambers="xy04" \
 --channels="c1,c3" \
 --channelNames="phase,green" \
 --backgroundIndex=2 \
 --startFrame=1 \
 --timestep=2 \
---nFrames=20 \
+--nFrames=12 \
 --distanceScale=0.22 \
 --verbose &
 

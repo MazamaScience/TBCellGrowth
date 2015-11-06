@@ -19,9 +19,13 @@ printMemoryUsage <- function() {
 
   # Sort and print to stdout
   objectSizes <- round(sort(objectSizes/1e6),1)
+  cat('\t----------------------------------------\n')
+  cat('\t-         Current Memory Usage         -\n')
+  cat('\t----------------------------------------\n')
   for (name in objectNames) {
     cat(paste0('\t',sprintf("%8.1f",objectSizes[name]),' MB : ',name,'\n'))
   }
-
+  cat('\t----------------------------------------\n')
+  
 }
 

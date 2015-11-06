@@ -15,10 +15,10 @@ n sequential images}
 \item{maxDistance}{the cutoff for distance between two blobs}
 }
 \value{
-A \code{list} with elements \code{timeseries}, a dataframe of blob IDs
-and blob sizes at each timestep (in pixels) and \code{centroids}, a \code{list}
-of dataimages with centroids, blob ID's and original integer labels for mapping
-output column names back to the original images
+A \code{list} with elements \code{timeseries}: a dataframe of blob IDs
+and blob sizes at each timestep (in pixels), and \code{centroids}: a \code{list}
+of dataframes, one for each timestep, with centroids, blob ID's (human names)
+and original integer labels for mapping output column names back to the original images.
 }
 \description{
 Searches an image for dark cell colonies and incrementally labels each colony.

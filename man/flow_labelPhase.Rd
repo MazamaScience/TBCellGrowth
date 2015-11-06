@@ -4,14 +4,14 @@
 \alias{flow_labelPhase}
 \title{Identify and Label Phase Microscopy Groups}
 \usage{
-flow_labelPhase(image, artifactMask, ignore)
+flow_labelPhase(image, artifactMask, ignoredRegions)
 }
 \arguments{
 \item{image}{an image matrix to search for cell colonies}
 
 \item{artifactMask}{a mask of non biological features to ignore. See \link{flow_createArtifactMask}.}
 
-\item{ignore}{a vector of row numbers to ignore. Blobs which have centroids
+\item{ignoredRegions}{a vector of row numbers to ignore. Blobs which have centroids
 in this range are removed.}
 }
 \value{

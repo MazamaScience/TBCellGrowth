@@ -139,7 +139,7 @@ for (chamber in opt$chambers) {
   for (channel in names(imageList)[-(names(imageList) == "phase")]) { # TODO:  Improve this logic
     if (getRunOptions('verbose')) cat(paste0("\tFinding ",channel, " overlap ...\n"))
     dyeOverlap[[channel]] <- findDyeOverlap(labeledImageList[[channel]], labeledImageList[['phase']], output)
-    profilePoint('overlap','seconds to findn dye overlaps')   
+    profilePoint('overlap','seconds to find dye overlaps')   
   }
   
   profilePoint('non_phase','seconds to find dye image overlaps')   
