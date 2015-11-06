@@ -33,9 +33,9 @@ if (FALSE) {
             '--dataDir=Images',
             '--outputDir=~/Desktop/TBResults/Nov05Test1',
             '--chambers=xy03,xy04,xy05,xy06,xy07,xy08,xy09,xy10,xy11,xy12,xy13,xy14',
-            '--channels=c2',
+            '--channels=c1',
             '--channelNames=phase',
-            '--minTimespan=12',
+            '--minTimespan=14',
             '--nFrames=20',
             '--startFrame=1',
             '--verbose')
