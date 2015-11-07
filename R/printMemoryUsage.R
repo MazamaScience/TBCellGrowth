@@ -26,6 +26,7 @@ printMemoryUsage <- function() {
     cat(paste0('\t',sprintf("%8.1f",objectSizes[name]),' MB : ',name,'\n'))
   }
   cat('\t----------------------------------------\n')
+  cat('\t----------------------------------------\n')
   
 }
 

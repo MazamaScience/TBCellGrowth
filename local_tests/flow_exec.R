@@ -55,9 +55,38 @@ for (chamber in opt$chambers) {
                             opt$channelNames, opt$extension,
                             startFrame=opt$backgroundIndex, n=1)
   
+  # TODO:  Handle missing background images
+  
   imageList <- loadImages(opt$dataDir, chamber, opt$channels,
                           opt$channelNames, opt$extension,
                           startFrame=opt$startFrame, n=opt$nFrames)
+  
+  # NOTE:  The imageList should only have good images for the purposes of tracking.
+  # NOTE:  Well will remove any timesteps that have a missing image in the phase
+  # NOTE:  or dye channel.
+  # NOTE:
+  # NOTE:  But we also need to keep track of missing images for future insertion of empty
+  # NOTE:  rows into the csv file and creation of 'missing' thumbnails.
+  
+  # Keep track of missing images
+  goodImageMask <- rep(TRUE,length(imageList[['phase']]))
+  goodImageList <- list()
+  for (channel in names(imageList)) {
+    goodImageList[[channel]] <- !is.na(imageList[[channel]])
+    goodImageMask <- goodImageMask & goodImageList[[channel]]
+  }
+  goodImageList$goodTimestep <- goodImageMask
+  
+  # Remove any timesteps that have a missing image in either channel
+  for (channel in names(imageList)) {
+    # Remove timesteps with any missing images, starting at the end 
+    # so that our ordering doesn't get messed up.
+    for (i in length(goodImageMask):1) {
+      if ( !goodImageMask[i] ) {
+        imageList[[channel]][[i]] <- NULL           
+      }
+    }
+  }
   
   # Merge backgrounds into imageList
   for (channel in names(imageList)) {
@@ -68,6 +97,8 @@ for (chamber in opt$chambers) {
     # Sanity check -- all dimensions should be the same
     dims <- lapply(imageList[[channel]], dim)
     if ( length(unique(dims)) > 1 ) {
+      cat(paste0('ERROR:\tTimesteps and image dimensions for the ',channel,' channel:\n'))
+      str(dims)
       stop(paste0('The channel named "',channel,'" has ',length(unique(dims)),' different image dimensions.'))
       # TODO:  Don't just quit at this point.
     }
@@ -184,7 +215,7 @@ for (chamber in opt$chambers) {
   profilePoint('generateBlobTimeseries','seconds to track blobs and build timeseries')   
   
   if (getRunOptions('verbose')) {
-    cat(paste0('Phase timeseries generated ---------------------------------\n\n'))
+    cat(paste0('\nPhase timeseries generated ---------------------------------\n\n'))
     printMemoryUsage()
   }
   
@@ -227,7 +258,7 @@ for (chamber in opt$chambers) {
   profilePoint('overlap','seconds to find dye image overlaps') 
   
   if (getRunOptions('verbose')) {
-    cat(paste0('Dye channels handled ---------------------------------------\n\n'))
+    cat(paste0('\nDye channels handled ---------------------------------------\n\n'))
     printMemoryUsage()
   }
   

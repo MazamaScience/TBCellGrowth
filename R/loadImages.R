@@ -9,13 +9,15 @@
 #' @param n number of images to load into memory
 #' @description This function uses the \pkg{EBImage::readimage} function
 #' to read in a series of images. Filenames for images are assumed to be
-#' ordered (e.g. with numeric indices). The return is a multi-level list
-#' of image matrices obtained by reading in files with \code{EBImage::readImage()}
+#' ordered (e.g. with numeric indices). The return is a list of two multi-level lists.
+#' 
+#' The \code{imageList} is a list of image matrices obtained by reading in files with \code{EBImage::readImage()}
 #' and then extractng the \code{.Data} slot of the EBImage Image object.
+#' Images that could not be read in have an NA stored in their slot.
 #' 
 #' The organizational structure is:
 #' 
-#' \code{images[[channel]][[timestep]]}
+#' \code{imageList[[channel]][[timestep]]}
 #' 
 #' @return A list of image matrices.
 
@@ -47,21 +49,40 @@ loadImages <- function(dataDir, chamber, channels=c("c1"), channelNames=c("phase
   timesteps <- timesteps[startFrame:length(timesteps)]
   
   # Subset timesteps if necessary
-  if ( n!="all" ) {
+  if ( n != "all" ) {
     timesteps <- timesteps[1:n]
   }
   
-  # Initialize images
-  images <- list()
-  
+  # Initialize imageList
+  imageList <- list()
   for (channel in channels) {
+    
+    imageList[[channel]] <- list()
+    
     for (timestep in timesteps) {
+      
       filename <- paste0(dataDir,"/",timestep,"/",chamber,channel,".",ext)
-      if (getRunOptions('verbose')) {
-        cat(paste0('\tLoading ',filename,'\n'))
+      if ( !file.exists(filename) ) {
+        cat(paste0('\tWARNING: ',filename,' NOT FOUND\n'))
+        imageList[[channel]][[timestep]] <- NA
+        next
       }
-      images[[channel]][[timestep]] <- round(readf(filename),4)
+      
+      if (getRunOptions('verbose')) cat(paste0('\tLoading  ',filename,'\n'))
+
+      result <- try( imageList[[channel]][[timestep]] <- round(readf(filename),4),
+                     silent=TRUE )
+      
+      if ( class(result)[1] == "try-error" ) {
+        err_msg <- geterrmessage()
+        if ( stringr::str_detect(err_msg,"object must be an array") ) {
+          cat(paste0('\tWARNING: ',filename,' CANNOT BE READ\n'))
+        }
+        imageList[[channel]][[timestep]] <- NA
+      }
+      
     }
+    
   }
   
   # NOTE:  The first channel will always be called "phase" throughout the package, regardless of the
@@ -72,8 +93,8 @@ loadImages <- function(dataDir, chamber, channels=c("c1"), channelNames=c("phase
   
   # Override first channelName
   channelNames[1] <- "phase"
-  names(images) <- channelNames
+  names(imageList) <- channelNames
   
-  return(images)
+  return(imageList)
   
 }

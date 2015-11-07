@@ -62,3 +62,17 @@ srun --mem-per-cpu=15626 -n2 -N1 --pty --preserve-env ./flow_exec.R \
 --distanceScale=0.22 \
 --verbose &
 
+
+# Rapid growth
+./flow_exec.R \
+--inputDir="/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, limiting PI, 9-1-15" \
+--dataDir="Experimental images" \
+--outputDir="~/TBResults/Sep01" \
+--chambers="xy05" \
+--channels="c1,c3" \
+--channelNames="phase,green" \
+--backgroundIndex=2 \
+--startFrame=8 \
+--nFrames=12 \
+--verbose &
+
