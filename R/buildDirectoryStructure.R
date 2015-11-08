@@ -30,6 +30,13 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   
   ptm <- proc.time()
   
+  # ----- Create excel files --------------------------------------------------
+
+  for (cName in names(labeled)) {
+    writeExcel(timeseriesList[[cName]], outputDir, cName, filenames, chamber=chamber)
+  }
+
+
   # ----- Create full frame images --------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tCreating full frames ...\n')
@@ -53,7 +60,7 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
       profilePoint('saveImages',paste('seconds to save outlined',cName,'images'))
     }
     
-    # All dyes combined of there are enough channels
+    # All dyes combined if there are enough channels
     if (length(names(labeled)) > 2) {
       ptm <- proc.time()
       cat("\nallDyes ")
@@ -128,12 +135,6 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
 
   profilePoint('saveImages',paste('seconds to save individual images'))
 
-  # ----- Create excel files --------------------------------------------------
-
-  for (cName in names(labeled)) {
-    writeExcel(timeseriesList[[cName]], outputDir, cName, filenames, chamber=chamber)
-  }
-
   cat(paste0("\tFull directory built in ", formatTime(directoryTime),'\n'))
   
 }
@@ -153,7 +154,12 @@ writeExcel <- function(df, outputDir, channel, filenames, chamber) {
   
   if (dim(df)[[2]] < 1) return()
   
-  write.csv(df, paste0(outputDir, "/", channel, "_", chamber, "_noLinks.csv"))
+  file <- paste0(outputDir, "/", channel, "_", chamber, "_noLinks.csv")
+  result <- try( write.csv(df, file) )
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\nWARNING:  Could not write "',file,'"/\n',err_msg,'\n'))   
+  }
   
   # Creates hyperlinks to specific images
   cellHyperlinks <- function(id) {
@@ -184,8 +190,12 @@ writeExcel <- function(df, outputDir, channel, filenames, chamber) {
 
   rownames(df) <- lapply(filenames, timeHyperlinks)
   
-  write.csv(df, paste0(outputDir, "/", channel, "_", chamber, ".csv"))
-  
+  file <- paste0(outputDir, "/", channel, "_", chamber, ".csv")
+  result <- try( write.csv(df, file) )
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\nWARNING:  Could not write "',file,'"/\n',err_msg,'\n'))   
+  }
  
   
 }
@@ -194,13 +204,38 @@ writeExcel <- function(df, outputDir, channel, filenames, chamber) {
 ###############################################################################
 
 writeImages <- function(images, outputDir, id, channel, filenames) {
-  dir.create(paste0(outputDir, "/", id, "/", channel), showWarnings=FALSE, recursive=TRUE)
-  for (i in 1:length(images)) {
-    file <- paste0(outputDir, "/", id, "/", channel, "/t_", filenames[[i]], ".jpg")
-    EBImage::writeImage(images[[i]], file=file)
+
+  # Create the directory
+  dir <- paste0(outputDir, "/", id, "/", channel)
+  result <- try( dir.create(dir, showWarnings=FALSE, recursive=TRUE) )
+  
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\nWARNING:  Could not create directory "',dir,'"\n',err_msg,'\n'))   
   }
-#  result <- try({
-    createGif(paste0(outputDir, "/", id, "/", channel), paste0("g_",id,".gif"))
-#  })
+
+  # Create individual timestep .jpg files
+  for (i in 1:length(images)) {
+
+    file <- paste0(outputDir, "/", id, "/", channel, "/t_", filenames[[i]], ".jpg")
+    result <- try( EBImage::writeImage(images[[i]], file=file) )
+
+    if ( class(result)[1] == "try-error" ) {
+      err_msg <- geterrmessage()
+      cat(paste0('\nWARNING:  Could not write "',file,'"/\n',err_msg,'\n'))   
+    }
+
+  }
+
+  # Create animated .gif image
+  dir <- paste0(outputDir, "/", id, "/", channel)
+  filename <- paste0("g_",id,".gif")
+  result <- try( createGif(dir,filename) )
+
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\nWARNING:  Could not write "',paste(dir,filename,sep='/'),'"/\n',err_msg,'\n'))   
+  }
+
 }
 
