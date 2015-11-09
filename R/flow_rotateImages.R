@@ -67,7 +67,7 @@ flow_rotateImages <- function(imageList,
   # Loop through leftover area
   for (i in 1:max(rSample)){
     # Get x and y size of this area
-    sample <- data.frame(which(rSample==i, arr.ind=TRUE))
+    sample <- data.frame(which(rSample==i, arr.ind=TRUE),stringsAsFactors=FALSE)
     x <- diff(range(sample$row))
     y <- diff(range(sample$col))
     # Determine which kind of offset this is and update it

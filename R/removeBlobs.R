@@ -3,6 +3,7 @@
 #' @param image an image matrix
 #' @param minSize lower threshold for removal
 #' @param maxSize upper threshold for removal
+#' @param label logical flag specifying whether to label images
 #' @description Finds the size of each blob group in an image and removes
 #' blobs under the given threshold of pixels. A blob is defined as a group of
 #' pixels connected horizontally or vertically.

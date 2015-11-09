@@ -10,20 +10,23 @@
 
 createGif <- function(dir, filename, ext="jpg", framerate=2, rescale=80) {
   delay <- 100 / framerate
-  os <- Sys.info()['sysname'][[1]]
-  inPath <- normalizePath(path.expand(paste0(dir, '/*.', ext)))
-  outPath <- normalizePath(path.expand(paste0(dir, '/', filename)))
+  inPath <- paste0(normalizePath(path.expand(dir)), '/*.', ext)
+  outPath <- paste0(normalizePath(path.expand(dir)), '/', filename)
   inPath <- gsub(" ", "\\\\ ", inPath)
   outPath <- gsub(" ", "\\\\ ", outPath)
-  if (os=="Darwin") system(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' ', inPath, ' ', outPath))
-  if (os=="Windows") shell(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' ', inPath, ' ', outPath))
+  if ( Sys.info()['sysname'] == "Windows" ) {
+    shell(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' ', inPath, ' ', outPath))
+  } else {
+    system(paste0('convert -resize "', rescale, '%" -delay  ', delay, ' ', inPath, ' ', outPath))    
+  }
 }
 
 # Accepts a list of matrices and creates a gif
 createGifFromList <- function(images, filename, delay=15, rescale=100) {
   
   # Temporary directory location. We store images here
-  tempDir <- "temp2234g12hdq5gp/"
+  ###tempDir <- "temp2234g12hdq5gp/"
+  tempDir <- tempdir()
   
   # Create the directory. Hide warnings if it already exists.
   dir.create(tempDir, showWarnings = FALSE)

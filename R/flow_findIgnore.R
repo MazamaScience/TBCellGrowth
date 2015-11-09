@@ -12,7 +12,8 @@
 flow_findIgnore <- function(ignore, dims) {
   
   if (length(ignore) < 1) {
-    return(data.frame(x1=c(),x2=c(),y1=c(),y2=c()))
+    return(data.frame(x1=c(),x2=c(),y1=c(),y2=c(),stringsAsFactors=FALSE))
+    # Same as return(data.frame())
   }
 
   boundaryList <- list("topLeft"=     c(1, dims[1]/3, 1, dims[2]/3),

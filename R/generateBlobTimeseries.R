@@ -1,47 +1,55 @@
 #' @export
 #' @title Searches an image for dark cell colonies and incrementally labels each colony.
-#' @param images a sequence of labeled images. See \link{flow_labelPhase}.
+#' @param images a list of labeled images See \link{flow_labelPhase}.
 #' @param minTimespan remove blobs from output which aren't found in at least
-#' n sequential images.
+#' n sequential images
 #' @param maxDistance the cutoff for distance between two blobs
-#' @return A \code{list} with elements \code{timeseries}, a dataframe of blob IDs 
-#' and blob sizes at each timestep (in pixels) and \code{centroids}, a \code{list}
-#' of dataimages with centroids, blob ID's and original integer labels for mapping
-#' output column names back to the original images.
+#' @return A \code{list} with elements \code{timeseries}: a dataframe of blob IDs 
+#' and blob sizes at each timestep (in pixels), and \code{centroids}: a \code{list}
+#' of dataframes, one for each timestep, with centroids, blob ID's (human names) 
+#' and original integer labels for mapping output column names back to the original images.
 
 generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
-  
-  ptm <- proc.time()
-  cat("\nMaking timeseries")
+    
+  # NOTE:  Include a timestep column so that we can sort if we have to.
+  # NOTE:  The documentation for merge.data.frame() says that for 'sort=FALSE'
+  # NOTE:  rows are returned "in an unspecified order".
   
   # Get centroids for first frame (assuming empty background frame is in images[[1]])
   centroidsBefore <- getCentroids(images[[1]])
   
-  # Initialize return timeseries output
-  output <- data.frame(t(data.frame(centroidsBefore$size,row.names=centroidsBefore$id)))
+  # Initialize return timeseries dataframe with sizes from the first timestep
+  sizeMatrix <- matrix(c(1,centroidsBefore$size),nrow=1)
+  colnames(sizeMatrix) <- c('timestep',centroidsBefore$id)
+  DF <- as.data.frame(sizeMatrix,stringsAsFactors=FALSE)
   
   # Initialize list of centroid data.frame. We'll also be returning this so we can map
-  # the timeseries back to the original images.
+  # the timeseries back to the original images
   centroids <- vector("list", length(images))
   centroids[[1]] <- centroidsBefore
   
-  cat("\nTracking blobs")
+  if (getRunOptions('verbose')) cat('\tTracking 1 ...\n')
   
   # Now track blobs between each pair of images
   for (i in 2:length(images)) {
     
-    cat(".")
+    if (getRunOptions('verbose')) cat(paste0('\tTracking ',i,' ...\n'))
     
     centroidsAfter <- getCentroids(images[[i]])
     
     # Find groups that are determined to be the same between the two images
     groups <- findSimilarGroups(centroidsBefore,centroidsAfter,maxDistance)
     
-    # For those continued group, give them the ID's from the previous frame
+    # For those continued groups, give them the ID's from the previous frame
     centroidsAfter <- updateCentroidIDs(centroidsAfter, groups)
     
-    # Add frame to output
-    output <- appendOutput(centroidsAfter, output)
+    # Create a new row as a dataframe
+    sizeMatrix <- matrix(c(i,centroidsAfter$size),nrow=1)
+    colnames(sizeMatrix) <- c('timestep',centroidsAfter$id)
+    newRowDF <- as.data.frame(sizeMatrix,stringsAsFactors=FALSE)
+    
+    # Append the new row (dataframe), retaining all columns and rows, inserting NA where necessary
+    DF <- merge(DF,newRowDF,all=TRUE,sort=FALSE)
     
     # Save centroids
     centroids[[i]] <- centroidsAfter
@@ -50,40 +58,35 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
     centroidsBefore <- centroidsAfter
     
   }
+    
+  # Sanity check -- sort rows just in case they got messed up somehow
+  rownames(DF) <- DF$timestep
+  DF <- DF[sort(DF$timestep),]
+
+  # Now remove the 'timestep' column
+  DF <- DF[,-1]
   
-  prelength <- dim(output)[[2]]
-  postlength <- sum(apply(output, 2, function(x) sum(!is.na(x)) >= minTimespan))
+  # Apply minimum timespan, only saving groups that are identified for at least n images
+  allBlobCount <- ncol(DF) - 1 # omit 'timespan'
+  DF <- DF[,apply(DF, 2, function(x) sum(!is.na(x)) >= minTimespan)]  
+  goodBlobCount <- ncol(DF) - 1 # omit 'timespan'
   
-  cat(paste0("\n",postlength," blobs kept out of ",prelength," with minimum timespan of ",minTimespan," frames"))
+  if (getRunOptions('verbose')) cat(paste0('\tRetaining ',goodBlobCount,' of ',allBlobCount,' blobs found in at least ',minTimespan,' frames\n'))
   
-  # Apply minimum timespan, only saving groups that are identified for at least
-  # n images
-  output <- output[,apply(output, 2, function(x) sum(!is.na(x)) >= minTimespan)]
-  
-  cat("\nTimeseries sorted by slope of ln(timeseries)")
-  
-  # Sort output by linear growth slope
-  sorted <- apply(log(output), 2, function(x) { 
+  # Sort DF by linear growth slope
+  sorted <- apply(log(DF), 2, function(x) { 
     x <- x[!is.na(x)]
     y <- 1:length(x)
     m <- lm(x ~ y)$coef[[1]]
     return(m)
   })
   sorted <- sort(sorted,TRUE)
-  output <- output[,names(sorted)]
+  DF <- DF[,names(sorted)]
   
-  # Make analysis dataframe
-  analysis <- output[-c(1:dim(output)[1]),]
-  analysis[1,] <- 0
-  
-  cat(paste0("\nTimeseries built in ", formatTime(ptm)))
-  
-  
-  
-  # HUMAN READABLE NAMES
-  ######################
-  ######################
-  
+
+  # ----- Add human column names ----------------------------------------------
+
+  # TODO:  We should be able to avoid loading the names
   data(nameList, envir=environment())
   
   # Find all IDs that are in use
@@ -107,14 +110,14 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
     centroids[[ii]]$id <- unlist(newNames[ids])
   }
   
-  # Apply new names to timeseries
-  colnames(output) <- unlist(newNames[colnames(output)])
-  
-  ######################
-  ######################
+  # Apply new names to timeseries dataframe
+  colnames(DF) <- newNames[colnames(DF)]
+    
+
+  # ----- return --------------------------------------------------------------
   
   return(list(
-    timeseries = output,
+    timeseries = DF,
     centroids = centroids
   ))
   
@@ -123,14 +126,15 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
 
 
 
-
+###############################################################################
 
 # Find the best fit between two images of centroids based on 
 # distance and size. Returns a best guess of which blobs became which
 findSimilarGroups <- function(c1, c2, maxDistance) {
   
   # Initialize dataframe with each combination of the two indices
-  df <- expand.grid(index1=seq(1,dim(c1)[[1]]), index2=seq(1,dim(c2)[[1]]))
+  ###df <- expand.grid(index1=seq(1,dim(c1)[1]), index2=seq(1,dim(c2)[1]))
+  df <- expand.grid(index1=1:nrow(c1), index2=1:nrow(c2))
   df$id1 <- c1$id[df$index1]
   df$id2 <- c2$id[df$index2]
   
@@ -153,8 +157,10 @@ findSimilarGroups <- function(c1, c2, maxDistance) {
   # Calculate "score" of group fit
   df$score <- (0.5^(df$dist/20)) * (df$growthRel^0.2)
   
-  # Remove undefinted scores
+  # Remove undefined scores
   df <- df[!is.nan(df$score),]
+  
+  # TODO:  Put hardcoded 'growthPer' threshold parameters in the configuration options
   
   # Remove unrealistic growth
   df <- df[df$growthPer < 2.5 & df$growthPer > 0.5,]
@@ -165,7 +171,7 @@ findSimilarGroups <- function(c1, c2, maxDistance) {
   # Sort scores
   df <- df[order(-df$score),]
   
-  # Remove duplicated ids. This remove weaker connections
+  # Remove duplicated ids. This removes weaker connections
   df <- df[!duplicated(df$index1),]
   df <- df[!duplicated(df$index2),]
   
@@ -174,35 +180,14 @@ findSimilarGroups <- function(c1, c2, maxDistance) {
 }
 
 
-
-# update the output with a new timestep and 
-appendOutput <- function(c1, output) {
-  
-  # find IDs that aren't already in output
-  newIDs <- c1[!(c1$id %in% colnames(output)),]
-  
-  # Create empty dataframe for new IDs
-  newIDs.df <- data.frame(t(data.frame(rep(NA,dim(newIDs)[[1]]))))
-  colnames(newIDs.df) <- newIDs$id
-  
-  # Bind current output with new IDs
-  allIDs.df <- cbind(output, newIDs.df)
-  
-  # Create a new row with all of the new values
-  newRow <- data.frame(t(data.frame(c1$size, row.names=c1$id)))
-  
-  # Add the new row with rbind.fill, which replaces missing values with NA
-  return(data.frame(dplyr::rbind_all(list(output, newRow))))
-  
-}
-
-
+###############################################################################
 
 # Updates a centroid dataframe with IDs that are determined to be
 # the same from the previous frame
 updateCentroidIDs <- function(c1, g) {
   
   # select columns that continue between frame1 & 2
+  # NOTE:  Conversion to character should not be needed if we always create dataframes with stringsAsFactors=FALSE
   idList <- as.character(c1$id)
   id1 <- as.character(g$id1)
   id2 <- as.character(g$id2)

@@ -2,88 +2,27 @@
 #' @title Normalize Dye Image Values
 #' @param image the image matrix to modify.
 #' @param artifactMask a mask of non biological features to ignore. See \link{flow_createArtifactMask}.
-#' @description Normalize a given dye image. TODO More info here
-#' @return an image of the same dimensions.
-# 
-# flow_equalizeDye <- function(image, artifactMask) {
-#   
-#   cat("\n")
-#   
-#   # For development shorten this so it's easier to play
-#   im <- image
-#   rm(image)
-#   
-# #   im <- xy$green[[2]]
-#   
-#   im[artifactMask] <- NA
-#   
-#   cat("a=")
-#   cat(round(mean(im, na.rm=TRUE),3))
-#   
-#   im <- im - mean(im, na.rm=TRUE)
-#   im[im < 0] <- NA
-#   
-#   im[im > 0.1] <- 0.1
-#   
-#   h <- hist(im, breaks=seq(0,0.1, by=0.001), plot=FALSE)
-#   
-#   keybreak <- h$mids[h$counts < (max(h$counts)/200)][1]
-#   
-#   cat(", b=")
-#   cat(round(1/keybreak,3))
-#   
-#   im <- im / keybreak
-# 
-#   return(im)
-#   
-# }
+#' @description Normalize a given dye image. TODO:  More info here
+#' @return An image of the same dimensions.
 
-### TEST
-flow_equalizeDye <- function(images, artifactMask) {
+flow_equalizeDye <- function(image, artifactMask) {
+  
+  dyeMedian <- getRunOptions('dyeMedian')
 
-  images <- lapply(images, filter_blur, 11)
+  # Get rid of noise by blurring
+  image <- filter_blur(image,11)
   
-  images <- lapply(images, function(im) {
-    im[artifactMask] = NA
-    return(im)
-  })
+  # Apply artifact mask
+  image[artifactMask] <- NA
   
-  t1 <- unlist(lapply(images, median, na.rm=TRUE))
-  t2 <- 0.6 / t1
-  t3 <- mapply(function(x,y) return((x*y)), images, t2, SIMPLIFY=FALSE)
-  t4 <- lapply(t3, function(x) ((x-0.5)*6)^4)
+  # Center and rescale the range of values
+  image <- image * (dyeMedian / median(image,na.rm=TRUE))
+  image <- ((image-0.5)*6)^4 # Ad hoc scaling factor
   
-  t4 <- lapply(t4, function(im) {
-    im[artifactMask] = median(im, na.rm=TRUE)
-    return(im)
-  })
+  # Set artifacts to the median value
+  image[artifactMask] <- median(image, na.rm=TRUE)
   
-  return(t4)
-  
-
-  
-#   # Find median of each image
-#   medians <- unlist(lapply(images, median))
-#   
-#   # Set each median to be the 0.1 and set the median to 0
-#   ims <- mapply(function(im,m) return(im*(0.1/m) - 0.1), images, medians, SIMPLIFY=FALSE)
-#   
-#   # Mask out artifacts
-#   ims <- lapply(ims, function(im) {
-#     im[artifactMask] <- mean(im)
-#     return(im)
-#   })
-#   
-#   # Brighten images based on SD
-#   ims <- lapply(ims, function(im) {
-#     return(im > ( mean(im) + 3*sd(im) ))
-#   })
-#   
-#   # Remove noise
-#   ims <- lapply(ims, function(im) {
-#     return(removeBlobs(im, 30))
-#   })
-#   
-#   return(ims)
+  return(image)
   
 }
+

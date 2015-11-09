@@ -38,13 +38,6 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=50, searchSpa
   
   profilePoint('edges','seconds to create background blobs')
   
-  if (getRunOptions('debug_image')) {
-    chamber <- getRunOptions('chambers')[1] # TODO:  Is getRunOption('chambers') always singular?
-    file <- paste0(getRunOptions('outputDir'),'/',chamber,'_',channel,'_000_alignEdges.jpg')
-    EBImage::writeImage(edges, file)
-    profilePoint('saveImages','seconds to save images')
-  }
-  
   # find squares
   centroids <- getCentroids(edges)
   centroids <- centroids[(centroids$xmax - centroids$xmin) < 450,]
@@ -71,7 +64,7 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=50, searchSpa
   bgIndex <- 1
   for ( targetId in targetIds ) {
     # Define a box centered on each target
-    targetCells <- data.frame(which(edges==targetId, arr.ind=TRUE))
+    targetCells <- data.frame(which(edges==targetId, arr.ind=TRUE),stringsAsFactors=FALSE)
     targetX <- mean(targetCells$row)
     targetY <- mean(targetCells$col)
     left <- targetX - buffer
