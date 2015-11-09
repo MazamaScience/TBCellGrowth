@@ -13,6 +13,8 @@ overlayColor <- function(color, bg, label, mergeWith=NULL) {
   
   colors <- list(green = c(0,0.5,0.1),
                  red = c(0.5,0,0),
+                 blue = c(0,0.1,0.5),
+                 pink = c(0.5,0.1,0.5),
                  orange = c(0.5,0.25,0),
                  phase = c(0.7,0.7,0.7))
   
@@ -40,10 +42,12 @@ overlayColor <- function(color, bg, label, mergeWith=NULL) {
   # They need to be in TF
   if (typeof(label) == "double") label <- label>0
   
+  bg[bg > 1] <- 1
+  
   # red, green, blue channels
-  image[,,1] <- (image[,,1] * !label) + (bg/2 + color[[1]]) * label
-  image[,,2] <- (image[,,2] * !label) + (bg/2 + color[[2]]) * label
-  image[,,3] <- (image[,,3] * !label) + (bg/2 + color[[3]]) * label
+  image[,,1] <- (image[,,1] * !label) + (bg/3 + color[[1]]) * label
+  image[,,2] <- (image[,,2] * !label) + (bg/3 + color[[2]]) * label
+  image[,,3] <- (image[,,3] * !label) + (bg/3 + color[[3]]) * label
 
 #   image[,,1] <- bg + label * color[[1]]
 #   image[,,2] <- bg + label * color[[2]]

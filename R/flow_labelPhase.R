@@ -10,44 +10,82 @@
 flow_labelPhase <- function(image, artifactMask, ignore) {
   
   cat(".")
+#   
+#   image[image > 1] <- 1
+#   
+#   imageMask <- image
+#   
+#   imageMask[artifactMask > 0] <- quantile(image, seq(0,1,0.05), na.rm=T)[[12]]
+#   
+#   imageEdit <- filter_sobel(imageMask, FALSE, 2)
+#   
+#   imageEdit <- imageEdit
+#   
+#   # imageEdit[EBImage::equalize(imageMask) > 0.35] <- 0
+#   
+#   imageEdit <- EBImage::closingGreyScale(imageEdit, EBImage::makeBrush(7))
+#   
+#   imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(5))
+#   
+#   imageEdit <- EBImage::fillHull(imageEdit)
+#   
+#   # imageEdit[EBImage::equalize(imageMask) > 0.6] <- 0
+#   
+# #   imageEdit <- dilateGreyScale(imageEdit, EBImage::makeBrush(5))
+#   
+#   imageEdit <- removeBlobs(imageEdit, 55)
+#   
+#   imageEdit <- EBImage::bwlabel(imageEdit)
+#   
+#   centroids <- getCentroids(imageEdit)
+#   toRemove <- removeIgnored(centroids, ignore)
+#   imageEdit[!(imageEdit %in% toRemove)] <- 0
+# 
+#   imageEdit <- EBImage::bwlabel(imageEdit)
+#   
+#   imageEdit[EBImage::equalize(imageMask) > 0.35] <- 0
+# 
+# #   imageEdit <- EBImage::fillHull(imageEdit)
+#   
+#   return(imageEdit)
   
   image[image > 1] <- 1
   
   imageMask <- image
   
-  imageMask[artifactMask > 0] <- quantile(image, seq(0,1,0.05), na.rm=T)[[19]]
+  imageMask[artifactMask > 0] <- quantile(image, seq(0,1,0.05), na.rm=T)[[12]]
   
-  imageEdit <- filter_sobel(imageMask, FALSE, 1)
-  
-  imageEdit <- imageEdit > 0.4
-  
-  imageEdit[EBImage::equalize(imageMask) > 0.35] <- 0
+  imageEdit <- filter_sobel(imageMask, FALSE, 2)
   
   imageEdit <- EBImage::closingGreyScale(imageEdit, EBImage::makeBrush(7))
   
-  imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(5))
+  imageEdit <- imageEdit > 0.5
   
-  imageEdit <- EBImage::fillHull(imageEdit)
+  # imageEdit <- fillHull(imageEdit)
   
-  imageEdit[EBImage::equalize(imageMask) > 0.6] <- 0
+  imageEdit[EBImage::equalize(imageMask) > 0.8] <- 0
   
-#   imageEdit <- dilateGreyScale(imageEdit, EBImage::makeBrush(5))
+  imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(3))
   
-  imageEdit <- removeBlobs(imageEdit, 55)
+  imageEdit[EBImage::dilateGreyScale(artifactMask, EBImage::makeBrush(3)) > 0] <- 0
+  
+  imageEdit <- removeBlobs(imageEdit, 100)
   
   imageEdit <- EBImage::bwlabel(imageEdit)
   
   centroids <- getCentroids(imageEdit)
   toRemove <- removeIgnored(centroids, ignore)
   imageEdit[!(imageEdit %in% toRemove)] <- 0
-
-  imageEdit <- EBImage::bwlabel(imageEdit)
   
-  imageEdit[EBImage::equalize(imageMask) > 0.35] <- 0
-
-#   imageEdit <- EBImage::fillHull(imageEdit)
+  imageEdit[EBImage::equalize(imageMask) > 0.775] <- 0
   
+  imageEdit <- removeBlobs(imageEdit, 175, label=FALSE)
+  
+  ####### TAKE 2 ########
+  ####### TAKE 2 ########
+  ####### TAKE 2 ########
   return(imageEdit)
+  
   
 }
 

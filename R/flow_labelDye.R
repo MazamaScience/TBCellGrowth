@@ -8,6 +8,10 @@
 #' @return A \code{matrix} of integer labeled blobs.
 
 flow_labelDye <- function(image, phase.labeled, artifactMask) {
+  
+  test = filter_sobel(image)
+  
+  imageEdit <- image
 
   cat(".")
   
@@ -25,19 +29,6 @@ flow_labelDye <- function(image, phase.labeled, artifactMask) {
   imageEdit <- EBImage::bwlabel(imageEdit)
   
   phase.labeled[imageEdit < 1] <- 0
-  
-#   dcp <- imageEdit
-#   for (i in 1:max(imageEdit)) {
-#     overlap <- phase.labeled[imageEdit == i]
-#     dcp[imageEdit == i] <- 0
-#     # If at least 20% overlap
-#     if (sum(overlap>0) > length(overlap)/5) {
-#       overlap <- overlap[overlap>0]
-#       unq <- unique(overlap)
-#       index <- unq[which.max(tabulate(match(overlap, unq)))]
-#       dcp[imageEdit == i] <- index
-#     }
-#   }
   
   return(phase.labeled)
    

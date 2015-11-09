@@ -20,7 +20,7 @@ getCentroids <- function(image) {
   
   # Function for generating an ID
   generateID <- function(x, y, z) {
-    return(paste0(sample(c(letters,LETTERS,0:9),12,replace=TRUE), collapse=""))
+    return(paste0("id", paste0(sample(c(letters,LETTERS,0:9),12,replace=TRUE), collapse="")))
   }
   
   

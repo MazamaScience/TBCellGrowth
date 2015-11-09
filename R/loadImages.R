@@ -19,7 +19,7 @@
 #' 
 #' @return A list of image matrices.
 
-loadImages <- function(dataDir, chamber, channels=c("c1"), channelNames=c("phase"), ext="tiff", startFrame=1, n=NULL) {
+loadImages <- function(dataDir, chamber, channels=c("c1"), channelNames=c("phase"), ext="tiff", startFrame=1, n="all") {
   
   # NOTE:  Suppress warnings to avoid seeing:
   # NOTE:
@@ -47,7 +47,7 @@ loadImages <- function(dataDir, chamber, channels=c("c1"), channelNames=c("phase
   timesteps <- timesteps[startFrame:length(timesteps)]
   
   # Subset timesteps if necessary
-  if ( !is.null(n) ) {
+  if ( n!="all" ) {
     timesteps <- timesteps[1:n]
   }
   
