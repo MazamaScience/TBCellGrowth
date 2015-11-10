@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript ###!/depot/R/3.2.1/bin/Rscript
+#!/usr/bin/Rscript
 #
 # Executable script for processing flow images
 
@@ -62,11 +62,13 @@ for (chamber in opt$chambers) {
                           startFrame=opt$startFrame, n=opt$nFrames)
   
   # NOTE:  The imageList should only have good images for the purposes of tracking.
-  # NOTE:  Well will remove any timesteps that have a missing image in the phase
+  # NOTE:  We will remove any timesteps that have a missing image in the phase
   # NOTE:  or dye channel.
   # NOTE:
   # NOTE:  But we also need to keep track of missing images for future insertion of empty
   # NOTE:  rows into the csv file and creation of 'missing' thumbnails.
+  
+  # TODO:  Handle cases where phase image is presnet by dye image is missing
   
   # Keep track of missing images
   goodImageMask <- rep(TRUE,length(imageList[['phase']]))
@@ -87,6 +89,7 @@ for (chamber in opt$chambers) {
       }
     }
   }
+  
   
   # Merge backgrounds into imageList
   for (channel in names(imageList)) {
@@ -268,7 +271,9 @@ for (chamber in opt$chambers) {
   
   # Generate filenames from timestamps
   # Assuming hours < 1000
-  hours <- opt$startTime + ((0:(length(imageList[['phase']])-1))*opt$timestep)
+###  hours <- opt$startTime + ((0:(length(imageList[['phase']])-1))*opt$timestep)
+  # NOTE:  timestep names are assigned during loadImages
+  hours <- opt$startTime + as.integer(names(imageList[['phase']])) * opt$timestep
   filenames <- stringr::str_sub(paste0('000',hours),-3)
   
   # Apply timesteps to row names of timeseries

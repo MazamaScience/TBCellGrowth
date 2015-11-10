@@ -18,10 +18,6 @@
 buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filenames, 
                                     outputDir="output", distanceScale=NULL, chamber="") { 
   
-  # Merge timeseries together
-  timeseriesList <- lapply(dyeOverlap, function(x) x)
-  timeseriesList[['phase']] <- output$timeseries
-  
   directoryTime <- proc.time()
   if (getRunOptions('verbose')) cat("\tBuilding directory structure ...\n")
   
@@ -32,8 +28,12 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   
   # ----- Create excel files --------------------------------------------------
 
-  for (cName in names(labeled)) {
-    writeExcel(timeseriesList[[cName]], outputDir, cName, filenames, chamber=chamber)
+  # phase channel
+  writeExcel(output$timeseries, outputDir, 'phase', filenames, chamber=chamber)
+  
+  # All dye channels
+  for (name in names(dyeOverlap)) {
+    writeExcel(dyeOverlap[[name]], outputDir, name, filenames, chamber=chamber)
   }
 
 
@@ -136,67 +136,6 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   profilePoint('saveImages',paste('seconds to save individual images'))
 
   cat(paste0("\tFull directory built in ", formatTime(directoryTime),'\n'))
-  
-}
-
-###############################################################################
-
-# Helper function, properly formats hyperlink function
-excelHyperlink <- function(url, text) {
-  return(paste0('=HYPERLINK("',url,'","',text,'")'))
-}
-
-###############################################################################
-
-# Accepts a table of values, the output directory, the current dye color,
-# and a vector of times / filenames
-writeExcel <- function(df, outputDir, channel, filenames, chamber) {
-  
-  if (dim(df)[[2]] < 1) return()
-  
-  file <- paste0(outputDir, "/", channel, "_", chamber, "_noLinks.csv")
-  result <- try( write.csv(df, file) )
-  if ( class(result)[1] == "try-error" ) {
-    err_msg <- geterrmessage()
-    cat(paste0('\nWARNING:  Could not write "',file,'"/\n',err_msg,'\n'))   
-  }
-  
-  # Creates hyperlinks to specific images
-  cellHyperlinks <- function(id) {
-    oDir <- paste0("individual/", id, "/", channel)
-    cols <- df[id]
-    for (i in 1:length(cols[[1]])) {
-      filename <- paste0(oDir, "/t_", filenames[[i]], ".jpg")
-      cols[id][[1]][[i]] <- excelHyperlink(filename, cols[id][[1]][[i]])
-    }
-    return(cols)
-  }
-  
-  # Create hyperlinks on blob names
-  colHyperlinks <- function(id) {
-    oDir <- paste0("individual/", id, "/", channel)
-    return(excelHyperlink(paste0(oDir),id))
-  }
-  
-  # Create hyperlinks for full frames at time points
-  timeHyperlinks <- function(time) {
-    link <- paste0("fullFrame/", channel, "/t_", time,".jpg")
-    return(excelHyperlink(link,time))
-  }
-  
-  df <- data.frame(lapply(names(df), cellHyperlinks),stringsAsFactors=FALSE)
-  
-  names(df) <- lapply(names(df), colHyperlinks)
-
-  rownames(df) <- lapply(filenames, timeHyperlinks)
-  
-  file <- paste0(outputDir, "/", channel, "_", chamber, ".csv")
-  result <- try( write.csv(df, file) )
-  if ( class(result)[1] == "try-error" ) {
-    err_msg <- geterrmessage()
-    cat(paste0('\nWARNING:  Could not write "',file,'"/\n',err_msg,'\n'))   
-  }
- 
   
 }
 

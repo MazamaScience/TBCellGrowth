@@ -17,11 +17,11 @@ if (FALSE) {
   args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, limiting PI, 9-1-15',
             '--dataDir=Experimental images',
             '--outputDir=~/TBResults/Sep01',
-            '--chambers=xy01,xy06',
+            '--chambers=xy05',
             '--channels=c1,c3',
             '--channelNames=phase,green',
             '--minTimespan=2',
-            '--nFrames=4',
+            '--nFrames=12',
             '--startFrame=8',
             '--backgroundIndex=2',
             '--verbose')
