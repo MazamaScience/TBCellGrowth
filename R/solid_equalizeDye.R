@@ -7,32 +7,16 @@
 #TODO how do we know if a frame isn't useful? Too dark?
 solid_equalizeDye <- function(image) {
   
-  cat("\n")
+  dyeMedian <- getRunOptions('dyeMedian')
   
-  # For development shorten this so it's easier to play
-  im <- image
-  rm(image)
+  # Get rid of noise by blurring
+  image <- filter_blur(image,7)
   
-#   im <- xy$green[[2]]
+  # Center and rescale the range of values
+  image <- image * (dyeMedian / median(image,na.rm=TRUE))
+  image <- ((image-0.5)*6)^4 # Ad hoc scaling factor
   
-  cat("a=")
-  cat(round(mean(im,na.rm=TRUE),3))
-  
-  im <- im - mean(im, na.rm=TRUE)
-  im[im < 0] <- NA
-  
-  h <- hist(im, breaks=50)
-  h$mids <- h$mids[h$counts > 100]
-  h$counts <- h$counts[h$counts > 100]
-  
-  keybreak <- h$mids[h$counts < (max(h$counts)/200)][1]
-  
-  cat(", b=")
-  cat(round(1/keybreak, 3))
-  
-  im <- im / keybreak
-
-  return(im)
+  return(image)
   
 }
 

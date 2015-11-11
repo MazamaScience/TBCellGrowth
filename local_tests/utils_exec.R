@@ -31,10 +31,10 @@ if (FALSE) {
   # Solid run 
   args <- c('--inputDir=/Volumes/MAZAMAMOB/Data/Alginate well plate, 10-16-15',
             '--dataDir=Images',
-            '--outputDir=~/Desktop/TBResults/Nov05Test1',
+            '--outputDir=~/Desktop/TBResults/Nov10Test1',
             '--chambers=xy03,xy04,xy05,xy06,xy07,xy08,xy09,xy10,xy11,xy12,xy13,xy14',
-            '--channels=c1',
-            '--channelNames=phase',
+            '--channels=c1,c3',
+            '--channelNames=phase01,red',
             '--minTimespan=14',
             '--nFrames=20',
             '--startFrame=1',

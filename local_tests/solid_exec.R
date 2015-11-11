@@ -122,7 +122,7 @@ for (chamber in opt$chambers) {
   for (channel in names(imageList)[-1]) { # TODO:  Improve this logic
     if (getRunOptions('verbose')) cat(paste0("\tEqualizing ",channel," ...\n"))
     for (i in 1:length(imageList[[channel]])) {
-      imageList[[channel]][[i]] <- flow_equalizeDye(imageList[[channel]][[i]], artifactMask)
+      imageList[[channel]][[i]] <- solid_equalizeDye(imageList[[channel]][[i]])
       # Profiling handled inside flow_equalizeDye
       if (getRunOptions('verbose')) cat(paste0("\tLabeling ",channel," ...\n"))
       labeledImageList[[channel]][[i]] <- flow_labelDye(imageList[[channel]][[i]], labeledImageList[[1]][[i]])
@@ -138,7 +138,7 @@ for (chamber in opt$chambers) {
   dyeOverlap <- list()
   for (channel in names(imageList)[-1]) { # TODO:  Improve this logic
     if (getRunOptions('verbose')) cat(paste0("\tFinding ",channel, " overlap ...\n"))
-    dyeOverlap[[channel]] <- findDyeOverlap(labeledImageList[[channel]], labeledImageList[[1]], output)
+    dyeOverlap[[channel]] <- findDyeOverlap(labeledImageList[[channel]], output)
     profilePoint('overlap','seconds to findn dye overlaps')   
   }
   
@@ -206,6 +206,10 @@ if (FALSE) {
     if (i<10) i = paste0("0",i)
     writeImage(im, paste0("im",i,".jpg"), quality=60)
   }
+  
+  ### TEST DIFFERENT TIMESERIES ALGORITHMS
+  plot(0, 0, type="n", xlim=c(0,dim(output$timeseries)[1]), ylim=c(0,max(output$timeseries, na.rm=TRUE)))
+  apply(output$timeseries, 2, lines, col=rgb(0,0,0,0.1))
 
 }
 

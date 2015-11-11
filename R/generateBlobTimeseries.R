@@ -9,7 +9,8 @@
 #' of dataframes, one for each timestep, with centroids, blob ID's (human names) 
 #' and original integer labels for mapping output column names back to the original images.
 
-generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
+generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50, 
+                                   absGrowthRange=c(-20,100), relGrowthRange=c(0.75,2)) {
     
   # NOTE:  Include a timestep column so that we can sort if we have to.
   # NOTE:  The documentation for merge.data.frame() says that for 'sort=FALSE'
@@ -38,7 +39,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
     centroidsAfter <- getCentroids(images[[i]])
     
     # Find groups that are determined to be the same between the two images
-    groups <- findSimilarGroups(centroidsBefore,centroidsAfter,maxDistance)
+    groups <- findSimilarGroups(centroidsBefore,centroidsAfter,maxDistance,absGrowthRange,relGrowthRange)
     
     # For those continued groups, give them the ID's from the previous frame
     centroidsAfter <- updateCentroidIDs(centroidsAfter, groups)
@@ -130,7 +131,7 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50) {
 
 # Find the best fit between two images of centroids based on 
 # distance and size. Returns a best guess of which blobs became which
-findSimilarGroups <- function(c1, c2, maxDistance) {
+findSimilarGroups <- function(c1, c2, maxDistance, absGrowthRange, relGrowthRange) {
   
   # Initialize dataframe with each combination of the two indices
   ###df <- expand.grid(index1=seq(1,dim(c1)[1]), index2=seq(1,dim(c2)[1]))
@@ -151,8 +152,9 @@ findSimilarGroups <- function(c1, c2, maxDistance) {
   size2 <- c2$size[df$index2]
   
   # Calculate the growth
-  df$growthPer <- size2 / size1
-  df$growthRel <- unlist(lapply(df$growthPer, function(x) if(x > 1) { return(1/x)  } else { return(x) }))
+  df$growthRel <- size2 / size1
+  df$growthAbs <- size2 - size1
+  # df$growthAbs <- unlist(lapply(df$growthPer, function(x) if(x > 1) { return(1/x)  } else { return(x) }))
   
   # Calculate "score" of group fit
   df$score <- (0.5^(df$dist/20)) * (df$growthRel^0.2)
@@ -163,7 +165,9 @@ findSimilarGroups <- function(c1, c2, maxDistance) {
   # TODO:  Put hardcoded 'growthPer' threshold parameters in the configuration options
   
   # Remove unrealistic growth
-  df <- df[df$growthPer < 2.5 & df$growthPer > 0.5,]
+  #
+  df <- df[ (df$growthAbs < absGrowthRange[2]) | (df$growthRel < relGrowthRange[2]), ]
+  df <- df[ (df$growthAbs > absGrowthRange[1]) | (df$growthRel > relGrowthRange[1]), ]
   
   # Remove unrealistic distance travelled
   df <- df[df$dist < maxDistance,]
