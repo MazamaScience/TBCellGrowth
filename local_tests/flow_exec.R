@@ -249,6 +249,9 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tFinding overlaps for non-\'phase\' images ...\n')
   
+  # Clear large objects from memory
+  rm(artifactMask)
+  
   # Find dye overlaps
   dyeOverlap <- list()
   # NOTE:  The "phase" channel is always first
@@ -265,14 +268,13 @@ for (chamber in opt$chambers) {
     printMemoryUsage()
   }
   
+
   # ----- Create output -------------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tCreating output csv and images ...\n')
   
-  # Generate filenames from timestamps
-  # Assuming hours < 1000
-###  hours <- opt$startTime + ((0:(length(imageList[['phase']])-1))*opt$timestep)
-  # NOTE:  timestep names are assigned during loadImages
+  # Generate filenames from timestamps (assuming hours < 1000)
+  # NOTE:  Timestep names are assigned during loadImages().
   hours <- opt$startTime + as.integer(names(imageList[['phase']])) * opt$timestep
   filenames <- stringr::str_sub(paste0('000',hours),-3)
   
