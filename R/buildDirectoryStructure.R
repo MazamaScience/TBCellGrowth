@@ -43,19 +43,6 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
   
   # Add overlays to phase
   # These overlays will also serve as a background to other channels
-<<<<<<< HEAD
-#  result <- try({
-    
-    full_overlay <- mapply(overlayOutlines, phase, labeled[[1]], col="yellow", SIMPLIFY=FALSE)
-    # full_overlay <- lapply(full_overlay, overlayScaleBar, distanceScale)
-    writeImages(images=full_overlay, outputDir=outputDir, id="fullFrame", channel="phase", filenames)
-    
-    profilePoint('saveImages','seconds to save outlined phase images')
-    
-    # Write non phase channels
-    for (cName in names(labeled)[-1]) {
-      if (getRunOptions('verbose')) cat(paste0('\tWriting ',cName,' ...\n'))
-=======
   
   full_overlay <- mapply(overlayOutlines, phase, labeled$phase, col="yellow", SIMPLIFY=FALSE)
   ### full_overlay <- lapply(full_overlay, overlayScaleBar, distanceScale)
@@ -78,37 +65,12 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
     cat("\nallDyes ")
     dir.create(paste0(outputDir, "/fullFrame/all"), showWarnings=FALSE, recursive=TRUE)
     for (cName in names(labeled)[names(labeled) != "phase"]) {
->>>>>>> 22df4ee3b37c6682a6b8d3a5cebfd50cf2253d56
       channel <- labeled[[cName]]
       full_overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
     }
-<<<<<<< HEAD
-    
-#     # All dyes combined if there are enough channels
-#     if (length(names(labeled)) > 2) {
-#       ptm <- proc.time()
-#       cat("\nallDyes ")
-#       dir.create(paste0(outputDir, "/fullFrame/all"), showWarnings=FALSE, recursive=TRUE)
-#       for (cName in names(labeled)[-1]) {
-#         channel <- labeled[[cName]]
-#         full_overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
-#       }
-#       writeImages(full_overlay, outputDir, "fullFrame", "all", filenames)
-#       cat(formatTime(ptm))
-#     }
-#     
-    rm(full_overlay)
-    
-#  }, silent=TRUE)
-#  
-#  if (class(result) == "try-error") {
-#    print(result)
-#  }
-=======
     writeImages(full_overlay, outputDir, "fullFrame", "all", filenames)
 ###    cat(formatTime(ptm))
   }
->>>>>>> 22df4ee3b37c6682a6b8d3a5cebfd50cf2253d56
   
   rm(full_overlay)
     
@@ -148,13 +110,8 @@ buildDirectoryStructure <- function(output, phase, labeled, dyeOverlap, filename
     ####################################################
     
     # Crop and color phase images
-<<<<<<< HEAD
     cropped_phase <- cropImageByID(id, output, phase, labeled[[1]])
 #     colored_phase <- mapply(overlayColor, "phase", cropped_phase$bg, cropped_phase$label, SIMPLIFY=FALSE)
-=======
-    cropped_phase <- cropImageByID(id, output, phase, labeled$phase)
-    #     colored_phase <- mapply(overlayColor, "phase", cropped_phase$bg, cropped_phase$label, SIMPLIFY=FALSE)
->>>>>>> 22df4ee3b37c6682a6b8d3a5cebfd50cf2253d56
     color_phase <- mapply(overlayOutlines, cropped_phase$bg, cropped_phase$labelSingle, col="yellow", thick=FALSE, SIMPLIFY=FALSE)
     color_phase <- lapply(color_phase, overlayScaleBar, distanceScale)
     color_phase <- mapply(overlayVitalStats, color_phase, id, filenames, sizes, distanceScale, SIMPLIFY=FALSE)
