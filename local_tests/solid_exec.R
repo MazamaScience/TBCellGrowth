@@ -85,11 +85,8 @@ for (chamber in opt$chambers) {
   }
   
   
-  # Merge backgrounds into imageList
+  # Check dimensions
   for (channel in names(imageList)) {
-    
-    imageList[[channel]] <- c(backgrounds[[channel]], imageList[[channel]])
-    names(imageList[[channel]])[1] <- '000'
     
     # Sanity check -- all dimensions should be the same
     dims <- lapply(imageList[[channel]], dim)
@@ -230,6 +227,8 @@ for (chamber in opt$chambers) {
   
   # Create full-frame images ------------------------------
   
+  if (getRunOptions('verbose')) cat("\tCreating full-frame images ...\n")
+  
   result <- try( writeFullFrameImages(timeseriesList, 
                                       phase=imageList[[1]], 
                                       labeled=labeledImageList,
@@ -247,6 +246,8 @@ for (chamber in opt$chambers) {
   # Profiling handled inside writeFullFrameImages()
   
   # Create individual images ------------------------------
+  
+  if (getRunOptions('verbose')) cat("\tCreating individual images ...\n")
   
   result <- try( writeIndividualImages(timeseriesList, 
                                        phase=imageList[[1]], 

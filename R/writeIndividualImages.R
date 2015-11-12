@@ -28,7 +28,7 @@ writeIndividualImages <- function(timeseriesList, phase, labeled, dyeOverlap, fi
     
     counter <- counter + 1
     if (getRunOptions('verbose')) {
-      if ( (counter %% everyNth) == 0 ) cat(paste0('\t',counter,'/',colonyCount,'\n'))
+      if ( (counter %% everyNth) == 0 ) cat(paste0('\t',counter,'/',colonyCount,' colonies\n'))
     }
     
     dir.create(paste0(outputDir,"/individual/",id), showWarnings=FALSE, recursive=TRUE)
