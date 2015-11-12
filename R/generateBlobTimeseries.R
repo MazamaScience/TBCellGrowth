@@ -4,6 +4,8 @@
 #' @param minTimespan remove blobs from output which aren't found in at least
 #' n sequential images
 #' @param maxDistance the cutoff for distance between two blobs
+#' @param absGrowthRange limits in absolute colony growth between timesteps (pixels)
+#' @param relGrowthRange limits in relative colony growth between timesteps
 #' @return A \code{list} with elements \code{timeseries}: a dataframe of blob IDs 
 #' and blob sizes at each timestep (in pixels), and \code{centroids}: a \code{list}
 #' of dataframes, one for each timestep, with centroids, blob ID's (human names) 

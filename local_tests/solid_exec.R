@@ -11,11 +11,12 @@
 library(methods)
 library(TBCellGrowth)
 
+print(getwd())
 # Utility functions (for parsing and validating arguments)
 source('utils_exec.R')
 
 # Obtain and validate command line arguments
-opt <- parseCommandLineArguments()
+opt <- solid_parseCommandLineArguments()
 
 # Create overall directory
 dir.create(opt$outputDir, showWarnings=FALSE)
@@ -54,7 +55,55 @@ for (chamber in opt$chambers) {
                           opt$channelNames, opt$extension,
                           startFrame=opt$startFrame, n=opt$nFrames)
   
+  # NOTE:  The imageList should only have good images for the purposes of tracking.
+  # NOTE:  We will remove any timesteps that have a missing image in the phase
+  # NOTE:  or dye channel.
+  # NOTE:
+  # NOTE:  But we also need to keep track of missing images for future insertion of empty
+  # NOTE:  rows into the csv file and creation of 'missing' thumbnails.
+  
+  # TODO:  Handle cases where phase image is presnet by dye image is missing
+  
+  # Keep track of missing images
+  goodImageMask <- rep(TRUE,length(imageList[['phase']]))
+  goodImageList <- list()
+  for (channel in names(imageList)) {
+    goodImageList[[channel]] <- !is.na(imageList[[channel]])
+    goodImageMask <- goodImageMask & goodImageList[[channel]]
+  }
+  goodImageList$goodTimestep <- goodImageMask
+  
+  # Remove any timesteps that have a missing image in either channel
+  for (channel in names(imageList)) {
+    # Remove timesteps with any missing images, starting at the end 
+    # so that our ordering doesn't get messed up.
+    for (i in length(goodImageMask):1) {
+      if ( !goodImageMask[i] ) {
+        imageList[[channel]][[i]] <- NULL           
+      }
+    }
+  }
+  
+  
+  # Merge backgrounds into imageList
+  for (channel in names(imageList)) {
+    
+    imageList[[channel]] <- c(backgrounds[[channel]], imageList[[channel]])
+    names(imageList[[channel]])[1] <- '000'
+    
+    # Sanity check -- all dimensions should be the same
+    dims <- lapply(imageList[[channel]], dim)
+    if ( length(unique(dims)) > 1 ) {
+      cat(paste0('ERROR:\tTimesteps and image dimensions for the ',channel,' channel:\n'))
+      str(dims)
+      stop(paste0('The channel named "',channel,'" has ',length(unique(dims)),' different image dimensions.'))
+      # TODO:  Don't just quit at this point.
+    }
+    
+  }
+  
   profilePoint('loadImages','seconds to load images')
+  if (getRunOptions('verbose')) printMemoryUsage()
   
   
   # ----- Equalise phase images -----------------------------------------------
@@ -109,10 +158,15 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tGenerating timeseries ...\n')
   
-  output <- generateBlobTimeseries(labeledImageList[[1]], 
+  timeseriesList <- generateBlobTimeseries(labeledImageList[[1]], 
                                    minTimespan=opt$minTimespan)
   
-  
+  if (getRunOptions('verbose')) {
+    cat(paste0('\nPhase timeseries generated ---------------------------------\n\n'))
+    printMemoryUsage()
+  }
+
+    
   # ----- Equalize and label non-phase images -----------------------------------
   
   # NOTE:  This is done here because labeling depends on the 'phase' labels.
@@ -138,7 +192,7 @@ for (chamber in opt$chambers) {
   dyeOverlap <- list()
   for (channel in names(imageList)[-1]) { # TODO:  Improve this logic
     if (getRunOptions('verbose')) cat(paste0("\tFinding ",channel, " overlap ...\n"))
-    dyeOverlap[[channel]] <- findDyeOverlap(labeledImageList[[channel]], output)
+    dyeOverlap[[channel]] <- findDyeOverlap(labeledImageList[[channel]], timeseriesList)
     profilePoint('overlap','seconds to findn dye overlaps')   
   }
   
@@ -155,22 +209,60 @@ for (chamber in opt$chambers) {
   filenames <- stringr::str_sub(paste0('000',hours),-3)
   
   # Apply timesteps to row names of timeseries
-  rownames(output$timeseries) <- filenames
+  rownames(timeseriesList$timeseries) <- filenames
   # Apply timesteps to overlap row names
   for (channel in names(dyeOverlap)) {
     rownames(dyeOverlap[[channel]]) <- filenames
   }
   
-  buildDirectoryStructure(output, 
-                          phase=imageList[[1]], 
-                          labeled=labeledImageList,
-                          dyeOverlap=dyeOverlap,
-                          filenames=filenames,
-                          outputDir=chamberOutputDir,
-                          distanceScale=opt$distanceScale)
+  # Create csv files ------------------
   
-  # Profiling handled inside buildDirectoryStructure()
-  ###profilePoint('output','seconds to build directory structure')   
+  if (getRunOptions('verbose')) cat("\tCreating csv files ...\n")
+  
+  # phase channel
+  # TODO:  Should we use opt$channelNames[1] here instead of "phase"?
+  writeExcel(timeseriesList$timeseries, chamberOutputDir, "phase", filenames, chamber)
+  
+  # All dye channels
+  for (name in names(dyeOverlap)) {
+    writeExcel(dyeOverlap[[name]], chamberOutputDir, name, filenames, chamber)
+  }
+  
+  # Create full-frame images ------------------------------
+  
+  result <- try( writeFullFrameImages(timeseriesList, 
+                                      phase=imageList[[1]], 
+                                      labeled=labeledImageList,
+                                      dyeOverlap=dyeOverlap,
+                                      filenames=filenames,
+                                      outputDir=chamberOutputDir,
+                                      distanceScale=opt$distanceScale),
+                 silent=FALSE )
+  
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\tWARNING:  While creating full-frame images:\n\t',err_msg,'\n'))
+  }
+  
+  # Profiling handled inside writeFullFrameImages()
+  
+  # Create individual images ------------------------------
+  
+  result <- try( writeIndividualImages(timeseriesList, 
+                                       phase=imageList[[1]], 
+                                       labeled=labeledImageList,
+                                       dyeOverlap=dyeOverlap,
+                                       filenames=filenames,
+                                       outputDir=chamberOutputDir,
+                                       distanceScale=opt$distanceScale),
+                 silent=FALSE )
+  
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\tWARNING:  While creating individual images:\n\t',err_msg,'\n'))
+  }
+  
+  # Profiling handled inside writeIndividualImages()
   
   
   # ----- Cleanup -------------------------------------------------------------
@@ -178,7 +270,7 @@ for (chamber in opt$chambers) {
   rm(imageList)
   rm(labeledImageList)
   rm(dyeOverlap)
-  rm(output)
+  rm(timeseriesList)
   
   if (getRunOptions('verbose')) {
     profileEnd(paste0('seconds total for chamber ',chamber,'\n'))
@@ -208,8 +300,8 @@ if (FALSE) {
   }
   
   ### TEST DIFFERENT TIMESERIES ALGORITHMS
-  plot(0, 0, type="n", xlim=c(0,dim(output$timeseries)[1]), ylim=c(0,max(output$timeseries, na.rm=TRUE)))
-  apply(output$timeseries, 2, lines, col=rgb(0,0,0,0.1))
+  plot(0, 0, type="n", xlim=c(0,dim(timeseriesList$timeseries)[1]), ylim=c(0,max(timeseriesList$timeseries, na.rm=TRUE)))
+  apply(timeseriesList$timeseries, 2, lines, col=rgb(0,0,0,0.1))
 
 }
 

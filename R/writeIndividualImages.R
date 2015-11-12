@@ -1,5 +1,5 @@
 #' @export
-#' @title Builds A Directory of Image With Excel UI
+#' @title Write Individual Images
 #' @param timeseriesList a List with timeseries and centroids from
 #' \link{generateBlobTimeseries}
 #' @param phase a list of phase contrast image matrices
@@ -12,63 +12,23 @@
 #' @param outputDir the directory to build the file structure
 #' @param distanceScale the distance conversion in um/pixel
 #' @param chamber the current chamber id
-#' @description write a lot more here TODO
+#' @description Creates individual directories and populates each
+#' with colony thumbnail images with outlines and other labeling.
 #' @return none
 
-buildDirectoryStructure <- function(timeseriesList, phase, labeled, dyeOverlap, filenames, 
-                                    outputDir="output", distanceScale=NULL, chamber="") { 
-  
-  # ----- Create full frame images --------------------------------------------
-  
-  if (getRunOptions('verbose')) cat('\tCreating full frames ...\n')
-  
-  # Add overlays to phase
-  # These overlays will also serve as a background to other channels
-  
-  full_overlay <- mapply(overlayOutlines, phase, labeled$phase, col="yellow", SIMPLIFY=FALSE)
-  ### full_overlay <- lapply(full_overlay, overlayScaleBar, distanceScale)
-  writeImages(images=full_overlay, outputDir=outputDir, id="fullFrame", channel="phase", filenames)
-  
-  profilePoint('saveImages','seconds to save outlined phase images')
-  
-  # Write non phase channels
-  for (cName in names(labeled)[names(labeled) != "phase"]) {
-    if (getRunOptions('verbose')) cat(paste0('\tWriting ',cName,' ...\n'))
-    channel <- labeled[[cName]]
-    overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
-    writeImages(overlay, outputDir, id="fullFrame", cName, filenames)
-    profilePoint('saveImages',paste('seconds to save outlined',cName,'images'))
-  }
-  
-  # All dyes combined if there are enough channels
-  if (length(names(labeled)) > 2) {
-    ptm <- proc.time()
-    cat("\nallDyes ")
-    dir.create(paste0(outputDir, "/fullFrame/all"), showWarnings=FALSE, recursive=TRUE)
-    for (cName in names(labeled)[names(labeled) != "phase"]) {
-      channel <- labeled[[cName]]
-      full_overlay <- mapply(overlayColor, cName, phase, channel, full_overlay, SIMPLIFY=FALSE)
-    }
-    writeImages(full_overlay, outputDir, "fullFrame", "all", filenames)
-  }
-  
-  rm(full_overlay)
-  
-  
-  # ----- Create individual images ----------------------------------------------
-  
-  if (getRunOptions('verbose')) cat("\tSaving images for individual ids ...\n")
+writeIndividualImages <- function(timeseriesList, phase, labeled, dyeOverlap, filenames, 
+                                  outputDir="output", distanceScale=NULL, chamber="") { 
   
   dir.create(paste0(outputDir, "/individual"), showWarnings=FALSE, recursive=TRUE)
   
   counter <- 0
-  coloniesCount <- length(names(timeseriesList$timeseries))
+  colonyCount <- length(names(timeseriesList$timeseries))
+  everyNth <- round(colonyCount/20)
   for (id in names(timeseriesList$timeseries)) {
     
     counter <- counter + 1
     if (getRunOptions('verbose')) {
-      pct <- round(1000*(counter/coloniesCount))
-      if ( (pct %% 100) == 0 ) cat(paste0('\t',pct/10,'%\n'))
+      if ( (counter %% everyNth) == 0 ) cat(paste0('\t',counter,'/',colonyCount,'\n'))
     }
     
     dir.create(paste0(outputDir,"/individual/",id), showWarnings=FALSE, recursive=TRUE)
@@ -76,7 +36,7 @@ buildDirectoryStructure <- function(timeseriesList, phase, labeled, dyeOverlap, 
     sizes <- numeric(length(filenames))
     for (ii in 1:length(timeseriesList$centroids)) {
       centroids <- timeseriesList$centroids[[ii]]
-      mask <- id==centroids$id
+      mask <- id == centroids$id
       if (sum(mask) > 0) {
         sizes[ii] <- centroids[mask,]$size
       } else {

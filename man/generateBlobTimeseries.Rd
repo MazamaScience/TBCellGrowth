@@ -4,7 +4,8 @@
 \alias{generateBlobTimeseries}
 \title{Searches an image for dark cell colonies and incrementally labels each colony.}
 \usage{
-generateBlobTimeseries(images, minTimespan = 8, maxDistance = 50)
+generateBlobTimeseries(images, minTimespan = 8, maxDistance = 50,
+  absGrowthRange = c(-20, 100), relGrowthRange = c(0.75, 2))
 }
 \arguments{
 \item{images}{a list of labeled images See \link{flow_labelPhase}.}
@@ -13,6 +14,10 @@ generateBlobTimeseries(images, minTimespan = 8, maxDistance = 50)
 n sequential images}
 
 \item{maxDistance}{the cutoff for distance between two blobs}
+
+\item{absGrowthRange}{limits in absolute colony growth between timesteps (pixels)}
+
+\item{relGrowthRange}{limits in relative colony growth between timesteps}
 }
 \value{
 A \code{list} with elements \code{timeseries}: a dataframe of blob IDs

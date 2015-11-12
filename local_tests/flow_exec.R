@@ -268,7 +268,7 @@ for (chamber in opt$chambers) {
     printMemoryUsage()
   }
   
-
+  
   # ----- Create output -------------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tCreating output csv and images ...\n')
@@ -285,16 +285,54 @@ for (chamber in opt$chambers) {
     rownames(dyeOverlap[[channel]]) <- filenames
   }
   
-  buildDirectoryStructure(timeseriesList, 
-                          phase=imageList[['phase']], 
-                          labeled=labeledImageList,
-                          dyeOverlap=dyeOverlap,
-                          filenames=filenames,
-                          outputDir=chamberOutputDir,
-                          distanceScale=opt$distanceScale)
+  # Create csv files --------------------------------------
   
-  # Profiling handled inside buildDirectoryStructure()
-  ###profilePoint('output','seconds to build directory structure')   
+  if (getRunOptions('verbose')) cat("\tCreating csv files ...\n")
+  
+  # phase channel
+  # TODO:  Should we use opt$channelNames[1] here instead of "phase"?
+  writeExcel(timeseriesList$timeseries, chamberOutputDir, "phase", filenames, chamber)
+  
+  # All dye channels
+  for (name in names(dyeOverlap)) {
+    writeExcel(dyeOverlap[[name]], chamberOutputDir, name, filenames, chamber)
+  }
+  
+  # Create full-frame images ------------------------------
+  
+  result <- try( writeFullFrameImages(timeseriesList, 
+                                      phase=imageList[[1]], 
+                                      labeled=labeledImageList,
+                                      dyeOverlap=dyeOverlap,
+                                      filenames=filenames,
+                                      outputDir=chamberOutputDir,
+                                      distanceScale=opt$distanceScale),
+                 silent=FALSE )
+  
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\tWARNING:  While creating full-frame images:\n\t',err_msg,'\n'))
+  }
+  
+  # Profiling handled inside writeFullFrameImages()
+
+  # Create individual images ------------------------------
+  
+  result <- try( writeIndividualImages(timeseriesList, 
+                                       phase=imageList[[1]], 
+                                       labeled=labeledImageList,
+                                       dyeOverlap=dyeOverlap,
+                                       filenames=filenames,
+                                       outputDir=chamberOutputDir,
+                                       distanceScale=opt$distanceScale),
+                 silent=FALSE )
+  
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\tWARNING:  While creating individual images:\n\t',err_msg,'\n'))
+  }
+  
+  # Profiling handled inside writeIndividualImages()
   
   
   # ----- Cleanup -------------------------------------------------------------
