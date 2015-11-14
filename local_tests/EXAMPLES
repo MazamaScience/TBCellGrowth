@@ -76,5 +76,6 @@ srun --mem-per-cpu=15626 -n2 -N1 --pty --preserve-env ./flow_exec.R \
 --minTimespan=3 \
 --nFrames=4 \
 --distanceScale=0.22 \
+--noHyperlinks \
 --verbose &
 

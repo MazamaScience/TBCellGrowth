@@ -30,27 +30,29 @@ writeExcel <- function(df, outputDir, channel, filenames, chamber) {
     cat(paste0('\nWARNING:  Could not write "',file,'"/\n',err_msg,'\n'))   
   }
   
-  # Now modify the dataframe to include hyperlinks
-  
-  # Convert cells into hyperlinks
-  for ( id in names(df) ) {
-    df[[id]] <- cellHyperlinks(df[[id]], id, filenames, channel)
-  }
-  
-  # Convert column headers into hyperlinks
-  names(df) <- lapply(names(df), colHyperlinks, channel)
-  
-  # Convert row headers into hyperlinks
-  rownames(df) <- lapply(filenames, timeHyperlinks, channel)
-  
-  # Save the hyperlinked .csv file
-  file <- paste0(outputDir, "/", channel, "_", chamber, ".csv")
-  result <- try( write.csv(df, file) )
-  if ( class(result)[1] == "try-error" ) {
-    err_msg <- geterrmessage()
-    cat(paste0('\nWARNING:  Could not write "',file,'"/\n',err_msg,'\n'))   
-  }
-  
+  # Save the hyperlinked version if requested
+  if ( !getRunOptions('noHyperlinks') ) {
+    
+    # Convert cells into hyperlinks
+    for ( id in names(df) ) {
+      df[[id]] <- cellHyperlinks(df[[id]], id, filenames, channel)
+    }
+    
+    # Convert column headers into hyperlinks
+    names(df) <- lapply(names(df), colHyperlinks, channel)
+    
+    # Convert row headers into hyperlinks
+    rownames(df) <- lapply(filenames, timeHyperlinks, channel)
+    
+    # Save the hyperlinked .csv file
+    file <- paste0(outputDir, "/", channel, "_", chamber, ".csv")
+    result <- try( write.csv(df, file) )
+    if ( class(result)[1] == "try-error" ) {
+      err_msg <- geterrmessage()
+      cat(paste0('\nWARNING:  Could not write "',file,'"/\n',err_msg,'\n'))   
+    }
+    
+  } # END of hyperlinked version
   
 }
 

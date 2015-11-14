@@ -249,24 +249,27 @@ for (chamber in opt$chambers) {
   
   # Create individual images ------------------------------
   
-  if (getRunOptions('verbose')) cat("\tCreating individual images ...\n")
-  
-  result <- try( writeIndividualImages(timeseriesList, 
-                                       phase=imageList[[1]], 
-                                       labeledImageList=labeledImageList,
-                                       dyeOverlap=dyeOverlap,
-                                       filenames=filenames,
-                                       outputDir=chamberOutputDir,
-                                       distanceScale=opt$distanceScale),
-                 silent=FALSE )
-  
-  if ( class(result)[1] == "try-error" ) {
-    err_msg <- geterrmessage()
-    cat(paste0('\tWARNING:  While creating individual images:\n\t',err_msg,'\n'))
+  if ( !getRunOptions('noHyperlinks') ) {
+    
+    if (getRunOptions('verbose')) cat("\tCreating individual images ...\n")
+    
+    result <- try( writeIndividualImages(timeseriesList, 
+                                         phase=imageList[[1]], 
+                                         labeledImageList=labeledImageList,
+                                         dyeOverlap=dyeOverlap,
+                                         filenames=filenames,
+                                         outputDir=chamberOutputDir,
+                                         distanceScale=opt$distanceScale),
+                   silent=FALSE )
+    
+    if ( class(result)[1] == "try-error" ) {
+      err_msg <- geterrmessage()
+      cat(paste0('\tWARNING:  While creating individual images:\n\t',err_msg,'\n'))
+    }
+    
+    # Profiling handled inside writeIndividualImages()
+    
   }
-  
-  # Profiling handled inside writeIndividualImages()
-  
   
   # ----- Cleanup -------------------------------------------------------------
   

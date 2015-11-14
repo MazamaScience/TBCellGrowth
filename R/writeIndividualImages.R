@@ -68,10 +68,8 @@ writeIndividualImages <- function(timeseriesList, phase, labeledImageList, dyeOv
         debug_text <- paste0(debug_text,"; overlayOutlines [",i,"]")
         
         # Add text annotations (requires disk write/read)
-        if ( !getRunOptions('noLabels') ) {
-          color_phase[[i]] <- overlayAnnotations(color_phase[[i]], cropped_phase$labelFull[[i]], id, infoList)
-          debug_text <- paste0(debug_text,"; overlayAnnotations [",i,"]")
-        }    
+        color_phase[[i]] <- overlayAnnotations(color_phase[[i]], cropped_phase$labelFull[[i]], id, infoList)
+        debug_text <- paste0(debug_text,"; overlayAnnotations [",i,"]")
         
       }
 

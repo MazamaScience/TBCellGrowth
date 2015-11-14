@@ -81,7 +81,7 @@ flow_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) 
     #     optparse::make_option(c("--searchSpace"), default=110, help="Size of search area for alignment [default %default]"),    
     #     
     optparse::make_option(c("--verbose"), action="store_true", default=FALSE, help="Print out verbose processing details [default %default]"), 
-    optparse::make_option(c("--noLabels"), action="store_true", default=FALSE, help="Skip the labeling of individual labels to speed things up [default %default]") 
+    optparse::make_option(c("--noHyperlinks"), action="store_true", default=FALSE, help="Skip the creation of colony images and hyperlinks [default %default]") 
     #     optparse::make_option(c("--profile"), action="store_true", default=FALSE, help="Print out additional timing information [default %default]"),  
     #     optparse::make_option(c("--debug_images"), action="store_true", default=FALSE, help="Generate intermediate images for evaluation [default %default]")    
   )
@@ -189,7 +189,7 @@ solid_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE))
     #     optparse::make_option(c("--searchSpace"), default=110, help="Size of search area for alignment [default %default]"),    
     #     
     optparse::make_option(c("--verbose"), action="store_true", default=FALSE, help="Print out verbose processing details [default %default]"), 
-    optparse::make_option(c("--noLabels"), action="store_true", default=FALSE, help="Skip the labeling of individual labels to speed things up [default %default]") 
+    optparse::make_option(c("--noHyperlinks"), action="store_true", default=FALSE, help="Skip the creation of colony images and hyperlinks [default %default]") 
     #     optparse::make_option(c("--profile"), action="store_true", default=FALSE, help="Print out additional timing information [default %default]"),  
     #     optparse::make_option(c("--debug_images"), action="store_true", default=FALSE, help="Generate intermediate images for evaluation [default %default]")    
   )
