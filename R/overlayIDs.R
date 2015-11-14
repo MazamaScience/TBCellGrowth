@@ -10,8 +10,8 @@
 
 overlayIDs <- function(image, centroids, labelbg=FALSE) {
   
-  dimx <- dim(image)[[1]]
-  dimy <- dim(image)[[2]]
+  dimx <- dim(image)[1]
+  dimy <- dim(image)[2]
   
   labelf = function() {
     text(centroids$x, centroids$ymin-8, centroids$id, cex=1)

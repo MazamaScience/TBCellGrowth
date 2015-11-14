@@ -4,8 +4,8 @@
 \alias{writeFullFrameImages}
 \title{Write Full Frame Images}
 \usage{
-writeFullFrameImages(timeseriesList, phase, labeled, dyeOverlap, filenames,
-  outputDir = "output", distanceScale = NULL, chamber = "")
+writeFullFrameImages(timeseriesList, phase, labeledImageList, dyeOverlap,
+  filenames, outputDir = "output", distanceScale = NULL, chamber = "")
 }
 \arguments{
 \item{timeseriesList}{a List with timeseries and centroids from
@@ -13,7 +13,7 @@ writeFullFrameImages(timeseriesList, phase, labeled, dyeOverlap, filenames,
 
 \item{phase}{a list of phase contrast image matrices}
 
-\item{labeled}{a list of labeled images from each channel
+\item{labeledImageList}{a list of labeled images from each channel
 \link{flow_labelPhase}}
 
 \item{dyeOverlap}{a \code{dataframe} of dye overlap values from

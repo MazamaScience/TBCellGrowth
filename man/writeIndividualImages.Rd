@@ -4,8 +4,8 @@
 \alias{writeIndividualImages}
 \title{Write Individual Images}
 \usage{
-writeIndividualImages(timeseriesList, phase, labeled, dyeOverlap, filenames,
-  outputDir = "output", distanceScale = NULL, chamber = "")
+writeIndividualImages(timeseriesList, phase, labeledImageList, dyeOverlap,
+  filenames, outputDir = "output", distanceScale = NULL, chamber = "")
 }
 \arguments{
 \item{timeseriesList}{a List with timeseries and centroids from
@@ -13,7 +13,7 @@ writeIndividualImages(timeseriesList, phase, labeled, dyeOverlap, filenames,
 
 \item{phase}{a list of phase contrast image matrices}
 
-\item{labeled}{a list of labeled images from each channel
+\item{labeledImageList}{a list of lists of labeled images for each channel
 \link{flow_labelPhase}}
 
 \item{dyeOverlap}{a \code{dataframe} of dye overlap values from

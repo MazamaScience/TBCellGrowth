@@ -2,7 +2,7 @@
 % Please edit documentation in R/getCentroids.R
 \name{getCentroids}
 \alias{getCentroids}
-\title{Finds Blob Centroids}
+\title{Find Blob Centroids}
 \usage{
 getCentroids(image)
 }
@@ -14,6 +14,6 @@ A \code{dataframe} with a row for each unique blob.
 }
 \description{
 Finds the center, size, and bounds of every non zero cluster
-of pixels. Requires the image was labeled using \code{EBImage::bwlabel}.
+of pixels in a labeled image. Image labeling is performed by \code{EBImage::bwlabel}.
 }
 

@@ -34,9 +34,11 @@ for (chamber in opt$chambers) {
   # ----- Create output directories -------------------------------------------
   
   chamberOutputDir <- paste0(opt$outputDir, "/", chamber)
+  debugDir <- paste0(chamberOutputDir,"/DEBUG")
   
   # Make directories and open file
   dir.create(chamberOutputDir, showWarnings=FALSE)
+  dir.create(debugDir, showWarnings=FALSE)
   
   # Divert all output to the transcript
   transcriptFile <- file(paste0(chamberOutputDir,'/TRANSCRIPT.txt'))
@@ -125,7 +127,7 @@ for (chamber in opt$chambers) {
   profilePoint('flow_equalizePhase','seconds to equalize phase images')
   
   if (getRunOptions('debug_images')) {
-    saveImageList(imageList,chamberOutputDir,chamber,'A_equalized')    
+    saveImageList(imageList,debugDir,chamber,'A_equalized')    
     profilePoint('saveImages','seconds to save images')
   }
   
@@ -139,7 +141,7 @@ for (chamber in opt$chambers) {
   ###profilePoint('flow_rotatePhase','seconds to rotate images')
   
   if (getRunOptions('debug_images')) {
-    saveImageList(imageList,chamberOutputDir,chamber,'B_rotated')    
+    saveImageList(imageList,debugDir,chamber,'B_rotated')    
     profilePoint('saveImages','seconds to save images')
   }
   
@@ -156,7 +158,7 @@ for (chamber in opt$chambers) {
   # Profiling handled inside flow_alignImages()
   
   if (getRunOptions('debug_images')) {
-    saveImageList(imageList,chamberOutputDir,chamber,'C_aligned')    
+    saveImageList(imageList,debugDir,chamber,'C_aligned')    
     profilePoint('saveImages','seconds to save images')
   }
   
@@ -269,6 +271,18 @@ for (chamber in opt$chambers) {
   }
   
   
+  # ----- Save .RData file for debugging --------------------------------------
+  
+  filename <- paste0(debugDir,'/timeseriesList.RData')
+  result <- try( save(timeseriesList,file=filename),
+                 silent=FALSE )
+  
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\tWARNING:  Unable to save timeseriesList.RData to debug directoroy.\n'))
+  }
+  
+  
   # ----- Create output -------------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tCreating output csv and images ...\n')
@@ -304,7 +318,7 @@ for (chamber in opt$chambers) {
 
   result <- try( writeFullFrameImages(timeseriesList, 
                                       phase=imageList[[1]], 
-                                      labeled=labeledImageList,
+                                      labeledImageList=labeledImageList,
                                       dyeOverlap=dyeOverlap,
                                       filenames=filenames,
                                       outputDir=chamberOutputDir,
@@ -324,7 +338,7 @@ for (chamber in opt$chambers) {
   
   result <- try( writeIndividualImages(timeseriesList, 
                                        phase=imageList[[1]], 
-                                       labeled=labeledImageList,
+                                       labeledImageList=labeledImageList,
                                        dyeOverlap=dyeOverlap,
                                        filenames=filenames,
                                        outputDir=chamberOutputDir,

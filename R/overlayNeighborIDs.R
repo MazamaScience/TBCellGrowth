@@ -52,10 +52,10 @@ overlayNeighborsIDs <- function(image, labels, id, centroids) {
   
   centroids <- centroids[(xmask | ymask),]
   
-  if (dim(centroids)[[1]] < 1) return(image)
+  if (dim(centroids)[1] < 1) return(image)
   
   plotf <- function() {
-    for (ii in 1:dim(centroids)[[1]]) {
+    for (ii in 1:dim(centroids)[1]) {
       cen <- centroids[ii,]
       if (cen$x < dimx/2) {
         adj <- c(0,0.5)

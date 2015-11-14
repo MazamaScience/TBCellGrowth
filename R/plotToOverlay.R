@@ -11,33 +11,44 @@
 #' @return a \code{matrix} image.
 
 plotToOverlay = function(plotf, dimx, dimy) {
-
-  # Initialize temporary png
-  png("temp345s45grf.png",width=dimx,height=dimy)
+  
+  # NOTE:  Put the work in a try block so we never skip removing the tmpfile
+  
+  result <- try({
     
-  # Save par
-  oldPar <- par()
+    # Initialize temporary png
+    filename <- tempfile(pattern='tmp_',tmpdir=getwd(),fileext=".png")
+    png(filename,width=dimx,height=dimy)
+    
+    # Set 0 margin parameters
+    par(mar=c(0,0,0,0), oma=c(0,0,0,0))
+    
+    # NOTE:  All plotting is in try blocks so that we will always dev.off()
+    # Blank plot with proper parameters
+    try( plot(0,0, ylim=c(dimy,1), xlim=c(1,dimx), type="n", axes=T, xaxt="n", yaxt='n', xaxs='i', yaxs='i') )
+    
+    # Execute plotting function
+    try( plotf() )
+    
+    dev.off()
+    
+    # Reset parameters
+    par(mar=c(5,4,4,2) + 0.1,
+        oma=c(0,0,0,0))
+    
+    # Now load the png as an "image" type
+    labelsMask <- 1 - EBImage::readImage(filename)[,,1]
+    
+  })
   
-  # Set 0 margin parameters
-  par(mar=c(0,0,0,0), oma=c(0,0,0,0))
-  
-  # Blank plot with proper parameters
-  plot(0,0, ylim=c(dimy,1), xlim=c(1,dimx), type="n", axes=T, xaxt="n", yaxt='n', xaxs='i', yaxs='i')
-  
-  # Execute plotting function
-  plotf()
-  dev.off()
-  
-  # Reset parameters
-  try(par(oldPar), silent=TRUE)
-  
-  # Now load the png as an "image" type
-  labels <- 1 - EBImage::readImage("temp345s45grf.png")[,,1]
+  if ( class(result)[1] == "try-error" ) {
+    labelsMask <- matrix(data=0, nrow=dimx, ncol=dimy)
+  }
   
   # Delete the file
-  file.remove("temp345s45grf.png")
-
+  if (file.exists(filename)) file.remove(filename)
+  
   # Return the mask
-  return(labels)
+  return(labelsMask)
   
 }
