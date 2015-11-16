@@ -17,13 +17,13 @@ if (FALSE) {
   args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, limiting PI, 9-1-15',
             '--dataDir=Experimental images',
             '--outputDir=~/TBResults/Sep01',
-            '--chambers=xy01,xy06',
+            '--chambers=xy05',
             '--channels=c1,c3',
             '--channelNames=phase,green',
-            '--minTimespan=2',
-            '--nFrames=4',
-            '--startFrame=8',
             '--backgroundIndex=2',
+            '--startFrame=8',
+            '--minTimespan=3',
+            '--nFrames=4',
             '--verbose')
   
   opt <- flow_parseCommandLineArguments(args)
@@ -31,10 +31,10 @@ if (FALSE) {
   # Solid run 
   args <- c('--inputDir=/Volumes/MAZAMAMOB/Data/Alginate well plate, 10-16-15',
             '--dataDir=Images',
-            '--outputDir=~/Desktop/TBResults/Nov05Test1',
+            '--outputDir=~/Desktop/TBResults/Nov10Test1',
             '--chambers=xy03,xy04,xy05,xy06,xy07,xy08,xy09,xy10,xy11,xy12,xy13,xy14',
-            '--channels=c1',
-            '--channelNames=phase',
+            '--channels=c1,c3',
+            '--channelNames=phase01,red',
             '--minTimespan=14',
             '--nFrames=20',
             '--startFrame=1',
@@ -64,7 +64,7 @@ flow_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) 
     optparse::make_option(c("--extension"), default="tif", type='character', help="File extension of input images [default \"%default\"]"),
     optparse::make_option(c("--startTime"), default=0, type='integer', help="Starting hour [default %default]"),
     optparse::make_option(c("--timestep"), default=3, type='integer', help="Hours between image acquisition [default %default]"),
-    optparse::make_option(c("--distanceScale"), default=0.21, type='integer', help="pixels/micrometer [default %default]"),
+    optparse::make_option(c("--distanceScale"), default=0.21, type='double', help="pixels/micrometer [default %default]"),
     # Chambers and channels
     optparse::make_option(c("--chambers"), default='xy01,xy02', type='character', help="Comma separate string of chamber ids [default \"%default\"]"),
     optparse::make_option(c("--channels"), default="c1", type='character', help="Comma separate string of channel ids [default \"%default\"]"),
@@ -74,17 +74,18 @@ flow_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) 
     optparse::make_option(c("--nFrames"), default="all", help="Number of frames to read [default \"%default\"]"),
     optparse::make_option(c("--minTimespan"), default=5, type='integer', help="Minimum number of frames in which a colony must be recognized [default %default]"),    
     # TODO:  What's the difference between backgroundIndex and startFrame    
-#     # Adjustable parameters
-#     optparse::make_option(c("--phaseMedian"), default=0.4, help="Median value after equalization [default %default]"),
-#     optparse::make_option(c("--numTargets"), default=10, help="Number of target features used for alignment [default %default]"),
-#     optparse::make_option(c("--targetWidth"), default=3, help="Size of target feature used for alignment [default %default]"),
-#     optparse::make_option(c("--searchSpace"), default=110, help="Size of search area for alignment [default %default]"),    
-#     
-    optparse::make_option(c("--verbose"), action="store_true", default=FALSE, help="Print out verbose processing details [default %default]") 
-#     optparse::make_option(c("--profile"), action="store_true", default=FALSE, help="Print out additional timing information [default %default]"),  
-#     optparse::make_option(c("--debug_images"), action="store_true", default=FALSE, help="Generate intermediate images for evaluation [default %default]")    
+    #     # Adjustable parameters
+    #     optparse::make_option(c("--phaseMedian"), default=0.4, help="Median value after equalization [default %default]"),
+    #     optparse::make_option(c("--numTargets"), default=10, help="Number of target features used for alignment [default %default]"),
+    #     optparse::make_option(c("--targetWidth"), default=3, help="Size of target feature used for alignment [default %default]"),
+    #     optparse::make_option(c("--searchSpace"), default=110, help="Size of search area for alignment [default %default]"),    
+    #     
+    optparse::make_option(c("--verbose"), action="store_true", default=FALSE, help="Print out verbose processing details [default %default]"), 
+    optparse::make_option(c("--noHyperlinks"), action="store_true", default=FALSE, help="Skip the creation of colony images and hyperlinks [default %default]") 
+    #     optparse::make_option(c("--profile"), action="store_true", default=FALSE, help="Print out additional timing information [default %default]"),  
+    #     optparse::make_option(c("--debug_images"), action="store_true", default=FALSE, help="Generate intermediate images for evaluation [default %default]")    
   )
-    
+  
   # Parse arguments
   opt <- optparse::parse_args(optparse::OptionParser(option_list=option_list), args)
   # Validate options
@@ -171,7 +172,7 @@ solid_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE))
     optparse::make_option(c("--extension"), default="tif", type='character', help="File extension of input images [default \"%default\"]"),
     optparse::make_option(c("--startTime"), default=0, type='integer', help="Starting hour [default %default]"),
     optparse::make_option(c("--timestep"), default=3, type='integer', help="Hours between image acquisition [default %default]"),
-    optparse::make_option(c("--distanceScale"), default=0.21, type='integer', help="pixels/micrometer [default %default]"),
+    optparse::make_option(c("--distanceScale"), default=0.21, type='double', help="pixels/micrometer [default %default]"),
     # Chambers and channels
     optparse::make_option(c("--chambers"), default='xy01,xy02', type='character', help="Comma separate string of chamber ids [default \"%default\"]"),
     optparse::make_option(c("--channels"), default="c1", type='character', help="Comma separate string of channel ids [default \"%default\"]"),
@@ -187,7 +188,8 @@ solid_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE))
     #     optparse::make_option(c("--targetWidth"), default=3, help="Size of target feature used for alignment [default %default]"),
     #     optparse::make_option(c("--searchSpace"), default=110, help="Size of search area for alignment [default %default]"),    
     #     
-    optparse::make_option(c("--verbose"), action="store_true", default=FALSE, help="Print out verbose processing details [default %default]") 
+    optparse::make_option(c("--verbose"), action="store_true", default=FALSE, help="Print out verbose processing details [default %default]"), 
+    optparse::make_option(c("--noHyperlinks"), action="store_true", default=FALSE, help="Skip the creation of colony images and hyperlinks [default %default]") 
     #     optparse::make_option(c("--profile"), action="store_true", default=FALSE, help="Print out additional timing information [default %default]"),  
     #     optparse::make_option(c("--debug_images"), action="store_true", default=FALSE, help="Generate intermediate images for evaluation [default %default]")    
   )
