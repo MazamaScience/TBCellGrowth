@@ -2,6 +2,7 @@
 
 export(applyCropRect)
 export(buildDirectoryStructure)
+export(calc_doublingTime)
 export(createGif)
 export(cropImageByID)
 export(filter_blur)

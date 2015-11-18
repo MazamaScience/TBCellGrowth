@@ -1,4 +1,4 @@
-#!/depot/R/3.2.1/bin/Rscript
+#!/usr/bin/Rscript
 #
 # Executable script for processing flow images
 
@@ -143,7 +143,7 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) cat('\tLabeling images ...\n')
   
   labeledImageList <- list()
-  labeledImageList[[1]] <- lapply(imageList[[1]], solid_labelPhase)
+  labeledImageList[['phase']] <- lapply(imageList[[1]], solid_labelPhase)
   
   profilePoint('flow_labelPhase','seconds to create labeled images')   
   

@@ -42,6 +42,23 @@ if (FALSE) {
   
   opt <- solid_parseCommandLineArguments(args)
  
+  # Looking for problem creating full-frame images
+  args <- c('--inputDir=/Volumes/sherman-ngs/KM_Temp_Imaging/Alginate INH treatment & Macs, 11-6-15',
+            '--dataDir=Experimental Images',
+            '--outputDir=/Users/jonathan/Projects/CIDR/Sherman/JC_Results/DELETEME', # Jon's laptop
+            '--chambers=xy01',
+            '--channels=c1',
+            '--channelNames=phase1',
+            '--startFrame=1',
+            '--nFrames=3',
+            '--minTimespan=2',
+            '--timestep=3',
+            '--distanceScale=0.21',
+            '--verbose')
+  
+  opt <- solid_parseCommandLineArguments(args)
+  
+  
   
 }
 
