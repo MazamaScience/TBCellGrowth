@@ -8,7 +8,7 @@
 #' vector of doubling times in hours.
 #' @return Vector of doubling times
 
-calc_doublingTime <- function(timeseries, rowStart=1, rowStop=nrow(timeseries)) {
+analysis_doublingTime <- function(timeseries, rowStart=1, rowStop=nrow(timeseries)) {
 
   # Extract hours vector and colony size matrix from timeseries
   hours <- timeseries[rowStart:rowStop,1]
