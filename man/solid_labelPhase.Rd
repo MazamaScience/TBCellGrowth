@@ -4,15 +4,22 @@
 \alias{solid_labelPhase}
 \title{Identify and Label Phase Microscopy Groups}
 \usage{
-solid_labelPhase(image)
+solid_labelPhase(image, minColonySize = 50)
 }
 \arguments{
 \item{image}{an image matrix to search for cell colonies}
+
+\item{minColonySize}{all identified groups of pixels, aka "blobs", below this size are discarded}
 }
 \value{
 A \code{matrix} of integer labeled blobs.
 }
 \description{
 Searches an image for dark cell colonies and incrementally labels each colony.
+}
+\note{
+A lot of "photoshop magic" happens here and the algorithm has several internal constants
+that might need to be adjusted if the quality of images changes significantly. The algorithm
+was tailored to the "phase1" channel of solid substrate images.
 }
 

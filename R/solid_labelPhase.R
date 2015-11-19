@@ -1,10 +1,14 @@
 #' @export
 #' @title Identify and Label Phase Microscopy Groups
 #' @param image an image matrix to search for cell colonies
+#' @param minColonySize all identified groups of pixels, aka "blobs", below this size are discarded
 #' @description Searches an image for dark cell colonies and incrementally labels each colony.
+#' @note A lot of "photoshop magic" happens here and the algorithm has several internal constants
+#' that might need to be adjusted if the quality of images changes significantly. The algorithm 
+#' was tailored to the "phase1" channel of solid substrate images.
 #' @return A \code{matrix} of integer labeled blobs.
 
-solid_labelPhase <- function(image) {
+solid_labelPhase <- function(image, minColonySize=50) {
   
   if (getRunOptions('verbose')) cat('\tLabeling ...\n')
   
@@ -48,18 +52,19 @@ solid_labelPhase <- function(image) {
   
   # Blobs under 50 pixels are very likely to be noise and there tends to be
   # a lot of those. Removing those speeds up later steps of the algorithm.
-  imageEdit <- removeBlobs(imageEdit, 50)
+  imageEdit <- removeBlobs(imageEdit, minColonySize)
   
   # We're only interested in outlines for solid images, so fill any
   # holes in the images.
   imageEdit <- EBImage::fillHull(imageEdit)
   
-  # blabel assigns each distinct blob of white pixels a unique integer
+  # bwlabel() assigns each distinct blob of white pixels a unique integer
   # value, which we'll later use to identify and track the blobs.
   imageEdit <- EBImage::bwlabel(imageEdit)
   
   # Now remove slightly bigger blobs as a precaution.
-  imageEdit <- removeBlobs(imageEdit, 60, label=FALSE)
+  minColonySize <- minColonySize * 1.2
+  imageEdit <- removeBlobs(imageEdit, minColonySize, label=FALSE)
   
   # For checking results during development
   if (FALSE) {

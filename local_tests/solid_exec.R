@@ -47,8 +47,11 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) {
     cat(paste0('\nProcessing chamber "',chamber,'" on ',Sys.time(),' ------------------------------\n\n'))
+    options(width=160)
+    str(opt)
   }
   
+
   # ----- Load images ---------------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tLoading images ...\n')
@@ -110,7 +113,7 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) cat('\tEqualizing images ...\n')
   
   # Assume that we always have phase
-  imageList[[1]] <- lapply(imageList[[1]], flow_equalizePhase, opt$phaseMedian)
+  imageList[['phase']] <- lapply(imageList[['phase']], flow_equalizePhase, opt$phaseMedian)
   
   profilePoint('flow_equalizePhase','seconds to equalize phase images')
   
@@ -143,9 +146,13 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) cat('\tLabeling images ...\n')
   
   labeledImageList <- list()
-  labeledImageList[['phase']] <- lapply(imageList[[1]], solid_labelPhase)
+  labeledImageList[['phase']] <- list()
+  for (i in 1:length(imageList[['phase']])) {    
+    if (getRunOptions('verbose')) cat(paste0('\tLabeling ',i,' ...\n'))
+    labeledImageList[['phase']][[i]] <- solid_labelPhase(imageList[['phase']][[i]], opt$minColonySize)
+  }
   
-  profilePoint('flow_labelPhase','seconds to create labeled images')   
+  profilePoint('solid_labelPhase','seconds to create labeled images')   
   
   if (getRunOptions('debug_images')) {
     saveImageList(labeledImageList,chamberOutputDir,chamber,'D_labeled')    
@@ -158,14 +165,14 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) cat('\tGenerating timeseries ...\n')
   
   timeseriesList <- generateBlobTimeseries(labeledImageList[[1]], 
-                                   minTimespan=opt$minTimespan)
+                                           minTimespan=opt$minTimespan)
   
   if (getRunOptions('verbose')) {
     cat(paste0('\nPhase timeseries generated ---------------------------------\n\n'))
     printMemoryUsage()
   }
-
-    
+  
+  
   # ----- Equalize and label non-phase images -----------------------------------
   
   # NOTE:  This is done here because labeling depends on the 'phase' labels.

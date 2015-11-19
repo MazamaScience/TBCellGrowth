@@ -47,6 +47,8 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) {
     cat(paste0('\nProcessing chamber "',chamber,'" on ',Sys.time(),' ------------------------------\n\n'))
+    options(width=160)
+    str(opt)
   }
   
   # ----- Load images ---------------------------------------------------------
@@ -199,7 +201,7 @@ for (chamber in opt$chambers) {
   labeledImageList[['phase']] <- list()
   for (i in 1:length(imageList[['phase']])) {    
     if (getRunOptions('verbose')) cat(paste0('\tLabeling ',i,' ...\n'))
-    labeledImageList[['phase']][[i]] <- flow_labelPhase(imageList[['phase']][[i]], artifactMask, ignoredRegions)
+    labeledImageList[['phase']][[i]] <- flow_labelPhase(imageList[['phase']][[i]], artifactMask, ignoredRegions, opt$minColonySize)
   }
   
   profilePoint('flow_labelPhase','seconds to create labeled images')   

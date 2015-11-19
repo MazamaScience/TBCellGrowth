@@ -4,10 +4,14 @@
 #' @param artifactMask a mask of non biological features to ignore. See \link{flow_createArtifactMask}.
 #' @param ignoredRegions a vector of row numbers to ignore. Blobs which have centroids
 #' in this range are removed.
+#' @param minColonySize all identified groups of pixels, aka "blobs", below this size are discarded
 #' @description Searches an image for dark cell colonies and incrementally labels each colony.
+#' @note A lot of "photoshop magic" happens here and the algorithm has several internal constants
+#' that might need to be adjusted if the quality of images changes significantly. The algorithm 
+#' was tailored to the "phase1" channel of Microfluidics images.
 #' @return A \code{matrix} of integer labeled blobs.
 
-flow_labelPhase <- function(image, artifactMask, ignoredRegions) {
+flow_labelPhase <- function(image, artifactMask, ignoredRegions, minColonySize=100) {
   
   # Ensure that the greatest pixel value is 1. Some EBImage functions
   # break if pixels greater than 1 are encountered
@@ -52,7 +56,7 @@ flow_labelPhase <- function(image, artifactMask, ignoredRegions) {
   # Blobs under 100 pixels are very likely to be noise and there tends to be
   # a lot of those. This is especially true since we expanded the radius.
   # Removing those speeds up later steps of the algorithm.
-  imageEdit <- removeBlobs(imageEdit, 100)
+  imageEdit <- removeBlobs(imageEdit, minColonySize)
   
   # blabel assigns each distinct blob of white pixels a unique integer
   # value, which we'll later use to identify and track the blobs.
@@ -75,8 +79,9 @@ flow_labelPhase <- function(image, artifactMask, ignoredRegions) {
   # in the mucrofluidics images will not be brightly lit
   imageEdit[EBImage::equalize(imageMask) > 0.775] <- 0
   
-  # Now remove blobs under 175 pixels, which experience has shown
-  # to 
+  # Now remove slightly bigger blobs as a precaution.
+  # NOTE:  Experience has shown that 175 pixels is a reasonable size at this stage.
+  minColonySize <- minColonySize * 1.75
   imageEdit <- removeBlobs(imageEdit, 175, label=FALSE)
   
   return(imageEdit)
