@@ -51,6 +51,8 @@ getCentroids <- function(image) {
     ymin[blobIndex] <- min(yy)
     ymax[blobIndex] <- max(yy)
     size[blobIndex] <- length(ind)
+    # NOTE:  Use set.seed() to guarantee reproducibility while doing "random" sampling
+    set.seed(123456)
     id[blobIndex] <- paste0("id", paste0(sample(c(letters,LETTERS,0:9),12,replace=TRUE), collapse=""))
     index[blobIndex] <- blobIndex
     

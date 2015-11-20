@@ -12,7 +12,7 @@
 #' to animaged gifs while full rows will be linked to full images for each timestep.
 #' 
 #' The images are generated in buildDirectoryStructure() which also calls this function.
-#' @return none
+#' @return Absolute path of the "no links" version of the .csv file.
 
 writeExcel <- function(df, outputDir, channel, filenames, chamber) {
   
@@ -22,13 +22,15 @@ writeExcel <- function(df, outputDir, channel, filenames, chamber) {
     return()
   }
   
-  # Save the "_noLinks" .csv file
-  file <- paste0(outputDir, "/", channel, "_", chamber, "_noLinks.csv")
+  # Save the "no links" version of the .csv file
+  file <- paste0(outputDir, "/", channel, "_", chamber, ".csv")
   result <- try( write.csv(df, file) )
   if ( class(result)[1] == "try-error" ) {
     err_msg <- geterrmessage()
     cat(paste0('\nWARNING:  Could not write "',file,'"/\n',err_msg,'\n'))   
   }
+  
+  returnValue <- file
   
   # Save the hyperlinked version if requested
   if ( !getRunOptions('noHyperlinks') ) {
@@ -45,7 +47,7 @@ writeExcel <- function(df, outputDir, channel, filenames, chamber) {
     rownames(df) <- lapply(filenames, timeHyperlinks, channel)
     
     # Save the hyperlinked .csv file
-    file <- paste0(outputDir, "/", channel, "_", chamber, ".csv")
+    file <- paste0(outputDir, "/", channel, "_", chamber, "_hyperlinks.csv")
     result <- try( write.csv(df, file) )
     if ( class(result)[1] == "try-error" ) {
       err_msg <- geterrmessage()
@@ -53,6 +55,8 @@ writeExcel <- function(df, outputDir, channel, filenames, chamber) {
     }
     
   } # END of hyperlinked version
+  
+  return(returnValue)
   
 }
 

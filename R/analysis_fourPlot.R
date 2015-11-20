@@ -3,7 +3,7 @@
 #' @param timeseries timeseries dataframe
 #' @param rowStart index of starting hour
 #' @param rowStop index of ending hour
-#' @param logScale logical indicating whether to use a logarhithmic scale for Y.
+#' @param title overall title
 #' @param filename path of the file to which the plot is saved (NULL will plot to screen)
 #' @description Given a "timeseries" dataframe with hours in the
 #' first column and colony sizes in all other columns, create a
@@ -11,7 +11,7 @@
 #' @return Vector of doubling times
 
 analysis_fourPlot <- function(timeseries, rowStart=1, rowStop=nrow(timeseries),
-                              filename=NULL, title='Title Goes Here') {
+                              title='Title Goes Here', filename=NULL) {
 
   # Get the doublingTime
   doublingTime <- analysis_doublingTime(timeseries, rowStart, rowStop)

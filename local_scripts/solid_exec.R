@@ -227,12 +227,18 @@ for (chamber in opt$chambers) {
   
   # phase channel
   # TODO:  Should we use opt$channelNames[1] here instead of "phase"?
-  writeExcel(timeseriesList$timeseries, chamberOutputDir, "phase", filenames, chamber)
+  csvFile <- writeExcel(timeseriesList$timeseries, chamberOutputDir, "phase", filenames, chamber)
   
   # All dye channels
   for (name in names(dyeOverlap)) {
     writeExcel(dyeOverlap[[name]], chamberOutputDir, name, filenames, chamber)
   }
+  
+  # Create debug plots ------------------------------------
+  
+  title <- paste0(chamber,opt$channelNames[1])
+  pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
+  analysis_fourPlot(timeseriesList$timeseries, title=title, filename=pngFile)
   
   # Create full-frame images ------------------------------
   

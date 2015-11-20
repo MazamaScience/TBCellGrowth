@@ -103,6 +103,8 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50,
       nameList <- c(nameList, paste0(tempNames, "_", ii))
     }
   } 
+  # NOTE:  Use set.seed() to guarantee reproducibility while doing "random" sampling
+  set.seed(123456)
   newNames <- nameList[sample(1:length(nameList),length(ids))]
   names(newNames) <- ids
   

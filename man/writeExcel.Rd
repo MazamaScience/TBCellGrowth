@@ -19,7 +19,7 @@ Typically timesteps.}
 \item{chamber}{name of the chamber whose images are loaded e.g. "xy2"}
 }
 \value{
-none
+Absolute path of the "no links" version of the .csv file.
 }
 \description{
 A specially formatted .csv file is generated from the contents

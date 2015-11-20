@@ -314,6 +314,12 @@ for (chamber in opt$chambers) {
     writeExcel(dyeOverlap[[name]], chamberOutputDir, name, filenames, chamber)
   }
   
+  # Create debug plots ------------------------------------
+  
+  title <- paste0(chamber,opt$channelNames[1])
+  pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
+  analysis_fourPlot(timeseriesList$timeseries, title=title, filename=pngFile)
+  
   # Create full-frame images ------------------------------
   
   if (getRunOptions('verbose')) cat("\tCreating full-frame images ...\n")
