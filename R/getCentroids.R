@@ -8,7 +8,8 @@
 getCentroids <- function(image) {
   
   # Number of blobs that were identified
-  blobCount <- max(image)
+  blobIndices <- unique(as.numeric(image))[-1]
+  blobCount <- length(blobIndices)
   
   # Initialize vectors 
   x <- numeric(blobCount)
@@ -33,7 +34,9 @@ getCentroids <- function(image) {
   indices <- indices[mask]
   
   # Loop through each blob index
-  for (blobIndex in 1:blobCount) {
+  for (i in 1:length(blobIndices)) {
+    
+    blobIndex <- blobIndices[i]
     
     # Find indices associated with this blob index
     ind <- indices[values==blobIndex]
@@ -44,17 +47,16 @@ getCentroids <- function(image) {
     yy <- (ind-1) %/% dimx + 1  # columns start with 1, not zero
 
     # Fill in the arrays
-    x[blobIndex] <- round(mean(xx))
-    y[blobIndex] <- round(mean(yy))
-    xmin[blobIndex] <- min(xx)
-    xmax[blobIndex] <- max(xx)
-    ymin[blobIndex] <- min(yy)
-    ymax[blobIndex] <- max(yy)
-    size[blobIndex] <- length(ind)
-    # NOTE:  Use set.seed() to guarantee reproducibility while doing "random" sampling
-    set.seed(123456)
-    id[blobIndex] <- paste0("id", paste0(sample(c(letters,LETTERS,0:9),12,replace=TRUE), collapse=""))
-    index[blobIndex] <- blobIndex
+    x[i] <- round(mean(xx))
+    y[i] <- round(mean(yy))
+    xmin[i] <- min(xx)
+    xmax[i] <- max(xx)
+    ymin[i] <- min(yy)
+    ymax[i] <- max(yy)
+    size[i] <- length(ind)
+    # i an "id" based on the center. Guaranteed to be unique as blobs cannot overlap
+    id[i] <- paste0('x=',x[i],',y=',y[i])
+    index[i] <- blobIndex
     
   } 
   
