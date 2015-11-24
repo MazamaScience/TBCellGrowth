@@ -20,7 +20,7 @@ cat('Working directory:\n')
 print(getwd())
 
 # Obtain and validate command line arguments
-opt <- flow_parseCommandLineArguments()
+opt <- solid_parseCommandLineArguments()
 
 # Create overall directory
 dir.create(opt$outputDir, showWarnings=FALSE)
@@ -51,17 +51,14 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) {
     cat(paste0('\nProcessing chamber "',chamber,'" on ',Sys.time(),' ------------------------------\n\n'))
+    options(width=160)
+    str(opt)
   }
   
+
   # ----- Load images ---------------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tLoading images ...\n')
-  
-  backgrounds <- loadImages(opt$backgroundDir, chamber, opt$channels,
-                            opt$channelNames, opt$extension,
-                            startFrame=opt$backgroundIndex, n=1)
-  
-  # TODO:  Handle missing background images
   
   imageList <- loadImages(opt$dataDir, chamber, opt$channels,
                           opt$channelNames, opt$extension,
@@ -97,11 +94,8 @@ for (chamber in opt$chambers) {
   }
   
   
-  # Merge backgrounds into imageList
+  # Check dimensions
   for (channel in names(imageList)) {
-    
-    imageList[[channel]] <- c(backgrounds[[channel]], imageList[[channel]])
-    names(imageList[[channel]])[1] <- '000'
     
     # Sanity check -- all dimensions should be the same
     dims <- lapply(imageList[[channel]], dim)
@@ -113,9 +107,6 @@ for (chamber in opt$chambers) {
     }
     
   }
-  
-  # Clear large objects from memory
-  rm(backgrounds)
   
   profilePoint('loadImages','seconds to load images')
   if (getRunOptions('verbose')) printMemoryUsage()
@@ -135,78 +126,37 @@ for (chamber in opt$chambers) {
     profilePoint('saveImages','seconds to save images')
   }
   
-  
-  # ----- Rotate images -------------------------------------------------------
-  
-  if (getRunOptions('verbose')) cat('\tRotating images ...\n')
-  
-  imageList <- flow_rotateImages(imageList)
-  
-  ###profilePoint('flow_rotatePhase','seconds to rotate images')
-  
-  if (getRunOptions('debug_images')) {
-    saveImageList(imageList,debugDir,chamber,'B_rotated')    
-    profilePoint('saveImages','seconds to save images')
-  }
-  
-  
+
+  ### TODO should these imagetypes be aligned?
   # ----- Align images --------------------------------------------------------
-  
-  if (getRunOptions('verbose')) cat('\tAligning images ...\n')
-  
-  imageList <- flow_alignImages(imageList,
-                                numTargets=opt$numTargets,
-                                targetWidth=opt$targetWidth, 
-                                searchSpace=opt$searchSpace)
-  
-  # Profiling handled inside flow_alignImages()
-  
-  if (getRunOptions('debug_images')) {
-    saveImageList(imageList,debugDir,chamber,'C_aligned')    
-    profilePoint('saveImages','seconds to save images')
-  }
-  
-  
-  # ----- Create artifact mask ------------------------------------------------
-  
-  if (getRunOptions('verbose')) cat('\tCreating artifact mask ...\n')
-  
-  artifactMask <- flow_createArtifactMask(imageList[['phase']][[1]], TRUE)
-  
-  profilePoint('flow_createArtifactMask','seconds to create artifact mask')
-  
-  
-  # ----- Ignore certain regions ----------------------------------------------
-  
-  if (getRunOptions('verbose')) cat('\tIgnoring regions ...\n')
-  
-  # Interpret ignore regions as pixels
-  ignoredRegions <- flow_findIgnore(opt$ignore[[chamber]], dim(imageList[['phase']][[1]]))
-  # Find dark line areas in the to ignore
-  darkLines <- flow_findDarkLines(imageList[['phase']][[1]])
-  # Combine these two into a final ignore list
-  ignoredRegions <- rbind(ignoredRegions, darkLines)
-  
-  ###profilePoint('ignoreRegions','seconds to create ignored regions')   
-  
+#   
+#   if (getRunOptions('verbose')) cat('\tAligning images ...\n')
+#   
+#   imageList <- flow_alignImages(imageList,
+#                                 numTargets=opt$numTargets,
+#                                 targetWidth=opt$targetWidth, 
+#                                 searchSpace=opt$searchSpace)
+#   
+#   # Profiling handled inside flow_alignImages()
+#   
+#   if (getRunOptions('debug_images')) {
+#     saveImageList(imageList,debugDir,chamber,'C_aligned')    
+#     profilePoint('saveImages','seconds to save images')
+#   }
+#   
   
   # ----- Label colonies --------------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tLabeling images ...\n')
   
-  # At this point we no longer need backgrounds
-  for (channel in names(imageList)) {
-    imageList[[channel]][[1]] <- NULL
-  }
-  
   labeledImageList <- list()
   labeledImageList[['phase']] <- list()
   for (i in 1:length(imageList[['phase']])) {    
     if (getRunOptions('verbose')) cat(paste0('\tLabeling ',i,' ...\n'))
-    labeledImageList[['phase']][[i]] <- flow_labelPhase(imageList[['phase']][[i]], artifactMask, ignoredRegions)
+    labeledImageList[['phase']][[i]] <- solid_labelPhase(imageList[['phase']][[i]], opt$minColonySize)
   }
   
-  profilePoint('flow_labelPhase','seconds to create labeled images')   
+  profilePoint('solid_labelPhase','seconds to create labeled images')   
   
   if (getRunOptions('debug_images')) {
     saveImageList(labeledImageList,chamberOutputDir,chamber,'D_labeled')    
@@ -218,10 +168,8 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tGenerating timeseries ...\n')
   
-  timeseriesList <- generateBlobTimeseries(labeledImageList[['phase']], 
+  timeseriesList <- generateBlobTimeseries(labeledImageList[[1]], 
                                            minTimespan=opt$minTimespan)
-  
-  profilePoint('generateBlobTimeseries','seconds to track blobs and build timeseries')   
   
   if (getRunOptions('verbose')) {
     cat(paste0('\nPhase timeseries generated ---------------------------------\n\n'))
@@ -235,65 +183,39 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tEqualizing and labeling non-phase images ...\n')
   
-  # NOTE:  The "phase" channel is always first
-  for (channel in opt$channelNames[-1]) {
-    
-    if (getRunOptions('verbose')) cat(paste0("\tEqualizing and labeling ",channel," ...\n"))
-    
+  for (channel in names(imageList)[-1]) { # TODO:  Improve this logic
+    if (getRunOptions('verbose')) cat(paste0("\tEqualizing ",channel," ...\n"))
     for (i in 1:length(imageList[[channel]])) {
-      # equalize
-      imageList[[channel]][[i]] <- flow_equalizeDye(imageList[[channel]][[i]], artifactMask)
-      profilePoint('equalizeDye','seconds to equalize dye image')
-      # label
-      labeledImageList[[channel]][[i]] <- flow_labelDye(imageList[[channel]][[i]],
-                                                        labeledImageList[['phase']][[i]],
-                                                        labelingThreshold=0.9)
-      profilePoint('label','seconds to label dye image')
+      imageList[[channel]][[i]] <- solid_equalizeDye(imageList[[channel]][[i]])
+      # Profiling handled inside flow_equalizeDye
+      if (getRunOptions('verbose')) cat(paste0("\tLabeling ",channel," ...\n"))
+      labeledImageList[[channel]][[i]] <- flow_labelDye(imageList[[channel]][[i]], labeledImageList[[1]][[i]])
+      # Profiling handled inside flow_equalizeDye
     }
-    
   }
+  
+  profilePoint('non_phase','seconds to equalize and label non-phase images')   
   
   if (getRunOptions('verbose')) cat('\tFinding overlaps for non-\'phase\' images ...\n')
   
-  # Clear large objects from memory
-  rm(artifactMask)
-  
-  # Find dye overlaps
+  # TODO:  Should this be inside the previous loop?
   dyeOverlap <- list()
-  # NOTE:  The "phase" channel is always first
-  for (channel in opt$channelNames[-1]) {    
+  for (channel in names(imageList)[-1]) { # TODO:  Improve this logic
     if (getRunOptions('verbose')) cat(paste0("\tFinding ",channel, " overlap ...\n"))
     dyeOverlap[[channel]] <- findDyeOverlap(labeledImageList[[channel]], timeseriesList)
-    profilePoint('overlap','seconds to find dye overlaps')   
+    profilePoint('overlap','seconds to findn dye overlaps')   
   }
   
-  profilePoint('overlap','seconds to find dye image overlaps') 
-  
-  if (getRunOptions('verbose')) {
-    cat(paste0('\nDye channels handled ---------------------------------------\n\n'))
-    printMemoryUsage()
-  }
-  
-  
-  # ----- Save .RData file for debugging --------------------------------------
-  
-  filename <- paste0(debugDir,'/timeseriesList.RData')
-  result <- try( save(timeseriesList,file=filename),
-                 silent=FALSE )
-  
-  if ( class(result)[1] == "try-error" ) {
-    err_msg <- geterrmessage()
-    cat(paste0('\tWARNING:  Unable to save timeseriesList.RData to debug directoroy.\n'))
-  }
+  profilePoint('non_phase','seconds to find dye image overlaps')   
   
   
   # ----- Create output -------------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tCreating output csv and images ...\n')
   
-  # Generate filenames from timestamps (assuming hours < 1000)
-  # NOTE:  Timestep names are assigned during loadImages().
-  hours <- opt$startTime + as.integer(names(imageList[['phase']])) * opt$timestep
+  # Generate filenames from timestamps
+  # Assuming hours < 1000
+  hours <- opt$startTime + ((0:(length(imageList[[1]])-1))*opt$timestep)
   filenames <- stringr::str_sub(paste0('000',hours),-3)
   
   # Apply timesteps to row names of timeseries
@@ -303,23 +225,29 @@ for (chamber in opt$chambers) {
     rownames(dyeOverlap[[channel]]) <- filenames
   }
   
-  # Create csv files --------------------------------------
+  # Create csv files ------------------
   
   if (getRunOptions('verbose')) cat("\tCreating csv files ...\n")
   
   # phase channel
   # TODO:  Should we use opt$channelNames[1] here instead of "phase"?
-  writeExcel(timeseriesList$timeseries, chamberOutputDir, "phase", filenames, chamber)
+  csvFile <- writeExcel(timeseriesList$timeseries, chamberOutputDir, "phase", filenames, chamber)
   
   # All dye channels
   for (name in names(dyeOverlap)) {
     writeExcel(dyeOverlap[[name]], chamberOutputDir, name, filenames, chamber)
   }
   
+  # Create debug plots ------------------------------------
+  
+  title <- paste0(chamber,opt$channelNames[1])
+  pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
+  analysis_fourPlot(timeseriesList$timeseries, title=title, filename=pngFile)
+  
   # Create full-frame images ------------------------------
   
   if (getRunOptions('verbose')) cat("\tCreating full-frame images ...\n")
-
+  
   result <- try( writeFullFrameImages(timeseriesList, 
                                       phase=imageList[[1]], 
                                       labeledImageList=labeledImageList,
@@ -335,7 +263,7 @@ for (chamber in opt$chambers) {
   }
   
   # Profiling handled inside writeFullFrameImages()
-
+  
   # Create individual images ------------------------------
   
   if ( !getRunOptions('noHyperlinks') ) {
@@ -383,5 +311,22 @@ for (chamber in opt$chambers) {
 ###############################################################################
 # END
 ###############################################################################
+
+if (FALSE) {
+  
+  outlined <- mapply(overlayOutlines, imageList[[1]], labeledImageList[[1]], col="yellow", SIMPLIFY=FALSE)
+  
+  for (i in 1:length(outlined)) {
+    im <- outlined[[i]]
+    if (i<10) i = paste0("0",i)
+    writeImage(im, paste0("im",i,".jpg"), quality=60)
+  }
+  
+  ### TEST DIFFERENT TIMESERIES ALGORITHMS
+  plot(0, 0, type="n", xlim=c(0,dim(timeseriesList$timeseries)[1]), ylim=c(0,max(timeseriesList$timeseries, na.rm=TRUE)))
+  apply(timeseriesList$timeseries, 2, lines, col=rgb(0,0,0,0.1))
+
+}
+
 
 

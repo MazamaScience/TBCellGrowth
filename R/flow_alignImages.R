@@ -48,6 +48,8 @@ flow_alignImages <- function(imageList, numTargets=12, targetWidth=50, searchSpa
   # ----- Picking alignment targets -------------------------------------------
   
   # Randomly pick features to track
+  # NOTE:  Use set.seed() to guarantee reproducibility while doing "random" sampling
+  set.seed(123456)
   targetIds <- sample(centroids$index, min(dim(centroids)[[1]], numTargets), replace=FALSE)
   
   # Create an empty list for the background samples

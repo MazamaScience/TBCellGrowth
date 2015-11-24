@@ -1,76 +1,87 @@
 #' @export
-#' @title Identify and Label Phase Microscopy Colonies
+#' @title Identify and Label Phase Microscopy Groups
 #' @param image an image matrix to search for cell colonies
 #' @param artifactMask a mask of non biological features to ignore. See \link{flow_createArtifactMask}.
 #' @param ignoredRegions a vector of row numbers to ignore. Blobs which have centroids
 #' in this range are removed.
-#' @param minBlobSize minimum size for a colony blob to be retained (pixels)
-#' @description Searches an image for dark cell colonies and uses EBImage::bwlabel
-#' to assign squential numeric labels to the pixels of each identified colony.
+#' @param minColonySize all identified groups of pixels, aka "blobs", below this size are discarded
+#' @description Searches an image for dark cell colonies and incrementally labels each colony.
+#' @note A lot of "photoshop magic" happens here and the algorithm has several internal constants
+#' that might need to be adjusted if the quality of images changes significantly. The algorithm 
+#' was tailored to the "phase1" channel of Microfluidics images.
 #' @return A \code{matrix} of integer labeled blobs.
 
-flow_labelPhase <- function(image, artifactMask, ignoredRegions, minBlobSize=100) {
+flow_labelPhase <- function(image, artifactMask, ignoredRegions, minColonySize=100) {
   
-  # TODO:  Set all hardcoded values here at the beginning of the function
-  # TODO:  so that we can easily modify or promote to an argument if needed.
-  
-  # Normalize to 0:1 by setting bright regions to 1
+  # Ensure that the greatest pixel value is 1. Some EBImage functions
+  # break if pixels greater than 1 are encountered
   image[image > 1] <- 1
   
-  # Save the normalized image for later use in equalizing
+  # The imageMask is a duplicate of the original image with the artifact mask
+  # applied to do. Areas inside the artifact mask are replaced with a reasonable
+  # quantile value intended to make them blend in with the background (or at least
+  # have very weak edges)
   imageMask <- image
+  imageMask[artifactMask > 0] <- quantile(image, seq(0,1,0.05), na.rm=T)[[12]]
   
-  # Set artifacts to medium gray 
-  imageMask[artifactMask > 0] <- quantile(image, 0.55)
-  ###imageMask[artifactMask > 0] <- quantile(image, seq(0,1,0.05), na.rm=T)[12]
-  
-  # Edge detect and fill in holes (closing performs dilate/erode)
+  # Find edges on the imageMask. This should mainly just have strong edges for
+  # blobs since the effect of the artifacts was muted.
   imageEdit <- filter_sobel(imageMask, FALSE, 2)
+  
+  # ClosingGreyScale first expands the radius of bright objects by 7 pixels
+  # and then reduces it by 7. This has the effect of joining blobs together
+  # and creating solid blobs where there may have been a weak signal.
   imageEdit <- EBImage::closingGreyScale(imageEdit, EBImage::makeBrush(7))
   
-  # Mask out everything below 50%
+  # Mask the image, saving edge values greater than 50% as "true" and
+  # values less than 50% as "false". Our assumption is that strong edges
+  # equal bacteria so we keep the top 50%th percentile.
   imageEdit <- imageEdit > 0.5
   
-  # imageEdit <- fillHull(imageEdit)
-  
+  # Now equalize the original image, which flattens the value histogram.
+  # This has the effect of turning bright areas extremely bright and dark areas
+  # extremely dark. We then remove the very very brightest areas from the mask.
+  # This is because solid images tend to be darkish blobs with a bright halo,
+  # and we can use that halo to "carve out" fairly accurate outlines of blobs.
   imageEdit[EBImage::equalize(imageMask) > 0.8] <- 0
   
+  # Expand the white blobs by 3 pixels. At this stage we're just trying to get
+  # a general region of what is blob and what is background. Finer edge detection
+  # comes later
   imageEdit <- EBImage::dilateGreyScale(imageEdit, EBImage::makeBrush(3))
   
+  # ???
   imageEdit[EBImage::dilateGreyScale(artifactMask, EBImage::makeBrush(3)) > 0] <- 0
   
-  # Remove blobs (colonies) smaller than minBlobSize
-  imageEdit <- removeBlobs(imageEdit, minBlobSize)
+  # Blobs under 100 pixels are very likely to be noise and there tends to be
+  # a lot of those. This is especially true since we expanded the radius.
+  # Removing those speeds up later steps of the algorithm.
+  imageEdit <- removeBlobs(imageEdit, minColonySize)
   
-  # Sequentially assign each blob a numeric identifier
+  # blabel assigns each distinct blob of white pixels a unique integer
+  # value, which we'll later use to identify and track the blobs.
   imageEdit <- EBImage::bwlabel(imageEdit)
   
-  # Calculate location information associated with each colony
-  # (x, y, xmin, xmax, ymin, ymax, size, id, index)
+  # Now we remove blobs whose centroids fall inside of the "ignore" region.
+  # We do this because it's too difficult to pick out good outlines in 
+  # certain regions of the image, namely the dark lines in between plate
+  # levels.
+  
+  # Find the centroids for all blobs
   centroids <- getCentroids(imageEdit)
-  
-  # TODO:  Place removeIgnored logic here in the main function and check why we have an error
-  # TODO:  for xy10 in this .sbatch script on the SLURM cluster:
-  
-#   --inputDir="/nearline/sherman-ngs/KM_Temp_Imaging/Microfluidics/BSL3/CellAsic, RvC & pLC372 Phage Delivery of GFP, 11-3-15" \
-#   --dataDir="Experimental Images" \
-#   --backgroundIndex=1 \
-#   --outputDir="/nearline/sherman-ngs/JC_Results/Nov03_phaseOnly" \
-#   --chambers="xy01,xy04,xy07,xy10" \
-#   --channels="c1" \
-#   --channelNames="phase1" \
-#   --startFrame=1 \
-#   --distanceScale=0.21 \
-#   --timestep=2 \
-#   --verbose
-  
+  # Find the indices of blobs who fall into the ignord regions
   toRemove <- removeIgnored(centroids, ignoredRegions)
-  
+  # Remove those blobs
   imageEdit[!(imageEdit %in% toRemove)] <- 0
   
+  # Do a final "carving" with a slightly less bright equalized image.
+  # This makes the edges much finer. It's safe to assume that bacteria 
+  # in the mucrofluidics images will not be brightly lit
   imageEdit[EBImage::equalize(imageMask) > 0.775] <- 0
   
-  # Again remove blobs smaller than a new threshold
+  # Now remove slightly bigger blobs as a precaution.
+  # NOTE:  Experience has shown that 175 pixels is a reasonable size at this stage.
+  minColonySize <- minColonySize * 1.75
   imageEdit <- removeBlobs(imageEdit, 175, label=FALSE)
   
   return(imageEdit)
