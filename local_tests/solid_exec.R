@@ -11,9 +11,13 @@
 library(methods)
 library(TBCellGrowth)
 
-print(getwd())
 # Utility functions (for parsing and validating arguments)
 source('utils_exec.R')
+
+# Print out session information
+print(sessionInfo())
+cat('Working directory:\n')
+print(getwd())
 
 # Obtain and validate command line arguments
 opt <- solid_parseCommandLineArguments()

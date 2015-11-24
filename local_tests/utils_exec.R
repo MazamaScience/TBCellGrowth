@@ -42,6 +42,22 @@ if (FALSE) {
   
   opt <- solid_parseCommandLineArguments(args)
  
+  # Debugging updateCentroidIDs
+  args <- c('--inputDir=/Volumes/sherman-ngs/KM_Temp_Imaging/Alginate INH treatment & Macs, 11-6-15',
+            '--dataDir=Images',
+            '--outputDir=~/Desktop/TBResults/TEST_A',
+            '--chambers=xy01',
+            '--channels=c1,c3',
+            '--channelNames=phase01,red',
+            '--startFrame=1',
+            '--nFrames=all',
+            '--timestep=3',
+            '--minColonySize=50',
+            '--minTimespan=15',
+            '--verbose')
+  
+  opt <- solid_parseCommandLineArguments(args)
+  
   
 }
 
