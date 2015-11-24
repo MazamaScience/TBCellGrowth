@@ -4,7 +4,7 @@
 
 # Example command line options for interactive debuggong
 if (FALSE) {
-
+  
   args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15',
             '--outputDir=~/TBResults/June29',
             '--chambers=xy01',
@@ -12,7 +12,7 @@ if (FALSE) {
             '--channelNames=phase,green',
             '--minTimespan=6',
             '--nFrames=8')
-
+  
   # Rapid growth
   args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, limiting PI, 9-1-15',
             '--dataDir=Experimental images',
@@ -41,7 +41,7 @@ if (FALSE) {
             '--verbose')
   
   opt <- solid_parseCommandLineArguments(args)
- 
+  
   # Debugging updateCentroidIDs
   args <- c('--inputDir=/Volumes/sherman-ngs/KM_Temp_Imaging/Alginate INH treatment & Macs, 11-6-15',
             '--dataDir=Experimental Images',

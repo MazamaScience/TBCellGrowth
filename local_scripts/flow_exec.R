@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript
+#!/usr/bin/env Rscript
 #
 # Executable script for processing flow images
 
@@ -311,7 +311,7 @@ for (chamber in opt$chambers) {
   
   # phase channel
   # TODO:  Should we use opt$channelNames[1] here instead of "phase"?
-  writeExcel(timeseriesList$timeseries, chamberOutputDir, "phase", filenames, chamber)
+  csvFile <- writeExcel(timeseriesList$timeseries, chamberOutputDir, "phase", filenames, chamber)
   
   # All dye channels
   for (name in names(dyeOverlap)) {
@@ -320,14 +320,14 @@ for (chamber in opt$chambers) {
   
   # Create debug plots ------------------------------------
   
-# TODO:  #  title <- paste0(chamber,opt$channelNames[1])
-# TODO:  #  pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
-# TODO:  #  analysis_fourPlot(timeseriesList$timeseries, title=title, filename=pngFile)
+  title <- paste0(chamber,opt$channelNames[1])
+  pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
+  analysis_fourPlot(timeseriesList$timeseries, title=title, filename=pngFile)
   
   # Create full-frame images ------------------------------
   
   if (getRunOptions('verbose')) cat("\tCreating full-frame images ...\n")
-
+  
   result <- try( writeFullFrameImages(timeseriesList, 
                                       phase=imageList[[1]], 
                                       labeledImageList=labeledImageList,
@@ -343,7 +343,7 @@ for (chamber in opt$chambers) {
   }
   
   # Profiling handled inside writeFullFrameImages()
-
+  
   # Create individual images ------------------------------
   
   if ( !getRunOptions('noHyperlinks') ) {

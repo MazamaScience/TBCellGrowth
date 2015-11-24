@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript
+#!/usr/bin/env Rscript
 #
 # Executable script for processing flow images
 
@@ -55,7 +55,7 @@ for (chamber in opt$chambers) {
     str(opt)
   }
   
-
+  
   # ----- Load images ---------------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tLoading images ...\n')
@@ -126,24 +126,24 @@ for (chamber in opt$chambers) {
     profilePoint('saveImages','seconds to save images')
   }
   
-
+  
   ### TODO should these imagetypes be aligned?
   # ----- Align images --------------------------------------------------------
-#   
-#   if (getRunOptions('verbose')) cat('\tAligning images ...\n')
-#   
-#   imageList <- flow_alignImages(imageList,
-#                                 numTargets=opt$numTargets,
-#                                 targetWidth=opt$targetWidth, 
-#                                 searchSpace=opt$searchSpace)
-#   
-#   # Profiling handled inside flow_alignImages()
-#   
-#   if (getRunOptions('debug_images')) {
-#     saveImageList(imageList,debugDir,chamber,'C_aligned')    
-#     profilePoint('saveImages','seconds to save images')
-#   }
-#   
+  #   
+  #   if (getRunOptions('verbose')) cat('\tAligning images ...\n')
+  #   
+  #   imageList <- flow_alignImages(imageList,
+  #                                 numTargets=opt$numTargets,
+  #                                 targetWidth=opt$targetWidth, 
+  #                                 searchSpace=opt$searchSpace)
+  #   
+  #   # Profiling handled inside flow_alignImages()
+  #   
+  #   if (getRunOptions('debug_images')) {
+  #     saveImageList(imageList,debugDir,chamber,'C_aligned')    
+  #     profilePoint('saveImages','seconds to save images')
+  #   }
+  #   
   
   # ----- Label colonies --------------------------------------------------------
   
@@ -231,8 +231,7 @@ for (chamber in opt$chambers) {
   
   # phase channel
   # TODO:  Should we use opt$channelNames[1] here instead of "phase"?
-# TODO:  #  csvFile <- writeExcel(timeseriesList$timeseries, chamberOutputDir, "phase", filenames, chamber)
-  writeExcel(timeseriesList$timeseries, chamberOutputDir, "phase", filenames, chamber)
+  csvFile <- writeExcel(timeseriesList$timeseries, chamberOutputDir, "phase", filenames, chamber)
   
   # All dye channels
   for (name in names(dyeOverlap)) {
@@ -241,9 +240,9 @@ for (chamber in opt$chambers) {
   
   # Create debug plots ------------------------------------
   
-# TODO: #  title <- paste0(chamber,opt$channelNames[1])
-# TODO: #  pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
-# TODO: #  analysis_fourPlot(timeseriesList$timeseries, title=title, filename=pngFile)
+  title <- paste0(chamber,opt$channelNames[1])
+  pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
+  analysis_fourPlot(timeseriesList$timeseries, title=title, filename=pngFile)
   
   # Create full-frame images ------------------------------
   
@@ -326,7 +325,7 @@ if (FALSE) {
   ### TEST DIFFERENT TIMESERIES ALGORITHMS
   plot(0, 0, type="n", xlim=c(0,dim(timeseriesList$timeseries)[1]), ylim=c(0,max(timeseriesList$timeseries, na.rm=TRUE)))
   apply(timeseriesList$timeseries, 2, lines, col=rgb(0,0,0,0.1))
-
+  
 }
 
 
