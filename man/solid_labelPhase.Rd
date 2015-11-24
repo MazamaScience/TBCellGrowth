@@ -4,10 +4,12 @@
 \alias{solid_labelPhase}
 \title{Identify and Label Phase Microscopy Groups}
 \usage{
-solid_labelPhase(image)
+solid_labelPhase(image, minColonySize = 50)
 }
 \arguments{
 \item{image}{an image matrix to search for cell colonies}
+
+\item{minColonySize}{all identified groups of pixels, aka "blobs", below this size are discarded}
 }
 \value{
 A \code{matrix} of integer labeled blobs.

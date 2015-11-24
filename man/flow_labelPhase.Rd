@@ -2,9 +2,9 @@
 % Please edit documentation in R/flow_labelPhase.R
 \name{flow_labelPhase}
 \alias{flow_labelPhase}
-\title{Identify and Label Phase Microscopy Colonies}
+\title{Identify and Label Phase Microscopy Groups}
 \usage{
-flow_labelPhase(image, artifactMask, ignoredRegions, minBlobSize = 100)
+flow_labelPhase(image, artifactMask, ignoredRegions, minColonySize = 100)
 }
 \arguments{
 \item{image}{an image matrix to search for cell colonies}
@@ -14,13 +14,12 @@ flow_labelPhase(image, artifactMask, ignoredRegions, minBlobSize = 100)
 \item{ignoredRegions}{a vector of row numbers to ignore. Blobs which have centroids
 in this range are removed.}
 
-\item{minBlobSize}{minimum size for a colony blob to be retained (pixels)}
+\item{minColonySize}{all identified groups of pixels, aka "blobs", below this size are discarded}
 }
 \value{
 A \code{matrix} of integer labeled blobs.
 }
 \description{
-Searches an image for dark cell colonies and uses EBImage::bwlabel
-to assign squential numeric labels to the pixels of each identified colony.
+Searches an image for dark cell colonies and incrementally labels each colony.
 }
 

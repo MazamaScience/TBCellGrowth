@@ -4,10 +4,11 @@
 #' @param artifactMask a mask of non biological features to ignore. See \link{flow_createArtifactMask}.
 #' @param ignoredRegions a vector of row numbers to ignore. Blobs which have centroids
 #' in this range are removed.
+#' @param minColonySize all identified groups of pixels, aka "blobs", below this size are discarded
 #' @description Searches an image for dark cell colonies and incrementally labels each colony.
 #' @return A \code{matrix} of integer labeled blobs.
 
-flow_labelPhase <- function(image, artifactMask, ignoredRegions) {
+flow_labelPhase <- function(image, artifactMask, ignoredRegions, minColonySize=100) {
   
   # Ensure that the greatest pixel value is 1. Some EBImage functions
   # break if pixels greater than 1 are encountered

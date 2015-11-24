@@ -42,6 +42,21 @@ if (FALSE) {
   
   opt <- solid_parseCommandLineArguments(args)
  
+  # Debugging updateCentroidIDs
+  args <- c('--inputDir=/Volumes/sherman-ngs/KM_Temp_Imaging/Alginate INH treatment & Macs, 11-6-15',
+            '--dataDir=Experimental Images',
+            '--outputDir=~/Desktop/TBResults/TEST_A',
+            '--chambers=xy01',
+            '--channels=c1,c3',
+            '--channelNames=phase01,red',
+            '--startFrame=1',
+            '--nFrames=6',
+            '--timestep=3',
+            '--minColonySize=50',
+            '--minTimespan=4',
+            '--verbose')
+  
+  opt <- solid_parseCommandLineArguments(args)
   
 }
 
@@ -68,18 +83,19 @@ flow_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) 
     # Chambers and channels
     optparse::make_option(c("--chambers"), default='xy01,xy02', type='character', help="Comma separate string of chamber ids [default \"%default\"]"),
     optparse::make_option(c("--channels"), default="c1", type='character', help="Comma separate string of channel ids [default \"%default\"]"),
-    optparse::make_option(c("--channelNames"), default="phase", type='character', help="Comma separate string of channel names [default \"%default\"]"),    
+    optparse::make_option(c("--channelNames"), default="phase", type='character', help="Comma separate string of channel names [default \"%default\"]"), 
+    # Labeling algorithm
+    optparse::make_option(c("--minColonySize"), default=100, type='integer', help="identified groups of pixels below this size are discarded [default \"%default\"]"),
     # Optimization
     optparse::make_option(c("--startFrame"), default=1, type='integer', help="Which image frame to start from [default %default]"),
     optparse::make_option(c("--nFrames"), default="all", help="Number of frames to read [default \"%default\"]"),
     optparse::make_option(c("--minTimespan"), default=5, type='integer', help="Minimum number of frames in which a colony must be recognized [default %default]"),    
-    # TODO:  What's the difference between backgroundIndex and startFrame    
     #     # Adjustable parameters
     #     optparse::make_option(c("--phaseMedian"), default=0.4, help="Median value after equalization [default %default]"),
     #     optparse::make_option(c("--numTargets"), default=10, help="Number of target features used for alignment [default %default]"),
-    #     optparse::make_option(c("--targetWidth"), default=3, help="Size of target feature used for alignment [default %default]"),
+    #     optparse::make_option(c("--targetWidth"), default=30, help="Size of target feature used for alignment [default %default]"),
     #     optparse::make_option(c("--searchSpace"), default=110, help="Size of search area for alignment [default %default]"),    
-    #     
+    # Debugging    
     optparse::make_option(c("--verbose"), action="store_true", default=FALSE, help="Print out verbose processing details [default %default]"), 
     optparse::make_option(c("--noHyperlinks"), action="store_true", default=FALSE, help="Skip the creation of colony images and hyperlinks [default %default]") 
     #     optparse::make_option(c("--profile"), action="store_true", default=FALSE, help="Print out additional timing information [default %default]"),  
@@ -177,17 +193,18 @@ solid_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE))
     optparse::make_option(c("--chambers"), default='xy01,xy02', type='character', help="Comma separate string of chamber ids [default \"%default\"]"),
     optparse::make_option(c("--channels"), default="c1", type='character', help="Comma separate string of channel ids [default \"%default\"]"),
     optparse::make_option(c("--channelNames"), default="phase", type='character', help="Comma separate string of channel names [default \"%default\"]"),    
+    # Labeling algorithm
+    optparse::make_option(c("--minColonySize"), default=50, type='integer', help="identified groups of pixels below this size are discarded [default \"%default\"]"),
     # Optimization
     optparse::make_option(c("--startFrame"), default=1, type='integer', help="Which image frame to start from [default %default]"),
     optparse::make_option(c("--nFrames"), default="all", help="Number of frames to read [default \"%default\"]"),
     optparse::make_option(c("--minTimespan"), default=5, type='integer', help="Minimum number of frames in which a colony must be recognized [default %default]"),    
-    # TODO:  What's the difference between backgroundIndex and startFrame    
     #     # Adjustable parameters
     #     optparse::make_option(c("--phaseMedian"), default=0.4, help="Median value after equalization [default %default]"),
     #     optparse::make_option(c("--numTargets"), default=10, help="Number of target features used for alignment [default %default]"),
-    #     optparse::make_option(c("--targetWidth"), default=3, help="Size of target feature used for alignment [default %default]"),
+    #     optparse::make_option(c("--targetWidth"), default=30, help="Size of target feature used for alignment [default %default]"),
     #     optparse::make_option(c("--searchSpace"), default=110, help="Size of search area for alignment [default %default]"),    
-    #     
+    # Debugging   
     optparse::make_option(c("--verbose"), action="store_true", default=FALSE, help="Print out verbose processing details [default %default]"), 
     optparse::make_option(c("--noHyperlinks"), action="store_true", default=FALSE, help="Skip the creation of colony images and hyperlinks [default %default]") 
     #     optparse::make_option(c("--profile"), action="store_true", default=FALSE, help="Print out additional timing information [default %default]"),  

@@ -1,10 +1,11 @@
 #' @export
 #' @title Identify and Label Phase Microscopy Groups
 #' @param image an image matrix to search for cell colonies
+#' @param minColonySize all identified groups of pixels, aka "blobs", below this size are discarded
 #' @description Searches an image for dark cell colonies and incrementally labels each colony.
 #' @return A \code{matrix} of integer labeled blobs.
 
-solid_labelPhase <- function(image) {
+solid_labelPhase <- function(image, minColonySize=50) {
   
   if (getRunOptions('verbose')) cat('\tLabeling ...\n')
   

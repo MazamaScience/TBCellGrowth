@@ -79,3 +79,20 @@ srun --mem-per-cpu=15626 -n2 -N1 --pty --preserve-env ./flow_exec.R \
 --noHyperlinks \
 --verbose &
 
+
+# Looking for problem creating full-frame images
+./solid_exec.R \
+--inputDir="/Volumes/sherman-ngs/KM_Temp_Imaging/Alginate INH treatment & Macs, 11-6-15" \
+--dataDir="Experimental Images" \
+--outputDir="/Users/jonathan/Projects/CIDR/Sherman/JC_Results/DELETEME" \
+--chambers="xy01" \
+--channels="c1" \
+--channelNames="phase1" \
+--startFrame=1 \
+--nFrames=3 \
+--minTimespan=2 \
+--timestep=3 \
+--distanceScale=0.21 \
+--verbose &
+  
+
