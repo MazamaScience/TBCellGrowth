@@ -52,6 +52,9 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) {
     cat(paste0('\nProcessing chamber "',chamber,'" on ',Sys.time(),' ------------------------------\n\n'))
     options(width=160)
+    cat('Working directory:\n')
+    print(getwd())
+    print(sessionInfo())
     str(opt)
   }
   
@@ -320,9 +323,16 @@ for (chamber in opt$chambers) {
   
   # Create debug plots ------------------------------------
   
-  title <- paste0(chamber,opt$channelNames[1])
-  pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
-  analysis_fourPlot(timeseriesList$timeseries, title=title, filename=pngFile)
+  result <- try( {
+    title <- paste0(chamber,opt$channelNames[1])
+    pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
+    analysis_fourPlot(timeseriesList$timeseries, title=title, filename=pngFile)
+  }, silent=FALSE )
+
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\tWARNING:  Error creating growth plot:\n\t',err_msg,'\n'))
+  }
   
   # Create full-frame images ------------------------------
   
