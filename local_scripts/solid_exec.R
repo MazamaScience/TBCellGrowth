@@ -15,7 +15,7 @@ library(TBCellGrowth)
 source('utils_exec.R')
 
 # Print out session information
-cat(paste0('\nWorking directory: ',getwd(),'\n')
+cat(paste0('\nWorking directory: ',getwd(),'\n'))
 print(sessionInfo())
 
 # Obtain and validate command line arguments
