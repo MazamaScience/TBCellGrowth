@@ -7,8 +7,6 @@
 
 solid_labelPhase <- function(image, minColonySize=50) {
   
-  if (getRunOptions('verbose')) cat('\tLabeling ...\n')
-  
   # Ensure that the greatest pixel value is 1. Some EBImage functions
   # break if pixels greater than 1 are encountered
   image[image > 1] <- 1

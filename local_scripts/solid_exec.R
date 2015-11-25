@@ -15,9 +15,8 @@ library(TBCellGrowth)
 source('utils_exec.R')
 
 # Print out session information
+cat(paste0('\nWorking directory: ',getwd(),'\n')
 print(sessionInfo())
-cat('Working directory:\n')
-print(getwd())
 
 # Obtain and validate command line arguments
 opt <- solid_parseCommandLineArguments()
@@ -52,9 +51,9 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) {
     cat(paste0('\nProcessing chamber "',chamber,'" on ',Sys.time(),' ------------------------------\n\n'))
     options(width=160)
-    cat('Working directory:\n')
-    print(getwd())
+    cat(paste0('\nWorking directory: ',getwd(),'\n')
     print(sessionInfo())
+    cat(paste0('\nRun options:\n')
     str(opt)
   }
   
