@@ -2,6 +2,8 @@
 
 export(analysis_doublingTime)
 export(analysis_fourPlot)
+export(analysis_twoPlot)
+export(analysis_winnowColonies)
 export(applyCropRect)
 export(buildDirectoryStructure)
 export(createGif)

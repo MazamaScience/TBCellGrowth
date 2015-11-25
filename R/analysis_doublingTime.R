@@ -16,8 +16,7 @@ analysis_doublingTime <- function(timeseries, rowStart=1, rowStop=nrow(timeserie
   
   # Calculate the doubling time for each colony
   # NOTE:  Based on http://www.pangloss.com/wiki/R_GrowthCurve
-  # NOTE:  apply(...) = Do a linear fit on each column and pull out the slope
-  ###  doublingTime <- log(2) / ( apply(m, 2, function(x) { lm(log(x) ~ hours)$coef[2] }) )
+  # NOTE:  Do a linear fit on each column and pull out the slope
   doublingTime <- vector('numeric',ncol(m))
   for ( j in 1:ncol(m) ) {
     result <- try( {
@@ -26,6 +25,9 @@ analysis_doublingTime <- function(timeseries, rowStart=1, rowStop=nrow(timeserie
     
     if ( class(result)[1] == "try-error" ) doublingTime[j] <- NA
   }
+  
+  # Add colony names from timeseries, omitting the first column which has hours
+  names(doublingTime) <- names(timeseries)[-1]
   
   return(doublingTime)
   

@@ -1,5 +1,5 @@
 #' @export
-#' @title Four Plots of Growth Curves and Doubling Times
+#' @title Two Plots of Growth Curves
 #' @param timeseries timeseries dataframe
 #' @param rowStart index of starting hour
 #' @param rowStop index of ending hour
@@ -7,11 +7,11 @@
 #' @param filename path of the file to which the plot is saved (NULL will plot to screen)
 #' @param pngSize image width/height in pixels
 #' @description Given a "timeseries" dataframe with hours in the
-#' first column and colony sizes in all other columns, create a
-#' plot of all columns.
-#' @return Vector of doubling times
+#' first column and colony sizes in all other columns, create growth curve plots for
+#' all columns.
+#' @return none
 
-analysis_fourPlot <- function(timeseries, rowStart=1, rowStop=nrow(timeseries),
+analysis_twoPlot <- function(timeseries, rowStart=1, rowStop=nrow(timeseries),
                               title='Title Goes Here', filename=NULL, pngSize=800) {
   
   
@@ -29,7 +29,7 @@ analysis_fourPlot <- function(timeseries, rowStart=1, rowStop=nrow(timeseries),
   gnat <- adjustcolor('black', 5/nrow(timeseries))
   gnat70 <- adjustcolor('black',0.7)
   
-  layout(matrix(c(1,1,2:5),nrow=3,byrow=TRUE),heights=c(0.3,1,1))
+  layout(matrix(c(1,1,2:3),nrow=2,byrow=TRUE),heights=c(0.15,1))
   
   # ----- Header --------------------------------------------------------------
   
@@ -86,35 +86,6 @@ analysis_fourPlot <- function(timeseries, rowStart=1, rowStop=nrow(timeseries),
   
   # Cleanup
   par(mar=c(5,4,4,2)+.1, mgp=c(3,1,0))
-  
-  
-  # ----- Boxplot -------------------------------------------------------------
-  
-  b <- boxplot(doublingTime,
-               ylab="Doubling Time (hours)",
-               main='Doubling Times')
-  
-  xpos <- 1
-  ypos <- b$out
-  text(xpos, ypos, names(b$out), pos=4, col=gnat70)
-  
-  
-  # ----- Histogram -----------------------------------------------------------
-  
-  DT_noOutliers <- doublingTime[!names(doublingTime) %in% names(b$out)]
-
-  hist(DT_noOutliers, n=length(DT_noOutliers),
-       col='gray30', border='gray30',
-       xlab='hours',
-       main="Histogram of Doubling Times (outliers removed)")
-
-  # Add a bar for the outliers (rect uses left,bottom,right,top)
-  usr <- par('usr')
-  outlierCount <- length(b$out)
-  if (length(outlierCount) > 0) {
-    rect(usr[2],0,usr[2]+0.5,outlierCount,col='salmon3',border='transparent', xpd=NA)
-    text(usr[2],outlierCount, paste0(outlierCount,' outliers'), col='salmon4', pos=2)
-  }
   
   
   # Cleanup

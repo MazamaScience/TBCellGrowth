@@ -15,7 +15,7 @@ library(TBCellGrowth)
 source('utils_exec.R')
 
 # Print out session information
-cat(paste0('\nWorking directory: ',getwd(),'\n')
+cat(paste0('\nWorking directory: ',getwd(),'\n'))
 print(sessionInfo())
 
 # Obtain and validate command line arguments
@@ -51,9 +51,9 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) {
     cat(paste0('\nProcessing chamber "',chamber,'" on ',Sys.time(),' ------------------------------\n\n'))
     options(width=160)
-    cat(paste0('\nWorking directory: ',getwd(),'\n')
+    cat(paste0('\nWorking directory: ',getwd(),'\n'))
     print(sessionInfo())
-    cat(paste0('\nRun options:\n')
+    cat(paste0('\nRun options:\n'))
     str(opt)
   }
   
@@ -217,7 +217,6 @@ for (chamber in opt$chambers) {
     profilePoint('saveImages','seconds to save images')
   }
   
-  
   # ----- Generate timeseries ---------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tGenerating timeseries ...\n')
@@ -323,9 +322,23 @@ for (chamber in opt$chambers) {
   # Create debug plots ------------------------------------
   
   result <- try( {
-    title <- paste0(chamber,opt$channelNames[1])
+    df <- timeseriesList$timeseries
+    # Perform winnowing
+    dfList <- analysis_winnowColonies(timeseries)
+    # Create new filenames
+    removedFile <- stringr::str_replace(csvFile,'\\.csv','_removed\\.csv')
+    retainedFile <- stringr::str_replace(csvFile,'\\.csv','_retained\\.csv')
     pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
-    analysis_fourPlot(timeseriesList$timeseries, title=title, filename=pngFile)
+    # Create csv files
+    write.csv(dfList$removed,removedFile)
+    write.csv(dfList$retained,retainedFile)
+    # create plots
+    title <- paste0(chamber,opt$channelNames[1],' REMOVED')
+    analysis_twoPlot(dfList$removed, title=title, filename=pngFile)
+    title <- paste0(chamber,opt$channelNames[1],' RETAINED')
+    analysis_twoPlot(dfList$retained, title=title, filename=pngFile)
+    title <- paste0(chamber,opt$channelNames[1],' RETAINED')
+    analysis_fourPlot(dfList$retained, title=title, filename=pngFile)
   }, silent=FALSE )
 
   if ( class(result)[1] == "try-error" ) {
