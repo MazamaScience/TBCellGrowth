@@ -322,9 +322,8 @@ for (chamber in opt$chambers) {
   # Create debug plots ------------------------------------
   
   result <- try( {
-    df <- timeseriesList$timeseries
     # Perform winnowing
-    dfList <- analysis_winnowColonies(timeseries)
+    dfList <- analysis_winnowColonies(timeseriesList$timeseries)
     # Create new filenames
     removedFile <- stringr::str_replace(csvFile,'\\.csv','_removed\\.csv')
     retainedFile <- stringr::str_replace(csvFile,'\\.csv','_retained\\.csv')
