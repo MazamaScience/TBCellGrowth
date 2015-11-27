@@ -44,7 +44,7 @@ analysis_winnowColonies <- function(timeseries, maxDoublingTime=NULL,
   negativeDTMask <- (doublingTime < 0)
 
   # Find colonies with doubling times above a threshold
-  maxDTMask <- rep(TRUE,ncol(timeseries))[-1] # remove timestep column to match other masks
+  overMaxDTMask <- rep(FALSE,ncol(timeseries))[-1] # remove timestep column to match other masks
   if (!is.null(maxDoublingTime)) {
     overMaxDTMask <- (doublingTime > maxDoublingTime)
   }

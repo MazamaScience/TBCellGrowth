@@ -22,4 +22,9 @@ A \code{matrix} of integer labeled blobs.
 \description{
 Searches an image for dark cell colonies and incrementally labels each colony.
 }
+\note{
+A lot of "photoshop magic" happens here and the algorithm has several internal constants
+that might need to be adjusted if the quality of images changes significantly. The algorithm
+was tailored to the "phase1" channel of Microfluidics images.
+}
 

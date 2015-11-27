@@ -245,25 +245,40 @@ for (chamber in opt$chambers) {
   result <- try( {
     # Perform winnowing
     dfList <- analysis_winnowColonies(timeseriesList$timeseries)
-    # Create new filenames
+    # Create new files
     removedFile <- stringr::str_replace(csvFile,'\\.csv','_removed\\.csv')
     retainedFile <- stringr::str_replace(csvFile,'\\.csv','_retained\\.csv')
-    pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
     # Create csv files
     write.csv(dfList$removed,removedFile)
     write.csv(dfList$retained,retainedFile)
     # create plots
-    title <- paste0(chamber,opt$channelNames[1],' REMOVED')
-    analysis_twoPlot(dfList$removed, title=title, filename=pngFile)
-    title <- paste0(chamber,opt$channelNames[1],' RETAINED')
-    analysis_twoPlot(dfList$retained, title=title, filename=pngFile)
-    title <- paste0(chamber,opt$channelNames[1],' RETAINED')
-    analysis_fourPlot(dfList$retained, title=title, filename=pngFile)
+    if ( nrow(dfList$removed ) > 0) {
+      write.csv(dfList$removed, removedFile)
+      title <- paste0(chamber,opt$channelNames[1],' REMOVED')
+      pngFile <- stringr::str_replace(csvFile,'\\.csv','_removed_2plot\\.png')
+      analysis_twoPlot(dfList$removed, title=title, filename=pngFile)
+      title <- paste0(chamber,opt$channelNames[1],' REMOVED')
+      pngFile <- stringr::str_replace(csvFile,'\\.csv','_removed_4plot\\.png')
+      analysis_fourPlot(dfList$removed, title=title, filename=pngFile)
+    } else {
+      cat(paste0('\tNOTE:  No colonies removed during generation of debug plots.'))
+    }
+    if ( nrow(dfList$tained ) > 0) {
+      write.csv(dfList$retained, retainedFile)
+      title <- paste0(chamber,opt$channelNames[1],' RETAINED')
+      pngFile <- stringr::str_replace(csvFile,'\\.csv','_retained_2plot\\.png')
+      analysis_twoPlot(dfList$retained, title=title, filename=pngFile)
+      title <- paste0(chamber,opt$channelNames[1],' RETAINED')
+      pngFile <- stringr::str_replace(csvFile,'\\.csv','_retained_4plot\\.png')
+      analysis_fourPlot(dfList$retained, title=title, filename=pngFile)
+    } else {
+      cat(paste0('\tNOTE:  No colonies retained during generation of debug plots.'))
+    }
   }, silent=FALSE )
   
   if ( class(result)[1] == "try-error" ) {
     err_msg <- geterrmessage()
-    cat(paste0('\tWARNING:  Error performing "phase" winnowing or plotting:\n\t',err_msg,'\n'))
+    cat(paste0('\tWARNING:  Error creating debug plots:\n\t',err_msg,'\n'))
   }
   
   # Create full-frame images ------------------------------

@@ -94,6 +94,8 @@ analysis_fourPlot <- function(timeseries, rowStart=1, rowStop=nrow(timeseries),
                ylab="Doubling Time (hours)",
                main='Doubling Times')
   
+  rug(doublingTime, side=2, ticksize=0.1)
+  
   xpos <- 1
   ypos <- b$out
   text(xpos, ypos, names(b$out), pos=4, col=gnat70)
@@ -106,14 +108,16 @@ analysis_fourPlot <- function(timeseries, rowStart=1, rowStop=nrow(timeseries),
   hist(DT_noOutliers, n=length(DT_noOutliers),
        col='gray30', border='gray30',
        xlab='hours',
-       main="Histogram of Doubling Times (outliers removed)")
+       main="Histogram of Doubling Times")
 
   # Add a bar for the outliers (rect uses left,bottom,right,top)
   usr <- par('usr')
   outlierCount <- length(b$out)
   if (length(outlierCount) > 0) {
-    rect(usr[2],0,usr[2]+0.5,outlierCount,col='salmon3',border='transparent', xpd=NA)
-    text(usr[2],outlierCount, paste0(outlierCount,' outliers'), col='salmon4', pos=2)
+    rect(usr[2],0,usr[1] + (usr[2]-usr[1])*1.01,outlierCount,col='salmon3',border='transparent', xpd=NA)
+    xpos <- usr[2]
+    ypos <- ifelse(outlierCount > usr[4], usr[4], outlierCount)
+    text(usr[2], ypos, paste0(outlierCount,' outliers'), col='salmon4', pos=2, xpd=NA)
   }
   
   

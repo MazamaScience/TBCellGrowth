@@ -6,6 +6,9 @@
 #' in this range are removed.
 #' @param minColonySize all identified groups of pixels, aka "blobs", below this size are discarded
 #' @description Searches an image for dark cell colonies and incrementally labels each colony.
+#' @note A lot of "photoshop magic" happens here and the algorithm has several internal constants
+#' that might need to be adjusted if the quality of images changes significantly. The algorithm 
+#' was tailored to the "phase1" channel of Microfluidics images.
 #' @return A \code{matrix} of integer labeled blobs.
 
 flow_labelPhase <- function(image, artifactMask, ignoredRegions, minColonySize=100) {
@@ -53,7 +56,7 @@ flow_labelPhase <- function(image, artifactMask, ignoredRegions, minColonySize=1
   # Blobs under 100 pixels are very likely to be noise and there tends to be
   # a lot of those. This is especially true since we expanded the radius.
   # Removing those speeds up later steps of the algorithm.
-  imageEdit <- removeBlobs(imageEdit, 100)
+  imageEdit <- removeBlobs(imageEdit, minColonySize)
   
   # blabel assigns each distinct blob of white pixels a unique integer
   # value, which we'll later use to identify and track the blobs.
@@ -76,9 +79,10 @@ flow_labelPhase <- function(image, artifactMask, ignoredRegions, minColonySize=1
   # in the mucrofluidics images will not be brightly lit
   imageEdit[EBImage::equalize(imageMask) > 0.775] <- 0
   
-  # Now remove blobs under 175 pixels, which experience has shown
-  # to 
-  imageEdit <- removeBlobs(imageEdit, 175, label=FALSE)
+  # Now remove slightly bigger blobs as a precaution.
+  # NOTE:  Experience has shown that 175 pixels is a reasonable size at this stage.
+  expandedColonySize <- minColonySize * 1.75
+  imageEdit <- removeBlobs(imageEdit, expandedColonySize, label=FALSE)
   
   return(imageEdit)
   
