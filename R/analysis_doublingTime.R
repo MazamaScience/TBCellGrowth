@@ -10,8 +10,8 @@
 
 analysis_doublingTime <- function(timeseries, rowStart=1, rowStop=nrow(timeseries)) {
   
-  # Extract hours vector and colony size matrix from timeseries
-  hours <- timeseries[rowStart:rowStop,1]
+  # Extract hours vector and colony size matrix from timeseries (converting from "003", etc.)
+  hours <- as.numeric(timeseries[rowStart:rowStop,1])
   m <- as.matrix(timeseries[rowStart:rowStop,-1])
   
   # Calculate the doubling time for each colony

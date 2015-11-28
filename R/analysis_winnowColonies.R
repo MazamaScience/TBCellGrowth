@@ -34,6 +34,9 @@
 analysis_winnowColonies <- function(timeseries, maxDoublingTime=NULL,
                                     removeOutliers=TRUE, minStartHour=NULL) {
   
+  # Make sure the first column is numeric rather than "003", etc.
+  timeseries[,1] <- as.numeric(timeseries[,1])
+  
   # Get the doublingTime
   doublingTime <- analysis_doublingTime(timeseries)
 

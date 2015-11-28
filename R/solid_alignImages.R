@@ -35,6 +35,8 @@ solid_alignImages <- function(images, numTargets=12, targetWidth=50, searchSpace
   edges <- EBImage::bwlabel(edges)
   
   # Pick seven random features to track
+  # NOTE:  Use set.seed() to guarantee reproducibility while doing "random" sampling
+  set.seed(123456)
   alignmentTargets <- sample(1:max(edges), numTargets, replace=TRUE)
   
   # Find centroids of alignment targets
