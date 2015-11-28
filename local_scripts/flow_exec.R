@@ -342,7 +342,7 @@ for (chamber in opt$chambers) {
     } else {
       cat(paste0('\tNOTE:  No colonies removed during generation of debug plots.'))
     }
-    if ( nrow(dfList$tained ) > 0) {
+    if ( nrow(dfList$retained ) > 0) {
       write.csv(dfList$retained, retainedFile)
       title <- paste0(chamber,opt$channelNames[1],' RETAINED')
       pngFile <- stringr::str_replace(csvFile,'\\.csv','_retained_2plot\\.png')
