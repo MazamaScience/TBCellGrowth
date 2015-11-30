@@ -286,7 +286,7 @@ for (chamber in opt$chambers) {
   
   if ( class(result)[1] == "try-error" ) {
     err_msg <- geterrmessage()
-    cat(paste0('\tWARNING:  Unable to save timeseriesList.RData to debug directoroy.\n'))
+    cat(paste0('\tWARNING:  Unable to save timeseriesList.RData to debug directory.\n'))
   }
   
   
@@ -306,6 +306,15 @@ for (chamber in opt$chambers) {
     rownames(dyeOverlap[[channel]]) <- filenames
   }
   
+  # NOTE:  At this point, the timeseriesList$timeseries dataframe has timesteps 
+  # NOTE:  as rownames but does not have a column that can be interpreted as hours.
+  # NOTE:  When the data are written out as a .csv file, these timestep rownames
+  # NOTE:  will be saved as the first column.
+  # NOTE:
+  # NOTE:  So the analysis_~ functions cannot be used on the timeseriesList$timeseries
+  # NOTE:  dataframe directly. The data must instead be read in from the .csv files
+  # NOTE:  because the analysis_~ functions get the timestep from the first column.
+  
   # Create csv files --------------------------------------
   
   if (getRunOptions('verbose')) cat("\tCreating csv files ...\n")
@@ -322,6 +331,8 @@ for (chamber in opt$chambers) {
   # Create debug plots ------------------------------------
   
   result <- try( {
+    # Read in "phase" data that has timestep as the first column
+    df <- read.csv(csvFile)
     # Perform winnowing
     dfList <- analysis_winnowColonies(timeseriesList$timeseries)
     # Create new files

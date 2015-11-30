@@ -211,6 +211,18 @@ for (chamber in opt$chambers) {
   profilePoint('non_phase','seconds to find dye image overlaps')   
   
   
+  # ----- Save .RData file for debugging --------------------------------------
+  
+  filename <- paste0(debugDir,'/timeseriesList.RData')
+  result <- try( save(timeseriesList,file=filename),
+                 silent=FALSE )
+  
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\tWARNING:  Unable to save timeseriesList.RData to debug directory.\n'))
+  }
+  
+  
   # ----- Create output -------------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tCreating output csv and images ...\n')
@@ -226,6 +238,15 @@ for (chamber in opt$chambers) {
   for (channel in names(dyeOverlap)) {
     rownames(dyeOverlap[[channel]]) <- filenames
   }
+  
+  # NOTE:  At this point, the timeseriesList$timeseries dataframe has timesteps 
+  # NOTE:  as rownames but does not have a column that can be interpreted as hours.
+  # NOTE:  When the data are written out as a .csv file, these timestep rownames
+  # NOTE:  will be saved as the first column.
+  # NOTE:
+  # NOTE:  So the analysis_~ functions cannot be used on the timeseriesList$timeseries
+  # NOTE:  dataframe directly. The data must instead be read in from the .csv files
+  # NOTE:  because the analysis_~ functions get the timestep from the first column.
   
   # Create csv files ------------------
   
@@ -243,8 +264,10 @@ for (chamber in opt$chambers) {
   # Create winnowing analysis and plots ---
   
   result <- try( {
+    # Read in "phase" data that has timestep as the first column
+    df <- read.csv(csvFile)
     # Perform winnowing
-    dfList <- analysis_winnowColonies(timeseriesList$timeseries)
+    dfList <- analysis_winnowColonies(df)
     # Create new files
     removedFile <- stringr::str_replace(csvFile,'\\.csv','_removed\\.csv')
     retainedFile <- stringr::str_replace(csvFile,'\\.csv','_retained\\.csv')
