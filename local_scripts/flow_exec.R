@@ -334,7 +334,7 @@ for (chamber in opt$chambers) {
     # Read in "phase" data that has timestep as the first column
     df <- read.csv(csvFile)
     # Perform winnowing
-    dfList <- analysis_winnowColonies(timeseriesList$timeseries)
+    dfList <- analysis_winnowColonies(df)
     # Create new files
     removedFile <- stringr::str_replace(csvFile,'\\.csv','_removed\\.csv')
     retainedFile <- stringr::str_replace(csvFile,'\\.csv','_retained\\.csv')
