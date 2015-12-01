@@ -10,7 +10,7 @@ analysis_winnowColonies(timeseries, maxDoublingTime = NULL,
 \arguments{
 \item{timeseries}{timeseries dataframe}
 
-\item{maxDoublingTime}{colonies with doubling times longer than this are removed}
+\item{maxDoublingTime}{colonies with doubling times larger than this are removed}
 
 \item{removeOutliers}{flag indicating whether to remove colonies with doubling time outliers}
 

@@ -1,8 +1,8 @@
 #' @export
 #' @title Remove Likely Artifacts
 #' @param timeseries timeseries dataframe
+#' @param maxDoublingTime colonies with doubling times larger than this are removed
 #' @param removeOutliers flag indicating whether to remove colonies with doubling time outliers
-#' @param maxDoublingTime colonies with doubling times longer than this are removed
 #' @param minStartHour colonies not identified by this hour are removed
 #' @description After image analysis, the TBCellGrowth package produces.csv files
 #' which can be read in as a "timeseries" dataframe
