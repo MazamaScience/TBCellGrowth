@@ -24,9 +24,9 @@ analysis_fourPlot <- function(timeseries, rowStart=1, rowStop=nrow(timeseries),
   
   # Create external file
   if (!is.null(filename)) png(filename, width=pngSize, height=pngSize)
-  
+
   # semi-opaque colors
-  gnat <- adjustcolor('black', 5/nrow(timeseries))
+  gnat <- adjustcolor('black', 0.3 + 10/ncol(timeseries))
   gnat70 <- adjustcolor('black',0.7)
   
   layout(matrix(c(1,1,2:5),nrow=3,byrow=TRUE),heights=c(0.3,1,1))
@@ -50,8 +50,10 @@ analysis_fourPlot <- function(timeseries, rowStart=1, rowStop=nrow(timeseries),
        main='Growth')
   
   # All other colonies
-  for ( i in 2:ncol(m) ) {
-    lines(m[,i] ~ hours, col=gnat)
+  if (ncol(m) > 1) {
+    for ( i in 2:ncol(m) ) {
+      lines(m[,i] ~ hours, col=gnat)
+    }
   }
   
   # Colony names
@@ -75,8 +77,10 @@ analysis_fourPlot <- function(timeseries, rowStart=1, rowStop=nrow(timeseries),
        main="Log of Growth")
   
   # All other colonies
-  for ( i in 2:ncol(log2m) ) {
-    lines(log2m[,i] ~ hours, col=gnat)
+  if (ncol(log2m) > 1) {
+    for ( i in 2:ncol(log2m) ) {
+      lines(log2m[,i] ~ hours, col=gnat)
+    }
   }
   
   # Colony names

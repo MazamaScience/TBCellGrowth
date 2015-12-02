@@ -285,6 +285,14 @@ analysis_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRU
 # Validate run options --------------------------------------------------------
 
 analysis_validateRunOptions <- function(opt) {
+  
+  opt$outputDir <- ifelse(opt$outputDir == '', getwd(), opt$outputDir)
+  
+  if (!file.exists(opt$inputDir)) stop(paste0("inputDir: directory does not exist: '",opt$inputDir,"'"))
+  csvFile <- paste0(opt$inputDir,'/',opt$inputCsv)
+  if (!file.exists(csvFile)) stop(paste0("inputCsv: file does not exist: '",csvFile,"'"))
+  if (!file.exists(opt$outputDir)) stop(paste0("outputDir: directory does not exist: '",opt$outputDir,"'"))
+  
   return(opt)
 }
 
