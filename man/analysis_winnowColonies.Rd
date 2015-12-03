@@ -4,11 +4,18 @@
 \alias{analysis_winnowColonies}
 \title{Remove Likely Artifacts}
 \usage{
-analysis_winnowColonies(timeseries, maxDoublingTime = NULL,
+analysis_winnowColonies(timeseries, minExpFitHour = 0,
+  maxExpFitHour = 1e+09, minDoublingTime = NULL, maxDoublingTime = NULL,
   removeOutliers = TRUE, minStartHour = NULL)
 }
 \arguments{
 \item{timeseries}{timeseries dataframe}
+
+\item{minExpFitHour}{hour of first datapoint to include in doubling time exponential fit}
+
+\item{maxExpFitHour}{hour of last datapoint to include in doubling time exponential fit}
+
+\item{minDoublingTime}{colonies with doubling times smaller than this are removed}
 
 \item{maxDoublingTime}{colonies with doubling times larger than this are removed}
 

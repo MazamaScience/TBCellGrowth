@@ -4,14 +4,14 @@
 \alias{analysis_doublingTime}
 \title{Calculate Doubling Times}
 \usage{
-analysis_doublingTime(timeseries, rowStart = 1, rowStop = nrow(timeseries))
+analysis_doublingTime(timeseries, minExpFitHour = 0, maxExpFitHour = 1e+09)
 }
 \arguments{
 \item{timeseries}{timeseries dataframe}
 
-\item{rowStart}{index of starting hour}
+\item{minExpFitHour}{hour of first datapoint to include in doubling time exponential fit}
 
-\item{rowStop}{index of ending hour}
+\item{maxExpFitHour}{hour of last datapoint to include in doubling time exponential fit}
 }
 \value{
 Vector of doubling times

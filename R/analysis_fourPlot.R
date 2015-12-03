@@ -1,8 +1,8 @@
 #' @export
 #' @title Four Plots of Growth Curves and Doubling Times
 #' @param timeseries timeseries dataframe
-#' @param rowStart index of starting hour
-#' @param rowStop index of ending hour
+#' @param minExpFitHour hour of first datapoint to include in doubling time exponential fit
+#' @param maxExpFitHour hour of last datapoint to include in doubling time exponential fit
 #' @param title overall title
 #' @param filename path of the file to which the plot is saved (NULL will plot to screen)
 #' @param pngSize image width/height in pixels
@@ -11,16 +11,16 @@
 #' plot of all columns.
 #' @return Vector of doubling times
 
-analysis_fourPlot <- function(timeseries, rowStart=1, rowStop=nrow(timeseries),
+analysis_fourPlot <- function(timeseries, minExpFitHour=0, maxExpFitHour=1e9,
                               title='Title Goes Here', filename=NULL, pngSize=800) {
   
   
   # Get the doublingTime
-  doublingTime <- analysis_doublingTime(timeseries, rowStart, rowStop)
+  doublingTime <- analysis_doublingTime(timeseries, minExpFitHour, maxExpFitHour)
   
   # Extract hours vector and colony size matrix from timeseries
-  hours <- timeseries[rowStart:rowStop,1]
-  m <- as.matrix(timeseries[rowStart:rowStop,-1])
+  hours <- timeseries[,1]
+  m <- as.matrix(timeseries[,-1])
   
   # Create external file
   if (!is.null(filename)) png(filename, width=pngSize, height=pngSize)

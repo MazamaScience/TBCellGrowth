@@ -34,6 +34,11 @@ if (FALSE) {
   
   opt <- solid_parseCommandLineArguments(args)
   
+  # Analysis example
+  args <- c('--inputDir=/Volumes/sherman-ngs/JC_Results/TEST_solid.0.1.17.11/xy01',
+            '--phaseCsv=phase_xy01.csv')
+  
+  opt <- analysis_parseCommandLineArguments(args)
 }
 
 ###############################################################################
@@ -264,8 +269,11 @@ analysis_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRU
   option_list <- list(    
     # File paths, all required
     optparse::make_option(c("--inputDir"), default='', type='character', help="Absolute path of the input directory [default \"%default\"]"),
-    optparse::make_option(c("--inputCsv"), default='', type='character', help="Name of the CSV file to process [default \"%default\"]"),
-    optparse::make_option(c("--outputDir"), default='', type='character', help="Absolute path of the output directory [default \"%default\"]"),
+    optparse::make_option(c("--phaseCsv"), default='', type='character', help="Name of the 'phase' CSV file to process [default \"%default\"]"),
+    optparse::make_option(c("--outputDir"), default=getwd(), type='character', help="Absolute path of the output directory [default \"%default\"]"),
+    optparse::make_option(c("--minExpFitHour"), default=0, type='character', help="Hour of first datapoint to include in doubling time exponential fit [default \"%default\"]"),
+    optparse::make_option(c("--maxExpFitHour"), default=1e9, type='character', help="Hour of last datapoint to include in doubling time exponential fit [default \"%default\"]"),
+    optparse::make_option(c("--minDoublingTime"), default=0, type='double', help="Colonies with doubling times smaller than this are removed [default \"%default\"]"),
     optparse::make_option(c("--maxDoublingTime"), default=1e9, type='double', help="Colonies with doubling times larger than this are removed [default \"%default\"]"),
     optparse::make_option(c("--removeOutliers"), default=TRUE, type='logical', help="Flag indicating whether to remove colonies with doubling time outliers [default \"%default\"]"),
     optparse::make_option(c("--minStartTime"), default=60, type='double', help="Colonies not identified by this hour are removed  [default \"%default\"]")
@@ -289,8 +297,8 @@ analysis_validateRunOptions <- function(opt) {
   opt$outputDir <- ifelse(opt$outputDir == '', getwd(), opt$outputDir)
   
   if (!file.exists(opt$inputDir)) stop(paste0("inputDir: directory does not exist: '",opt$inputDir,"'"))
-  csvFile <- paste0(opt$inputDir,'/',opt$inputCsv)
-  if (!file.exists(csvFile)) stop(paste0("inputCsv: file does not exist: '",csvFile,"'"))
+  csvFile <- paste0(opt$inputDir,'/',opt$phaseCsv)
+  if (!file.exists(csvFile)) stop(paste0("phaseCsv: file does not exist: '",csvFile,"'"))
   if (!file.exists(opt$outputDir)) stop(paste0("outputDir: directory does not exist: '",opt$outputDir,"'"))
   
   return(opt)

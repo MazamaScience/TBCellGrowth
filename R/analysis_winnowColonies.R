@@ -1,6 +1,9 @@
 #' @export
 #' @title Remove Likely Artifacts
 #' @param timeseries timeseries dataframe
+#' @param minExpFitHour hour of first datapoint to include in doubling time exponential fit
+#' @param maxExpFitHour hour of last datapoint to include in doubling time exponential fit
+#' @param minDoublingTime colonies with doubling times smaller than this are removed
 #' @param maxDoublingTime colonies with doubling times larger than this are removed
 #' @param removeOutliers flag indicating whether to remove colonies with doubling time outliers
 #' @param minStartHour colonies not identified by this hour are removed
@@ -31,14 +34,15 @@
 #' 
 #' @return List of two timeseries dataframes: "retained" and "removed".
 
-analysis_winnowColonies <- function(timeseries, maxDoublingTime=NULL,
+analysis_winnowColonies <- function(timeseries, minExpFitHour=0, maxExpFitHour=1e9,
+                                    minDoublingTime=NULL, maxDoublingTime=NULL,
                                     removeOutliers=TRUE, minStartHour=NULL) {
   
   # Make sure the first column is numeric rather than "003", etc.
   timeseries[,1] <- as.numeric(timeseries[,1])
   
   # Get the doublingTime
-  doublingTime <- analysis_doublingTime(timeseries)
+  doublingTime <- analysis_doublingTime(timeseries, minExpFitHour, maxExpFitHour)
 
   # Remove any NA doubling times
   missingDTMask <- is.na(doublingTime)
