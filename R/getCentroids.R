@@ -51,9 +51,15 @@ getCentroids <- function(image) {
     ymin[blobIndex] <- min(yy)
     ymax[blobIndex] <- max(yy)
     size[blobIndex] <- length(ind)
-    ###id[blobIndex] <- paste0("id", paste0(sample(c(letters,LETTERS,0:9),12,replace=TRUE), collapse=""))
-    # Create an "id" based on the center. Guaranteed to be unique as blobs cannot overlap
-    id[blobIndex] <- paste0('x=',x[blobIndex],',y=',y[blobIndex])
+    id[blobIndex] <- paste0("id", paste0(sample(c(letters,LETTERS,0:9),12,replace=TRUE), collapse=""))
+    # NOTE:  Generating an id by center position, which seems reasonable, generates the following error message:
+    # NOTE:  
+    # NOTE:  Error in fix.by(by.y, y) : 'by' must specify uniquely valid columns
+    # NOTE:  Calls: generateBlobTimeseries -> merge -> merge.data.frame -> fix.by
+    # NOTE:  In addition: There were 50 or more warnings (use warnings() to see the first 50)
+    # NOTE:  Execution halted
+    #### Create an "id" based on the center. Guaranteed to be unique as blobs cannot overlap
+    ###id[blobIndex] <- paste0('x=',x[blobIndex],',y=',y[blobIndex])
     index[blobIndex] <- blobIndex
     
   } 
