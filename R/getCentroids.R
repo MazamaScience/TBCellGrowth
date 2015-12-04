@@ -51,7 +51,9 @@ getCentroids <- function(image) {
     ymin[blobIndex] <- min(yy)
     ymax[blobIndex] <- max(yy)
     size[blobIndex] <- length(ind)
-    id[blobIndex] <- paste0("id", paste0(sample(c(letters,LETTERS,0:9),12,replace=TRUE), collapse=""))
+    ###id[blobIndex] <- paste0("id", paste0(sample(c(letters,LETTERS,0:9),12,replace=TRUE), collapse=""))
+    # Create an "id" based on the center. Guaranteed to be unique as blobs cannot overlap
+    id[blobIndex] <- paste0('x=',x[blobIndex],',y=',y[blobIndex])
     index[blobIndex] <- blobIndex
     
   } 
