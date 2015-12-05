@@ -10,8 +10,6 @@
 
 solid_labelPhase <- function(image, minColonySize=50) {
   
-  if (getRunOptions('verbose')) cat('\tLabeling ...\n')
-  
   # Ensure that the greatest pixel value is 1. Some EBImage functions
   # break if pixels greater than 1 are encountered
   image[image > 1] <- 1
@@ -63,8 +61,8 @@ solid_labelPhase <- function(image, minColonySize=50) {
   imageEdit <- EBImage::bwlabel(imageEdit)
   
   # Now remove slightly bigger blobs as a precaution.
-  minColonySize <- minColonySize * 1.2
-  imageEdit <- removeBlobs(imageEdit, minColonySize, label=FALSE)
+  expandedColonySize <- minColonySize * 1.2
+  imageEdit <- removeBlobs(imageEdit, expandedColonySize, label=FALSE)
   
   # For checking results during development
   if (FALSE) {

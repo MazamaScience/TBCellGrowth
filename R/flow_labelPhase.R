@@ -81,8 +81,8 @@ flow_labelPhase <- function(image, artifactMask, ignoredRegions, minColonySize=1
   
   # Now remove slightly bigger blobs as a precaution.
   # NOTE:  Experience has shown that 175 pixels is a reasonable size at this stage.
-  minColonySize <- minColonySize * 1.75
-  imageEdit <- removeBlobs(imageEdit, 175, label=FALSE)
+  expandedColonySize <- minColonySize * 1.75
+  imageEdit <- removeBlobs(imageEdit, expandedColonySize, label=FALSE)
   
   return(imageEdit)
   

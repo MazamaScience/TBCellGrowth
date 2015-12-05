@@ -4,15 +4,7 @@
 
 # Example command line options for interactive debuggong
 if (FALSE) {
-
-  args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, RPL22, & pEXCF-0023, 6-29-15',
-            '--outputDir=~/TBResults/June29',
-            '--chambers=xy01',
-            '--channels=c1',
-            '--channelNames=phase,green',
-            '--minTimespan=6',
-            '--nFrames=8')
-
+  
   # Rapid growth
   args <- c('--inputDir=/Volumes/MazamaData1/Data/TBData/CellAsic, RvC, limiting PI, 9-1-15',
             '--dataDir=Experimental images',
@@ -41,29 +33,25 @@ if (FALSE) {
             '--verbose')
   
   opt <- solid_parseCommandLineArguments(args)
- 
-  # Debugging updateCentroidIDs
-  args <- c('--inputDir=/Volumes/sherman-ngs/KM_Temp_Imaging/Alginate INH treatment & Macs, 11-6-15',
-            '--dataDir=Experimental Images',
-            '--outputDir=~/Desktop/TBResults/TEST_A',
-            '--chambers=xy01',
-            '--channels=c1,c3',
-            '--channelNames=phase01,red',
-            '--startFrame=1',
-            '--nFrames=6',
-            '--timestep=3',
-            '--minColonySize=50',
-            '--minTimespan=4',
-            '--verbose')
   
-  opt <- solid_parseCommandLineArguments(args)
+  # Analysis example
+  args <- c('--inputDir=/Volumes/sherman-ngs/JC_Results/TEST_flow.0.1.17.13/xy01/',
+            '--phaseCsv=phase_xy01.csv',
+            '--minExpFitHour=6',
+            '--maxExpFitHour=30',
+            '--minDoublingTime=0.1',
+            '--maxDoublingTime=60',
+            '--minStartTime=36')
   
+  opt <- analysis_parseCommandLineArguments(args)
 }
 
+###############################################################################
+# For flow_exec.R
+###############################################################################
 
 # Parse command line arguments ------------------------------------------------
 
-# @title Parse Command Line Arguments
 # @args vector of command line arguments
 
 flow_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) {
@@ -113,7 +101,7 @@ flow_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) 
   
 }
 
-###############################################################################
+# Validate run options --------------------------------------------------------
 
 flow_validateRunOptions <- function(opt) {
   
@@ -168,13 +156,12 @@ flow_validateRunOptions <- function(opt) {
 }
 
 
-
-
-
+###############################################################################
+# For solid_exec.R
+###############################################################################
 
 # Parse command line arguments ------------------------------------------------
 
-# @title Parse Command Line Arguments
 # @args vector of command line arguments
 
 solid_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) {
@@ -222,7 +209,7 @@ solid_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE))
   
 }
 
-###############################################################################
+# Validate run options --------------------------------------------------------
 
 solid_validateRunOptions <- function(opt) {
   
@@ -272,3 +259,53 @@ solid_validateRunOptions <- function(opt) {
   return(opt)
   
 }
+
+
+###############################################################################
+# For analysis_exec.R
+###############################################################################
+
+# Parse command line arguments ------------------------------------------------
+
+# @args vector of command line arguments
+
+analysis_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) {
+  
+  option_list <- list(    
+    # File paths, all required
+    optparse::make_option(c("--inputDir"), default='', type='character', help="Absolute path of the input directory [default \"%default\"]"),
+    optparse::make_option(c("--phaseCsv"), default='', type='character', help="Name of the 'phase' CSV file to process [default \"%default\"]"),
+    optparse::make_option(c("--outputDir"), default=getwd(), type='character', help="Absolute path of the output directory [default \"%default\"]"),
+    optparse::make_option(c("--minExpFitHour"), default=0, type='double', help="Hour of first datapoint to include in doubling time exponential fit [default \"%default\"]"),
+    optparse::make_option(c("--maxExpFitHour"), default=1e9, type='double', help="Hour of last datapoint to include in doubling time exponential fit [default \"%default\"]"),
+    optparse::make_option(c("--minDoublingTime"), default=0, type='double', help="Colonies with doubling times smaller than this many hours are removed [default \"%default\"]"),
+    optparse::make_option(c("--maxDoublingTime"), default=1e9, type='double', help="Colonies with doubling times larger than this many hours are removed [default \"%default\"]"),
+    optparse::make_option(c("--removeOutliers"), default=TRUE, type='logical', help="Flag indicating whether to remove colonies with doubling time outliers [default \"%default\"]"),
+    optparse::make_option(c("--maxStartHour"), default=60, type='double', help="Colonies not identified by this hour are removed  [default \"%default\"]")
+  )
+  
+  # Parse arguments
+  opt <- optparse::parse_args(optparse::OptionParser(option_list=option_list), args)
+  # Validate options
+  opt <- analysis_validateRunOptions(opt)
+  # Set internal package state
+  setRunOptions(opt)
+  
+  return(opt)
+  
+}
+
+# Validate run options --------------------------------------------------------
+
+analysis_validateRunOptions <- function(opt) {
+  
+  opt$outputDir <- ifelse(opt$outputDir == '', getwd(), opt$outputDir)
+  
+  if (!file.exists(opt$inputDir)) stop(paste0("inputDir: directory does not exist: '",opt$inputDir,"'"))
+  csvFile <- paste0(opt$inputDir,'/',opt$phaseCsv)
+  if (!file.exists(csvFile)) stop(paste0("phaseCsv: file does not exist: '",csvFile,"'"))
+  if (!file.exists(opt$outputDir)) stop(paste0("outputDir: directory does not exist: '",opt$outputDir,"'"))
+  
+  return(opt)
+}
+

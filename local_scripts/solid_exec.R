@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript
+#!/usr/bin/env Rscript
 #
 # Executable script for processing flow images
 
@@ -15,9 +15,8 @@ library(TBCellGrowth)
 source('utils_exec.R')
 
 # Print out session information
+cat(paste0('\nWorking directory: ',getwd(),'\n'))
 print(sessionInfo())
-cat('Working directory:\n')
-print(getwd())
 
 # Obtain and validate command line arguments
 opt <- solid_parseCommandLineArguments()
@@ -52,10 +51,13 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) {
     cat(paste0('\nProcessing chamber "',chamber,'" on ',Sys.time(),' ------------------------------\n\n'))
     options(width=160)
+    cat(paste0('\nWorking directory: ',getwd(),'\n'))
+    print(sessionInfo())
+    cat(paste0('\nRun options:\n'))
     str(opt)
   }
   
-
+  
   # ----- Load images ---------------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tLoading images ...\n')
@@ -126,24 +128,24 @@ for (chamber in opt$chambers) {
     profilePoint('saveImages','seconds to save images')
   }
   
-
+  
   ### TODO should these imagetypes be aligned?
   # ----- Align images --------------------------------------------------------
-#   
-#   if (getRunOptions('verbose')) cat('\tAligning images ...\n')
-#   
-#   imageList <- flow_alignImages(imageList,
-#                                 numTargets=opt$numTargets,
-#                                 targetWidth=opt$targetWidth, 
-#                                 searchSpace=opt$searchSpace)
-#   
-#   # Profiling handled inside flow_alignImages()
-#   
-#   if (getRunOptions('debug_images')) {
-#     saveImageList(imageList,debugDir,chamber,'C_aligned')    
-#     profilePoint('saveImages','seconds to save images')
-#   }
-#   
+  #   
+  #   if (getRunOptions('verbose')) cat('\tAligning images ...\n')
+  #   
+  #   imageList <- flow_alignImages(imageList,
+  #                                 numTargets=opt$numTargets,
+  #                                 targetWidth=opt$targetWidth, 
+  #                                 searchSpace=opt$searchSpace)
+  #   
+  #   # Profiling handled inside flow_alignImages()
+  #   
+  #   if (getRunOptions('debug_images')) {
+  #     saveImageList(imageList,debugDir,chamber,'C_aligned')    
+  #     profilePoint('saveImages','seconds to save images')
+  #   }
+  #   
   
   # ----- Label colonies --------------------------------------------------------
   
@@ -209,6 +211,18 @@ for (chamber in opt$chambers) {
   profilePoint('non_phase','seconds to find dye image overlaps')   
   
   
+  # ----- Save .RData file for debugging --------------------------------------
+  
+  filename <- paste0(debugDir,'/timeseriesList.RData')
+  result <- try( save(timeseriesList,file=filename),
+                 silent=FALSE )
+  
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\tWARNING:  Unable to save timeseriesList.RData to debug directory.\n'))
+  }
+  
+  
   # ----- Create output -------------------------------------------------------
   
   if (getRunOptions('verbose')) cat('\tCreating output csv and images ...\n')
@@ -225,6 +239,15 @@ for (chamber in opt$chambers) {
     rownames(dyeOverlap[[channel]]) <- filenames
   }
   
+  # NOTE:  At this point, the timeseriesList$timeseries dataframe has timesteps 
+  # NOTE:  as rownames but does not have a column that can be interpreted as hours.
+  # NOTE:  When the data are written out as a .csv file, these timestep rownames
+  # NOTE:  will be saved as the first column.
+  # NOTE:
+  # NOTE:  So the analysis_~ functions cannot be used on the timeseriesList$timeseries
+  # NOTE:  dataframe directly. The data must instead be read in from the .csv files
+  # NOTE:  because the analysis_~ functions get the timestep from the first column.
+  
   # Create csv files ------------------
   
   if (getRunOptions('verbose')) cat("\tCreating csv files ...\n")
@@ -238,11 +261,50 @@ for (chamber in opt$chambers) {
     writeExcel(dyeOverlap[[name]], chamberOutputDir, name, filenames, chamber)
   }
   
-  # Create debug plots ------------------------------------
+  # TODO:  Analysis should be done separately and this chunk should be removed
   
-  title <- paste0(chamber,opt$channelNames[1])
-  pngFile <- stringr::str_replace(csvFile,'\\.csv','\\.png')
-  analysis_fourPlot(timeseriesList$timeseries, title=title, filename=pngFile)
+#   # Create winnowing analysis and plots ---
+#   
+#   result <- try( {
+#     # Read in "phase" data that has timestep as the first column
+#     df <- read.csv(csvFile)
+#     # Perform winnowing
+#     dfList <- analysis_winnowColonies(df)
+#     # Create new files
+#     removedFile <- stringr::str_replace(csvFile,'\\.csv','_removed\\.csv')
+#     retainedFile <- stringr::str_replace(csvFile,'\\.csv','_retained\\.csv')
+#     # Create csv files
+#     write.csv(dfList$removed,removedFile)
+#     write.csv(dfList$retained,retainedFile)
+#     # create plots
+#     if ( nrow(dfList$removed ) > 0) {
+#       write.csv(dfList$removed, removedFile)
+#       title <- paste0(chamber,opt$channelNames[1],' REMOVED')
+#       pngFile <- stringr::str_replace(csvFile,'\\.csv','_removed_2plot\\.png')
+#       analysis_twoPlot(dfList$removed, title=title, filename=pngFile)
+#       title <- paste0(chamber,opt$channelNames[1],' REMOVED')
+#       pngFile <- stringr::str_replace(csvFile,'\\.csv','_removed_4plot\\.png')
+#       analysis_fourPlot(dfList$removed, title=title, filename=pngFile)
+#     } else {
+#       cat(paste0('\tNOTE:  No colonies removed during generation of debug plots.'))
+#     }
+#     if ( nrow(dfList$retained ) > 0) {
+#       write.csv(dfList$retained, retainedFile)
+#       title <- paste0(chamber,opt$channelNames[1],' RETAINED')
+#       pngFile <- stringr::str_replace(csvFile,'\\.csv','_retained_2plot\\.png')
+#       analysis_twoPlot(dfList$retained, title=title, filename=pngFile)
+#       title <- paste0(chamber,opt$channelNames[1],' RETAINED')
+#       pngFile <- stringr::str_replace(csvFile,'\\.csv','_retained_4plot\\.png')
+#       analysis_fourPlot(dfList$retained, title=title, filename=pngFile)
+#     } else {
+#       cat(paste0('\tNOTE:  No colonies retained during generation of debug plots.'))
+#     }
+#   }, silent=FALSE )
+#   
+#   if ( class(result)[1] == "try-error" ) {
+#     err_msg <- geterrmessage()
+#     cat(paste0('\tWARNING:  Error creating debug plots:\n\t',err_msg,'\n'))
+#   }
   
   # Create full-frame images ------------------------------
   
@@ -325,7 +387,7 @@ if (FALSE) {
   ### TEST DIFFERENT TIMESERIES ALGORITHMS
   plot(0, 0, type="n", xlim=c(0,dim(timeseriesList$timeseries)[1]), ylim=c(0,max(timeseriesList$timeseries, na.rm=TRUE)))
   apply(timeseriesList$timeseries, 2, lines, col=rgb(0,0,0,0.1))
-
+  
 }
 
 

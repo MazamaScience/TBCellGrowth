@@ -95,4 +95,12 @@ srun --mem-per-cpu=15626 -n2 -N1 --pty --preserve-env ./flow_exec.R \
 --distanceScale=0.21 \
 --verbose &
   
-
+# Post processing
+./analysis_exec.r \
+--inputDir="/Volumes/sherman-ngs/JC_Results/TEST_solid.0.1.17.13/xy01/" \
+--phaseCsv="phase_xy01.csv" \
+--minExpFitHour=24 \
+--maxExpFitHour=60 \
+--minDoublingTime=0.1 \
+--maxDoublingTime=60 \
+--maxStartHour=60
