@@ -31,7 +31,7 @@ count <- ncol(df) - 1 # don't count the 'timestep' column
 cat(paste0('Winnowing ',count,' colonies ...\n'))
 dfList <- analysis_winnowColonies(df, opt$minExpFitHour, opt$maxExpFitHour,
                                   opt$minDoublingTime, opt$maxDoublingTime,
-                                  opt$removeOutliers, opt$minStartTime)
+                                  opt$removeOutliers, opt$maxStartHour)
 
 # Create output file name
 outputPhaseCsv <- paste0(opt$outputDir,'/',opt$phaseCsv)

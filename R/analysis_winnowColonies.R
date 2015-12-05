@@ -3,10 +3,10 @@
 #' @param timeseries timeseries dataframe
 #' @param minExpFitHour hour of first datapoint to include in doubling time exponential fit
 #' @param maxExpFitHour hour of last datapoint to include in doubling time exponential fit
-#' @param minDoublingTime colonies with doubling times smaller than this are removed
-#' @param maxDoublingTime colonies with doubling times larger than this are removed
+#' @param minDoublingTime colonies with doubling times smaller than this many hours are removed
+#' @param maxDoublingTime colonies with doubling times larger than this many hours are removed
 #' @param removeOutliers flag indicating whether to remove colonies with doubling time outliers
-#' @param minStartHour colonies not identified by this hour are removed
+#' @param maxStartHour colonies not identified by this hour are removed
 #' @description After image analysis, the TBCellGrowth package produces.csv files
 #' which can be read in as a "timeseries" dataframe
 #' with hours in the first column and colony sizes in all other columns.
@@ -36,7 +36,7 @@
 
 analysis_winnowColonies <- function(timeseries, minExpFitHour=0, maxExpFitHour=1e9,
                                     minDoublingTime=NULL, maxDoublingTime=NULL,
-                                    removeOutliers=TRUE, minStartHour=NULL) {
+                                    removeOutliers=TRUE, maxStartHour=NULL) {
   
   # Make sure the first column is numeric rather than "003", etc.
   timeseries[,1] <- as.numeric(timeseries[,1])
@@ -66,10 +66,10 @@ analysis_winnowColonies <- function(timeseries, minExpFitHour=0, maxExpFitHour=1
     outlierDTMask <- (names(doublingTime) %in% names(b$out))
   }
   
-  # Find colonies that existed before minStartHour
+  # Find colonies that existed before maxStartHour
   earlyMask <- rep(TRUE,ncol(timeseries))[-1] # remove timestep column to match other masks
-  if (!is.null(minStartHour)) {
-    timeMask <- timeseries[,1] <= minStartHour
+  if ( !is.null(maxStartHour) ) {
+    timeMask <- timeseries[,1] <= maxStartHour
     earlyTimeseries <- timeseries[timeMask,]
     anyMask <- apply(earlyTimeseries, 2, function(x) {any(!is.na(x))})
     earlyNames <- names(timeseries[anyMask])

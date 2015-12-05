@@ -10,9 +10,15 @@
 
 analysis_doublingTime <- function(timeseries, minExpFitHour=0, maxExpFitHour=1e9) {
   
-  # Extract hours vector and colony size matrix from timeseries (converting from "003", etc.)
+  # Guarantee that additional arguments are numeric. (Defaults to alphabetic comparison and much confusion otherwise.)
+  minExpFitHour <- as.numeric(minExpFitHour)
+  maxExpFitHour <- as.numeric(maxExpFitHour)
+  
+  # Extract hours vector (converting from "003", etc.)
   hours <- as.numeric(timeseries[,1])
   hourMask <- (hours >= minExpFitHour) & (hours <= maxExpFitHour)
+  
+  # Sanity check
   if ( sum(hourMask) < 2 ) stop(paste0('Fewer than 2 timesteps between hour=',minExpFitHour,' and hour=',maxExpFitHour,'.'))
   
   # Reduced hours vector and timeseries matrix that also omits the 'hours' column

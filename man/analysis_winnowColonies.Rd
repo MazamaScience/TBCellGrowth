@@ -6,7 +6,7 @@
 \usage{
 analysis_winnowColonies(timeseries, minExpFitHour = 0,
   maxExpFitHour = 1e+09, minDoublingTime = NULL, maxDoublingTime = NULL,
-  removeOutliers = TRUE, minStartHour = NULL)
+  removeOutliers = TRUE, maxStartHour = NULL)
 }
 \arguments{
 \item{timeseries}{timeseries dataframe}
@@ -15,13 +15,13 @@ analysis_winnowColonies(timeseries, minExpFitHour = 0,
 
 \item{maxExpFitHour}{hour of last datapoint to include in doubling time exponential fit}
 
-\item{minDoublingTime}{colonies with doubling times smaller than this are removed}
+\item{minDoublingTime}{colonies with doubling times smaller than this many hours are removed}
 
-\item{maxDoublingTime}{colonies with doubling times larger than this are removed}
+\item{maxDoublingTime}{colonies with doubling times larger than this many hours are removed}
 
 \item{removeOutliers}{flag indicating whether to remove colonies with doubling time outliers}
 
-\item{minStartHour}{colonies not identified by this hour are removed}
+\item{maxStartHour}{colonies not identified by this hour are removed}
 }
 \value{
 List of two timeseries dataframes: "retained" and "removed".

@@ -35,8 +35,13 @@ if (FALSE) {
   opt <- solid_parseCommandLineArguments(args)
   
   # Analysis example
-  args <- c('--inputDir=/Volumes/sherman-ngs/JC_Results/TEST_solid.0.1.17.11/xy01',
-            '--phaseCsv=phase_xy01.csv')
+  args <- c('--inputDir=/Volumes/sherman-ngs/JC_Results/TEST_flow.0.1.17.13/xy01/',
+            '--phaseCsv=phase_xy01.csv',
+            '--minExpFitHour=6',
+            '--maxExpFitHour=30',
+            '--minDoublingTime=0.1',
+            '--maxDoublingTime=60',
+            '--minStartTime=36')
   
   opt <- analysis_parseCommandLineArguments(args)
 }
@@ -271,12 +276,12 @@ analysis_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRU
     optparse::make_option(c("--inputDir"), default='', type='character', help="Absolute path of the input directory [default \"%default\"]"),
     optparse::make_option(c("--phaseCsv"), default='', type='character', help="Name of the 'phase' CSV file to process [default \"%default\"]"),
     optparse::make_option(c("--outputDir"), default=getwd(), type='character', help="Absolute path of the output directory [default \"%default\"]"),
-    optparse::make_option(c("--minExpFitHour"), default=0, type='character', help="Hour of first datapoint to include in doubling time exponential fit [default \"%default\"]"),
-    optparse::make_option(c("--maxExpFitHour"), default=1e9, type='character', help="Hour of last datapoint to include in doubling time exponential fit [default \"%default\"]"),
-    optparse::make_option(c("--minDoublingTime"), default=0, type='double', help="Colonies with doubling times smaller than this are removed [default \"%default\"]"),
-    optparse::make_option(c("--maxDoublingTime"), default=1e9, type='double', help="Colonies with doubling times larger than this are removed [default \"%default\"]"),
+    optparse::make_option(c("--minExpFitHour"), default=0, type='double', help="Hour of first datapoint to include in doubling time exponential fit [default \"%default\"]"),
+    optparse::make_option(c("--maxExpFitHour"), default=1e9, type='double', help="Hour of last datapoint to include in doubling time exponential fit [default \"%default\"]"),
+    optparse::make_option(c("--minDoublingTime"), default=0, type='double', help="Colonies with doubling times smaller than this many hours are removed [default \"%default\"]"),
+    optparse::make_option(c("--maxDoublingTime"), default=1e9, type='double', help="Colonies with doubling times larger than this many hours are removed [default \"%default\"]"),
     optparse::make_option(c("--removeOutliers"), default=TRUE, type='logical', help="Flag indicating whether to remove colonies with doubling time outliers [default \"%default\"]"),
-    optparse::make_option(c("--minStartTime"), default=60, type='double', help="Colonies not identified by this hour are removed  [default \"%default\"]")
+    optparse::make_option(c("--maxStartHour"), default=60, type='double', help="Colonies not identified by this hour are removed  [default \"%default\"]")
   )
   
   # Parse arguments
