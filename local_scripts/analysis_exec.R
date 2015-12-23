@@ -53,7 +53,7 @@ if ( removedCount > 0 ) {
   log_2 <- dfList$removed
   log_2[,-1] <- log2(dfList$removed[,-1])
   file <- stringr::str_replace(outputPhaseCsv,'\\.csv','_removed_log2\\.csv')
-  write.csv(log2, file)
+  write.csv(log_2, file)
   
   # Create "phase" 2plot
   title <- paste0(removedCount,' Colonies Removed')
@@ -88,7 +88,7 @@ if ( ncol(dfList$retained ) > 0 ) {
   log_2 <- dfList$retained
   log_2[,-1] <- log2(dfList$retained[,-1])
   file <- stringr::str_replace(outputPhaseCsv,'\\.csv','_retained_log2\\.csv')
-  write.csv(log2, file)
+  write.csv(log_2, file)
   
   # Create "phase" 2plot
   title <- paste0(retainedCount,' Colonies Retained')
