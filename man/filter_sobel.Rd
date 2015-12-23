@@ -9,7 +9,7 @@ filter_sobel(image, blur = 7, scalar = 1)
 \arguments{
 \item{image}{image matrix to detect edges on}
 
-\item{blur}{numeric blur radius used in filter_blur()}
+\item{blur}{numeric blur radius used in filter_blur() or \code{FALSE} for no blurring}
 
 \item{scalar}{numeric scaling factor}
 }

@@ -4,22 +4,50 @@
 \alias{solid_labelPhase}
 \title{Identify and Label Phase Microscopy Groups}
 \usage{
-solid_labelPhase(image, minColonySize = 50)
+solid_labelPhase(image, minColonySize = 50, detectionThreshold = 0.6,
+  haloQuantile = 0.98, brightThreshold = 0.8, dilateErodeBrush1 = 7,
+  dilateErodeBrush2 = 3)
 }
 \arguments{
 \item{image}{an image matrix to search for cell colonies}
 
 \item{minColonySize}{all identified groups of pixels, aka "blobs", below this size are discarded}
+
+\item{detectionThreshold}{brightness level above which colonies are detected}
+
+\item{haloQuantile}{brightness level of equalized image above which pixels are considred to be a colony "halo"}
+
+\item{brightThreshold}{brightness level above which pixels are considered part of a colony's "internal halo"}
+
+\item{dilateErodeBrush1}{size of brush used to convert edges into full colonies}
+
+\item{dilateErodeBrush2}{size of brush used to merge nearby pixels that are likely part of the same colony}
 }
 \value{
 A \code{matrix} of integer labeled blobs.
 }
 \description{
-Searches an image for dark cell colonies and incrementally labels each colony.
+Searches an image for dark cell colonies with a light "halo" and incrementally labels each colony.
 }
 \note{
-A lot of "photoshop magic" happens here and the algorithm has several internal constants
+A lot of "photoshop magic" happens here and the algorithm has several arguments
 that might need to be adjusted if the quality of images changes significantly. The algorithm
-was tailored to the "phase1" channel of solid substrate images.
+was tailored to the "phase1" channel of solid substrate images that have the appearance of
+dark cell colonies with a light "halo".
+
+This algorithm is inappropriate for imagery that does not have this appearance.
+
+Algorithm steps include:
+\enumerate{
+  \item{edge detection with a Sobel filter}
+  \item{dilate/erode with a brush width of \code{dilateErodeBrush1} to get contiguous areas identified as colonies}
+  \item{mark pixels above \code{detectionThreshold} as colonies (white)}
+  \item{change the very brightest pixels (above \code{haloQuantile}) to black to get crsip edges}
+  \item{change all pixels above \code{brightThreshold} to white to restore colony internal pixels}
+  \item{dilate/erode with a brush width of \code{dilateErodeBrush2} to capture small detections around colonies}
+  \item{discard all colonies smaller than minColonySize}
+  \item{fill any holes in contiguous areas}
+  \item{label colonies}
+}
 }
 

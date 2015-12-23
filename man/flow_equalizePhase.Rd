@@ -12,10 +12,13 @@ flow_equalizePhase(image, medianNew)
 \item{medianNew}{a new median value to set scale the image values against}
 }
 \value{
-an image of the same dimensions.
+An image of the same dimensions.
 }
 \description{
 Normalize a given image matrix based on median. The new median
  value should be between 0 and 1, and will typically be between 0.2 and 0.6.
+}
+\note{
+There are no hard-coded parameters in this function.
 }
 

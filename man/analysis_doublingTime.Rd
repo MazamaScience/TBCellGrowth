@@ -21,4 +21,18 @@ Given a "timeseries" dataframe with hours in the
 first column and colony sizes in all other columns, return a
 vector of doubling times in hours.
 }
+\details{
+The algorithm for calculating doubling times is very straightforward:
+\preformatted{
+  1) hours = first column of incoming 'timeseries' dataframe
+  2) colonies = all other columns of incoming 'timeseries' dataframe
+  3) subset both 'hours' and 'colonies' to include only the desired rows (hours)
+  4) for each column in 'colonies':
+       slope = linear least squares regression of ln(colony_size) vs. hours
+       doubling time = log(2) / slope
+}
+}
+\references{
+http://www.pangloss.com/wiki/R_GrowthCurve
+}
 

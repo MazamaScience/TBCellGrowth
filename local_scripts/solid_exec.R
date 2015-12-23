@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 #
-# Executable script for processing flow images
+# Executable script for processing solid images
 
 
 ###############################################################################
@@ -33,7 +33,8 @@ for (chamber in opt$chambers) {
   
   # Begin profiling
   profileStart()
-  
+
+    
   # ----- Create output directories -------------------------------------------
   
   chamberOutputDir <- paste0(opt$outputDir, "/", chamber)
@@ -95,7 +96,6 @@ for (chamber in opt$chambers) {
     }
   }
   
-  
   # Check dimensions
   for (channel in names(imageList)) {
     
@@ -118,6 +118,8 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tEqualizing images ...\n')
   
+  # NOTE:  flow_equalizePhase() has the preferred equalization algorithm, even for solid images.
+  
   # Assume that we always have phase
   imageList[['phase']] <- lapply(imageList[['phase']], flow_equalizePhase, opt$phaseMedian)
   
@@ -129,25 +131,11 @@ for (chamber in opt$chambers) {
   }
   
   
-  ### TODO should these imagetypes be aligned?
-  # ----- Align images --------------------------------------------------------
-  #   
-  #   if (getRunOptions('verbose')) cat('\tAligning images ...\n')
-  #   
-  #   imageList <- flow_alignImages(imageList,
-  #                                 numTargets=opt$numTargets,
-  #                                 targetWidth=opt$targetWidth, 
-  #                                 searchSpace=opt$searchSpace)
-  #   
-  #   # Profiling handled inside flow_alignImages()
-  #   
-  #   if (getRunOptions('debug_images')) {
-  #     saveImageList(imageList,debugDir,chamber,'C_aligned')    
-  #     profilePoint('saveImages','seconds to save images')
-  #   }
-  #   
-  
   # ----- Label colonies --------------------------------------------------------
+  
+  # NOTE:  solid_labelPhase() is optimized for dark cell colonies with a bright "halo".
+  # NOTE:  This detection and labeling function will not perform will on images that
+  # NOTE:  do not have these characteristics.
   
   if (getRunOptions('verbose')) cat('\tLabeling images ...\n')
   
@@ -170,8 +158,15 @@ for (chamber in opt$chambers) {
   
   if (getRunOptions('verbose')) cat('\tGenerating timeseries ...\n')
   
-  timeseriesList <- generateBlobTimeseries(labeledImageList[[1]], 
-                                           minTimespan=opt$minTimespan)
+  result <- try( timeseriesList <- generateBlobTimeseries(labeledImageList[[1]], 
+                                           minTimespan=opt$minTimespan),
+                 silent=FALSE )
+
+  if ( class(result)[1] == "try-error" ) {
+    err_msg <- geterrmessage()
+    cat(paste0('\tWARNING:  "',err_msg,'" Skipping chamber ',chamber))
+    next
+  }
   
   if (getRunOptions('verbose')) {
     cat(paste0('\nPhase timeseries generated ---------------------------------\n\n'))
@@ -261,51 +256,6 @@ for (chamber in opt$chambers) {
     writeExcel(dyeOverlap[[name]], chamberOutputDir, name, filenames, chamber)
   }
   
-  # TODO:  Analysis should be done separately and this chunk should be removed
-  
-#   # Create winnowing analysis and plots ---
-#   
-#   result <- try( {
-#     # Read in "phase" data that has timestep as the first column
-#     df <- read.csv(csvFile)
-#     # Perform winnowing
-#     dfList <- analysis_winnowColonies(df)
-#     # Create new files
-#     removedFile <- stringr::str_replace(csvFile,'\\.csv','_removed\\.csv')
-#     retainedFile <- stringr::str_replace(csvFile,'\\.csv','_retained\\.csv')
-#     # Create csv files
-#     write.csv(dfList$removed,removedFile)
-#     write.csv(dfList$retained,retainedFile)
-#     # create plots
-#     if ( nrow(dfList$removed ) > 0) {
-#       write.csv(dfList$removed, removedFile)
-#       title <- paste0(chamber,opt$channelNames[1],' REMOVED')
-#       pngFile <- stringr::str_replace(csvFile,'\\.csv','_removed_2plot\\.png')
-#       analysis_twoPlot(dfList$removed, title=title, filename=pngFile)
-#       title <- paste0(chamber,opt$channelNames[1],' REMOVED')
-#       pngFile <- stringr::str_replace(csvFile,'\\.csv','_removed_4plot\\.png')
-#       analysis_fourPlot(dfList$removed, title=title, filename=pngFile)
-#     } else {
-#       cat(paste0('\tNOTE:  No colonies removed during generation of debug plots.'))
-#     }
-#     if ( nrow(dfList$retained ) > 0) {
-#       write.csv(dfList$retained, retainedFile)
-#       title <- paste0(chamber,opt$channelNames[1],' RETAINED')
-#       pngFile <- stringr::str_replace(csvFile,'\\.csv','_retained_2plot\\.png')
-#       analysis_twoPlot(dfList$retained, title=title, filename=pngFile)
-#       title <- paste0(chamber,opt$channelNames[1],' RETAINED')
-#       pngFile <- stringr::str_replace(csvFile,'\\.csv','_retained_4plot\\.png')
-#       analysis_fourPlot(dfList$retained, title=title, filename=pngFile)
-#     } else {
-#       cat(paste0('\tNOTE:  No colonies retained during generation of debug plots.'))
-#     }
-#   }, silent=FALSE )
-#   
-#   if ( class(result)[1] == "try-error" ) {
-#     err_msg <- geterrmessage()
-#     cat(paste0('\tWARNING:  Error creating debug plots:\n\t',err_msg,'\n'))
-#   }
-  
   # Create full-frame images ------------------------------
   
   if (getRunOptions('verbose')) cat("\tCreating full-frame images ...\n")
@@ -373,22 +323,5 @@ for (chamber in opt$chambers) {
 ###############################################################################
 # END
 ###############################################################################
-
-if (FALSE) {
-  
-  outlined <- mapply(overlayOutlines, imageList[[1]], labeledImageList[[1]], col="yellow", SIMPLIFY=FALSE)
-  
-  for (i in 1:length(outlined)) {
-    im <- outlined[[i]]
-    if (i<10) i = paste0("0",i)
-    writeImage(im, paste0("im",i,".jpg"), quality=60)
-  }
-  
-  ### TEST DIFFERENT TIMESERIES ALGORITHMS
-  plot(0, 0, type="n", xlim=c(0,dim(timeseriesList$timeseries)[1]), ylim=c(0,max(timeseriesList$timeseries, na.rm=TRUE)))
-  apply(timeseriesList$timeseries, 2, lines, col=rgb(0,0,0,0.1))
-  
-}
-
 
 

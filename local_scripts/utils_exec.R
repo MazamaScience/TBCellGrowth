@@ -35,13 +35,13 @@ if (FALSE) {
   opt <- solid_parseCommandLineArguments(args)
   
   # Analysis example
-  args <- c('--inputDir=/Volumes/sherman-ngs/JC_Results/TEST_flow.0.1.17.13/xy01/',
+  args <- c('--inputDir=/Volumes/sherman-ngs/JC_Results/TEST_solid.0.2.0/xy01/',
             '--phaseCsv=phase_xy01.csv',
             '--minExpFitHour=6',
             '--maxExpFitHour=30',
             '--minDoublingTime=0.1',
             '--maxDoublingTime=60',
-            '--minStartTime=36')
+            '--maxStartHour=36')
   
   opt <- analysis_parseCommandLineArguments(args)
 }

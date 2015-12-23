@@ -1,13 +1,15 @@
 #' @export
-#' @title Normalize Image Values
+#' @title Photoshop Style Auto Levels
 #' @param image the image matrix to modify.
 #' @description Normalize a given solid image. This function attempts to 
 #' replicate the auto levels function in Photoshop. It shifts the peak of
 #' the histogram to 0 and scales the values so the histogram is between 
 #' 0 and ~0.5
+#' @note This function is deprecated for 'solid' images in favor of the simpler
+#' equalization found in \code{flow_equalizePhase()}.
 #' @return an image of the same dimensions.
 
-solid_equalizePhase<- function(image) {
+solid_equalizePhase <- function(image) {
   
   cat("\n")
   

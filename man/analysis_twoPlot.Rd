@@ -25,7 +25,13 @@ none
 }
 \description{
 Given a "timeseries" dataframe with hours in the
-first column and colony sizes in all other columns, create growth curve plots for
-all columns.
+first column and colony sizes in all other columns, create the following plots:
+\enumerate{
+  \item{growth plot of colony sizes}
+  \item{growth plot of log2 of colony sizes}
+}
+}
+\seealso{
+\link{analysis_doublingTime}
 }
 

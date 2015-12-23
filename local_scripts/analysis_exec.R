@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 #
-# Executable script for processing flow images
+# Executable script for performing overview analysis on TBCellGrowth output files.
 
 
 ###############################################################################
@@ -45,6 +45,16 @@ if ( removedCount > 0 ) {
   removedFile <- stringr::str_replace(outputPhaseCsv,'\\.csv','_removed\\.csv')
   write.csv(dfList$removed, removedFile)
   
+  # Create "doublingTime" and "log2(phase)" csv files
+  cat(paste0('Writing "removed_doublingTimes" csv file ...\n'))
+  doublingTime <- analysis_doublingTime(dfList$removed, opt$minExpFitHour, opt$maxExpFitHour)
+  file <- stringr::str_replace(outputPhaseCsv,'\\.csv','_removed_doublingTimes\\.csv')
+  write.csv(doublingTime, file)
+  log_2 <- dfList$removed
+  log_2[,-1] <- log2(dfList$removed[,-1])
+  file <- stringr::str_replace(outputPhaseCsv,'\\.csv','_removed_log2\\.csv')
+  write.csv(log2, file)
+  
   # Create "phase" 2plot
   title <- paste0(removedCount,' Colonies Removed')
   pngFile <- stringr::str_replace(outputPhaseCsv,'\\.csv','_removed_2plot\\.png')
@@ -69,6 +79,16 @@ if ( ncol(dfList$retained ) > 0 ) {
   cat(paste0('Writing "retained" csv file with ',retainedCount,' colonies ...\n'))
   retainedFile <- stringr::str_replace(outputPhaseCsv,'\\.csv','_retained\\.csv')
   write.csv(dfList$retained, retainedFile)
+
+  # Create "doublingTime" and "log2(phase)" csv files
+  cat(paste0('Writing "retained_doublingTimes" csv file ...\n'))
+  doublingTime <- analysis_doublingTime(dfList$retained, opt$minExpFitHour, opt$maxExpFitHour)
+  file <- stringr::str_replace(outputPhaseCsv,'\\.csv','_retained_doublingTimes\\.csv')
+  write.csv(doublingTime, file)
+  log_2 <- dfList$retained
+  log_2[,-1] <- log2(dfList$retained[,-1])
+  file <- stringr::str_replace(outputPhaseCsv,'\\.csv','_retained_log2\\.csv')
+  write.csv(log2, file)
   
   # Create "phase" 2plot
   title <- paste0(retainedCount,' Colonies Retained')

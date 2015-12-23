@@ -2,7 +2,7 @@
 % Please edit documentation in R/solid_equalizePhase.R
 \name{solid_equalizePhase}
 \alias{solid_equalizePhase}
-\title{Normalize Image Values}
+\title{Photoshop Style Auto Levels}
 \usage{
 solid_equalizePhase(image)
 }
@@ -17,5 +17,9 @@ Normalize a given solid image. This function attempts to
 replicate the auto levels function in Photoshop. It shifts the peak of
 the histogram to 0 and scales the values so the histogram is between
 0 and ~0.5
+}
+\note{
+This function is deprecated for 'solid' images in favor of the simpler
+equalization found in \code{flow_equalizePhase()}.
 }
 

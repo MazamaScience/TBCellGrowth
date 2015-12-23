@@ -25,7 +25,32 @@ Vector of doubling times
 }
 \description{
 Given a "timeseries" dataframe with hours in the
-first column and colony sizes in all other columns, create a
-plot of all columns.
+first column and colony sizes in all other columns, create the following plots:
+\enumerate{
+  \item{growth plot of colony sizes}
+  \item{growth plot of log of colony sizes}
+  \item{boxplot of doubling times}
+  \item{histogram of doubling times with boxplot outliers removed}
+}
+}
+\details{
+The R boxplot() function is used to define outliers and has the following documentation
+where IQR stands for Inter-Quartile Range:
+
+The two 'hinges' are versions of the first and third quartile, i.e., close to
+quantile(x, c(1,3)/4). The hinges equal the quartiles for odd n (where n <- length(x))
+and differ for even n. Whereas the quartiles only equal observations for n %% 4 == 1 (n = 1 mod 4),
+the hinges do so additionally for n %% 4 == 2 (n = 2 mod 4), and are in the middle
+of two observations otherwise.
+
+The notches (if requested) extend to +/-1.58 IQR/sqrt(n). This seems to be based on
+the same calculations as the formula with 1.57 in Chambers et al (1983, p. 62), given
+in McGill et al (1978, p. 16). They are based on asymptotic normality of the median
+and roughly equal sample sizes for the two medians being compared, and are said to
+be rather insensitive to the underlying distributions of the samples. The idea appears
+to be to give roughly a 95% confidence interval for the difference in two medians.
+}
+\seealso{
+\link{analysis_doublingTime}
 }
 

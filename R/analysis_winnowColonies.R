@@ -13,16 +13,16 @@
 #' Depending on run configuration, some portion of the colonies will be artifacts
 #' -- bubbles, blotches, specks, etc.
 #' 
-#' This function helps to winnow down liktely artifacts and returns a dataframe
+#' This function helps to winnow down likely artifacts and returns a dataframe
 #' that likely contains a higher percentage of actual colonies.
 #' 
 #' The main way this function removes artifacts is by removing "colonies" that
 #' do not grow. Doubling times for rapidly growing colonies will be low numbers
-#' while doubling times for no or little growht will be very large numbers. 
+#' while doubling times for no or little growth will be very large numbers. 
 #' Negative doubling times are found where identified "colonies" shrink over time.
 #' 
 #' This function identifies any colony with a negative doubling time as an artifact.
-#' After removal of negative doubling times, the boxlplot() fucntion is used to 
+#' After removal of negative doubling times, the boxlplot() function is used to 
 #' identifiy outliers. These are subsequently removed.
 #' 
 #' An additional option is to remove all "colonies" that are not identified until
@@ -31,7 +31,22 @@
 #' 
 #' This funciton returns a list with two dataframes, one containing the retained
 #' colonies and one containing the removed colonies.
+#' @details The R boxplot() function is used to define outliers and has the following documentation
+#' where IQR stands for Inter-Quartile Range:
 #' 
+#' The two 'hinges' are versions of the first and third quartile, i.e., close to 
+#' quantile(x, c(1,3)/4). The hinges equal the quartiles for odd n (where n <- length(x)) 
+#' and differ for even n. Whereas the quartiles only equal observations for n %% 4 == 1 (n = 1 mod 4), 
+#' the hinges do so additionally for n %% 4 == 2 (n = 2 mod 4), and are in the middle 
+#' of two observations otherwise.
+#'
+#' The notches (if requested) extend to +/-1.58 IQR/sqrt(n). This seems to be based on 
+#' the same calculations as the formula with 1.57 in Chambers et al (1983, p. 62), given 
+#' in McGill et al (1978, p. 16). They are based on asymptotic normality of the median 
+#' and roughly equal sample sizes for the two medians being compared, and are said to 
+#' be rather insensitive to the underlying distributions of the samples. The idea appears 
+#' to be to give roughly a 95% confidence interval for the difference in two medians.
+#' @seealso \link{analysis_doublingTime}
 #' @return List of two timeseries dataframes: "retained" and "removed".
 
 analysis_winnowColonies <- function(timeseries, minExpFitHour=0, maxExpFitHour=1e9,

@@ -76,6 +76,10 @@ generateBlobTimeseries <- function(images, minTimespan=8, maxDistance=50,
   
   if (getRunOptions('verbose')) cat(paste0('\tRetaining ',goodBlobCount,' of ',allBlobCount,' blobs found in at least ',minTimespan,' frames\n'))
   
+  if (goodBlobCount < 1) {
+    stop('No blobs retained.')
+  }
+  
   # Sort DF by linear growth slope
   sorted <- apply(log(DF), 2, function(x) { 
     x <- x[!is.na(x)]
