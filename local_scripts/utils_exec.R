@@ -65,8 +65,8 @@ flow_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) 
     optparse::make_option(c("--backgroundIndex"), default=1, type='integer', help="Background index [default \"%default\"]"),
     # Image information
     optparse::make_option(c("--extension"), default="tif", type='character', help="File extension of input images [default \"%default\"]"),
-    optparse::make_option(c("--startTime"), default=0, type='integer', help="Starting hour [default %default]"),
-    optparse::make_option(c("--timestep"), default=3, type='integer', help="Hours between image acquisition [default %default]"),
+    optparse::make_option(c("--startTime"), default=0.0, type='double', help="Starting hour [default %default]"),
+    optparse::make_option(c("--timestep"), default=3.0, type='double', help="Hours between image acquisition [default %default]"),
     optparse::make_option(c("--distanceScale"), default=0.21, type='double', help="pixels/micrometer [default %default]"),
     # Chambers and channels
     optparse::make_option(c("--chambers"), default='xy01,xy02', type='character', help="Comma separate string of chamber ids [default \"%default\"]"),
@@ -74,12 +74,17 @@ flow_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE)) 
     optparse::make_option(c("--channelNames"), default="phase", type='character', help="Comma separate string of channel names [default \"%default\"]"), 
     # Labeling algorithm
     optparse::make_option(c("--minColonySize"), default=100, type='integer', help="identified groups of pixels below this size are discarded [default \"%default\"]"),
-    # Optimization
+    optparse::make_option(c("--minSizeExpansion"), default=1.75, type='double', help="used to determine size threshold in final removal of \"junk\" [default \"%default\"]"),
+    optparse::make_option(c("--detectionThreshold"), default=0.5, type='double', help="brightness level above which colonies are detected [default \"%default\"]"),
+    optparse::make_option(c("--haloQuantile"), default=0.8, type='double', help="brightness level of equalized image above which pixels are considred to be a colony \"halo\" [default \"%default\"]"),
+    optparse::make_option(c("--brightThreshold"), default=0.775, type='double', help="brightness level above which pixels ARE NOT considered part of a colony (different from solid_exec) [default \"%default\"]"),
+    optparse::make_option(c("--dilateErodeBrush1"), default=7, type='double', help="size of brush used to convert edges into full colonies [default \"%default\"]"),
+    optparse::make_option(c("--dilateErodeBrush2"), default=3, type='double', help="size of brush used to merge nearby pixels that are likely part of the same colony [default \"%default\"]"),
+  # Optimization
     optparse::make_option(c("--startFrame"), default=1, type='integer', help="Which image frame to start from [default %default]"),
     optparse::make_option(c("--nFrames"), default="all", help="Number of frames to read [default \"%default\"]"),
     optparse::make_option(c("--minTimespan"), default=5, type='integer', help="Minimum number of frames in which a colony must be recognized [default %default]"),    
     #     # Adjustable parameters
-    #     optparse::make_option(c("--phaseMedian"), default=0.4, help="Median value after equalization [default %default]"),
     #     optparse::make_option(c("--numTargets"), default=10, help="Number of target features used for alignment [default %default]"),
     #     optparse::make_option(c("--targetWidth"), default=30, help="Size of target feature used for alignment [default %default]"),
     #     optparse::make_option(c("--searchSpace"), default=110, help="Size of search area for alignment [default %default]"),    
@@ -173,8 +178,8 @@ solid_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE))
     optparse::make_option(c("--dataDir"), default="Time Course", type='character', help="Relative path of the data directory within inputDir [default \"%default\"]"),
     # Image information
     optparse::make_option(c("--extension"), default="tif", type='character', help="File extension of input images [default \"%default\"]"),
-    optparse::make_option(c("--startTime"), default=0, type='integer', help="Starting hour [default %default]"),
-    optparse::make_option(c("--timestep"), default=3, type='integer', help="Hours between image acquisition [default %default]"),
+    optparse::make_option(c("--startTime"), default=0.0, type='double', help="Starting hour [default %default]"),
+    optparse::make_option(c("--timestep"), default=3.0, type='double', help="Hours between image acquisition [default %default]"),
     optparse::make_option(c("--distanceScale"), default=0.21, type='double', help="pixels/micrometer [default %default]"),
     # Chambers and channels
     optparse::make_option(c("--chambers"), default='xy01,xy02', type='character', help="Comma separate string of chamber ids [default \"%default\"]"),
@@ -182,12 +187,17 @@ solid_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRUE))
     optparse::make_option(c("--channelNames"), default="phase", type='character', help="Comma separate string of channel names [default \"%default\"]"),    
     # Labeling algorithm
     optparse::make_option(c("--minColonySize"), default=50, type='integer', help="identified groups of pixels below this size are discarded [default \"%default\"]"),
+    optparse::make_option(c("--minSizeExpansion"), default=1.2, type='double', help="used to determine size threshold in final removal of \"junk\" [default \"%default\"]"),
+    optparse::make_option(c("--detectionThreshold"), default=0.6, type='double', help="brightness level above which colonies are detected [default \"%default\"]"),
+    optparse::make_option(c("--haloQuantile"), default=0.98, type='double', help="brightness level of equalized image above which pixels are considred to be a colony \"halo\" [default \"%default\"]"),
+    optparse::make_option(c("--brightThreshold"), default=0.8, type='double', help="brightness level above which pixels ARE considered part of a colony's \"internal halo\" (different from flow_exec) [default \"%default\"]"),
+    optparse::make_option(c("--dilateErodeBrush1"), default=7, type='double', help="size of brush used to convert edges into full colonies [default \"%default\"]"),
+    optparse::make_option(c("--dilateErodeBrush2"), default=3, type='double', help="size of brush used to merge nearby pixels that are likely part of the same colony [default \"%default\"]"),
     # Optimization
     optparse::make_option(c("--startFrame"), default=1, type='integer', help="Which image frame to start from [default %default]"),
     optparse::make_option(c("--nFrames"), default="all", help="Number of frames to read [default \"%default\"]"),
     optparse::make_option(c("--minTimespan"), default=5, type='integer', help="Minimum number of frames in which a colony must be recognized [default %default]"),    
     #     # Adjustable parameters
-    #     optparse::make_option(c("--phaseMedian"), default=0.4, help="Median value after equalization [default %default]"),
     #     optparse::make_option(c("--numTargets"), default=10, help="Number of target features used for alignment [default %default]"),
     #     optparse::make_option(c("--targetWidth"), default=30, help="Size of target feature used for alignment [default %default]"),
     #     optparse::make_option(c("--searchSpace"), default=110, help="Size of search area for alignment [default %default]"),    
@@ -276,12 +286,12 @@ analysis_parseCommandLineArguments <- function(args=commandArgs(trailingOnly=TRU
     optparse::make_option(c("--inputDir"), default='', type='character', help="Absolute path of the input directory [default \"%default\"]"),
     optparse::make_option(c("--phaseCsv"), default='', type='character', help="Name of the 'phase' CSV file to process [default \"%default\"]"),
     optparse::make_option(c("--outputDir"), default=getwd(), type='character', help="Absolute path of the output directory [default \"%default\"]"),
-    optparse::make_option(c("--minExpFitHour"), default=0, type='double', help="Hour of first datapoint to include in doubling time exponential fit [default \"%default\"]"),
+    optparse::make_option(c("--minExpFitHour"), default=0.0, type='double', help="Hour of first datapoint to include in doubling time exponential fit [default \"%default\"]"),
     optparse::make_option(c("--maxExpFitHour"), default=1e9, type='double', help="Hour of last datapoint to include in doubling time exponential fit [default \"%default\"]"),
-    optparse::make_option(c("--minDoublingTime"), default=0, type='double', help="Colonies with doubling times smaller than this many hours are removed [default \"%default\"]"),
+    optparse::make_option(c("--minDoublingTime"), default=0.0, type='double', help="Colonies with doubling times smaller than this many hours are removed [default \"%default\"]"),
     optparse::make_option(c("--maxDoublingTime"), default=1e9, type='double', help="Colonies with doubling times larger than this many hours are removed [default \"%default\"]"),
     optparse::make_option(c("--removeOutliers"), default=TRUE, type='logical', help="Flag indicating whether to remove colonies with doubling time outliers [default \"%default\"]"),
-    optparse::make_option(c("--maxStartHour"), default=60, type='double', help="Colonies not identified by this hour are removed  [default \"%default\"]")
+    optparse::make_option(c("--maxStartHour"), default=60.0, type='double', help="Colonies not identified by this hour are removed  [default \"%default\"]")
   )
   
   # Parse arguments

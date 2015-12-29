@@ -138,12 +138,29 @@ for (chamber in opt$chambers) {
   # NOTE:  do not have these characteristics.
   
   if (getRunOptions('verbose')) cat('\tLabeling images ...\n')
+
+  # NOTE:  All arguments to flow_labelPhase() are specified here. Named arguments match the 
+  # NOTE:  default values for this function.  This "daylighting" of the parameters
+  # NOTE:  make them available to anyone who may wish to create a copy of this script
+  # NOTE:  and modify these values for experimentation.
+  # NOTE: 
+  # NOTE:  But be warned that these defaults were arrived at after much tinkering 
+  # NOTE:  with immediate visual feedback and are best adjusted in an interactive 
+  # NOTE:  R session with the environment loaded with data as would be found at this
+  # NOTE:  point in the execution of this script.
   
   labeledImageList <- list()
   labeledImageList[['phase']] <- list()
   for (i in 1:length(imageList[['phase']])) {    
     if (getRunOptions('verbose')) cat(paste0('\tLabeling ',i,' ...\n'))
-    labeledImageList[['phase']][[i]] <- solid_labelPhase(imageList[['phase']][[i]], opt$minColonySize)
+    labeledImageList[['phase']][[i]] <- solid_labelPhase(imageList[['phase']][[i]],
+                                                         minColonySize=opt$minColonySize,
+                                                         minSizeExpansion=opt$minSizeExpansion,
+                                                         detectionThreshold=opt$detectionThreshold,
+                                                         haloQuantile=opt$haloQuantile,
+                                                         brightThreshold=opt$brightThreshold,
+                                                         dilateErodeBrush1=opt$dilateErodeBrush1,
+                                                         dilateErodeBrush2=opt$dilateErodeBrush2)
   }
   
   profilePoint('solid_labelPhase','seconds to create labeled images')   

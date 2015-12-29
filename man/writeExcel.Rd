@@ -27,6 +27,6 @@ of the \code{df} dataframe. Individual cells will be linked to images associated
 with each TB colony (row) at each timestep (col). Full columns will be linked
 to animaged gifs while full rows will be linked to full images for each timestep.
 
-The images are generated in buildDirectoryStructure() which also calls this function.
+The images are generated in flow_exec.R and solid_exec.R which also call this function.
 }
 

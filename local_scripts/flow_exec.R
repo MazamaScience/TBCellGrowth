@@ -202,12 +202,21 @@ for (chamber in opt$chambers) {
   for (channel in names(imageList)) {
     imageList[[channel]][[1]] <- NULL
   }
-  
+
   labeledImageList <- list()
   labeledImageList[['phase']] <- list()
   for (i in 1:length(imageList[['phase']])) {    
     if (getRunOptions('verbose')) cat(paste0('\tLabeling ',i,' ...\n'))
-    labeledImageList[['phase']][[i]] <- flow_labelPhase(imageList[['phase']][[i]], artifactMask, ignoredRegions, opt$minColonySize)
+    labeledImageList[['phase']][[i]] <- flow_labelPhase(imageList[['phase']][[i]],
+                                                        artifactMask,
+                                                        ignoredRegions,
+                                                        minColonySize=opt$minColonySize,
+                                                        minSizeExpansion=opt$minSizeExpansion,
+                                                        detectionThreshold=opt$detectionThreshold,
+                                                        haloQuantile=opt$haloQuantile,
+                                                        brightThreshold=opt$brightThreshold,
+                                                        dilateErodeBrush1=opt$dilateErodeBrush1,
+                                                        dilateErodeBrush2=opt$dilateErodeBrush2)
   }
   
   profilePoint('flow_labelPhase','seconds to create labeled images')   

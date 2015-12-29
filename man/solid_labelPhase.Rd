@@ -4,20 +4,22 @@
 \alias{solid_labelPhase}
 \title{Identify and Label Phase Microscopy Groups}
 \usage{
-solid_labelPhase(image, minColonySize = 50, detectionThreshold = 0.6,
-  haloQuantile = 0.98, brightThreshold = 0.8, dilateErodeBrush1 = 7,
-  dilateErodeBrush2 = 3)
+solid_labelPhase(image, minColonySize = 50, minSizeExpansion = 1.2,
+  detectionThreshold = 0.6, haloQuantile = 0.98, brightThreshold = 0.8,
+  dilateErodeBrush1 = 7, dilateErodeBrush2 = 3)
 }
 \arguments{
 \item{image}{an image matrix to search for cell colonies}
 
 \item{minColonySize}{all identified groups of pixels, aka "blobs", below this size are discarded}
 
+\item{minSizeExpansion}{used to determine size threshold in final removal of "junk"}
+
 \item{detectionThreshold}{brightness level above which colonies are detected}
 
 \item{haloQuantile}{brightness level of equalized image above which pixels are considred to be a colony "halo"}
 
-\item{brightThreshold}{brightness level above which pixels are considered part of a colony's "internal halo"}
+\item{brightThreshold}{brightness level above which pixels ARE considered part of a colony's "internal halo" (different from flow_labelPhase)}
 
 \item{dilateErodeBrush1}{size of brush used to convert edges into full colonies}
 
@@ -48,6 +50,7 @@ Algorithm steps include:
   \item{discard all colonies smaller than minColonySize}
   \item{fill any holes in contiguous areas}
   \item{label colonies}
+  \item{remove colonies larger than \code{minColonySize * minSizeExpansion} as a precaution}
 }
 }
 

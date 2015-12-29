@@ -4,17 +4,30 @@
 \alias{flow_labelPhase}
 \title{Identify and Label Phase Microscopy Groups}
 \usage{
-flow_labelPhase(image, artifactMask, ignoredRegions, minColonySize = 100)
+flow_labelPhase(image, artifactMask, ignoredRegions, minColonySize = 100,
+  minSizeExpansion = 1.75, detectionThreshold = 0.5, haloQuantile = 0.8,
+  brightThreshold = 0.775, dilateErodeBrush1 = 7, dilateErodeBrush2 = 3)
 }
 \arguments{
 \item{image}{an image matrix to search for cell colonies}
 
 \item{artifactMask}{a mask of non biological features to ignore. See \link{flow_createArtifactMask}.}
 
-\item{ignoredRegions}{a vector of row numbers to ignore. Blobs which have centroids
-in this range are removed.}
+\item{ignoredRegions}{a vector of row numbers to ignore. Blobs which have centroids in this range are removed.}
 
 \item{minColonySize}{all identified groups of pixels, aka "blobs", below this size are discarded}
+
+\item{minSizeExpansion}{used to determine size threshold in final removal of "junk"}
+
+\item{detectionThreshold}{brightness level above which colonies are detected}
+
+\item{haloQuantile}{brightness level of equalized image above which pixels are considred to be a colony "halo"}
+
+\item{brightThreshold}{brightness level above which pixels ARE NOT considered part of a colony (different from solid_labelPhase)}
+
+\item{dilateErodeBrush1}{size of brush used to convert edges into full colonies}
+
+\item{dilateErodeBrush2}{size of brush used to merge nearby pixels that are likely part of the same colony}
 }
 \value{
 A \code{matrix} of integer labeled blobs.
@@ -23,8 +36,26 @@ A \code{matrix} of integer labeled blobs.
 Searches an image for dark cell colonies and incrementally labels each colony.
 }
 \note{
-A lot of "photoshop magic" happens here and the algorithm has several internal constants
+A lot of "photoshop magic" happens here and the algorithm has several arguments
 that might need to be adjusted if the quality of images changes significantly. The algorithm
-was tailored to the "phase1" channel of Microfluidics images.
+was tailored to the "phase1" channel of micro-fluidics images that have the appearance of
+dark cell colonies with a light "halo".
+
+This algorithm is inappropriate for imagery that does not have this appearance.
+
+Algorithm steps include:
+\enumerate{
+  \item{replace pixels identified in the \code{artifactMask} with medium gray (background)}
+  \item{edge detection with a Sobel filter}
+  \item{dilate/erode with a brush width of \code{dilateErodeBrush1} to get contiguous areas identified as colonies}
+  \item{mark pixels above \code{detectionThreshold} as colonies (white)}
+  \item{change the very brightest pixels (above \code{haloQuantile}) to black to get crsip edges}
+  \item{dilate/erode with a brush width of \code{dilateErodeBrush2} to capture small detections around colonies}
+  \item{discard all colonies smaller than \code{minColonySize}}
+  \item{label colonies}
+  \item{remove colonies in ignored regions}
+  \item{change all pixels above \code{brightThreshold} to black to more closely "hug" colonies}
+  \item{remove colonies larger than \code{minColonySize * minSizeExpansion} as a precaution}
+}
 }
 

@@ -2,9 +2,10 @@
 #' @title Identify and Label Phase Microscopy Groups
 #' @param image an image matrix to search for cell colonies
 #' @param minColonySize all identified groups of pixels, aka "blobs", below this size are discarded
+#' @param minSizeExpansion used to determine size threshold in final removal of "junk"
 #' @param detectionThreshold brightness level above which colonies are detected
 #' @param haloQuantile brightness level of equalized image above which pixels are considred to be a colony "halo"
-#' @param brightThreshold brightness level above which pixels are considered part of a colony's "internal halo"
+#' @param brightThreshold brightness level above which pixels ARE considered part of a colony's "internal halo" (different from flow_labelPhase)
 #' @param dilateErodeBrush1 size of brush used to convert edges into full colonies
 #' @param dilateErodeBrush2 size of brush used to merge nearby pixels that are likely part of the same colony
 #' @description Searches an image for dark cell colonies with a light "halo" and incrementally labels each colony.
@@ -26,14 +27,18 @@
 #'   \item{discard all colonies smaller than minColonySize}
 #'   \item{fill any holes in contiguous areas}
 #'   \item{label colonies}
+#'   \item{remove colonies larger than \code{minColonySize * minSizeExpansion} as a precaution}
 #' }
 #' @return A \code{matrix} of integer labeled blobs.
 
-solid_labelPhase <- function(image, minColonySize=50,
+solid_labelPhase <- function(image,
+                             minColonySize=50,
+                             minSizeExpansion=1.2,
                              detectionThreshold=0.6,
                              haloQuantile=0.98,
                              brightThreshold=0.8,
-                             dilateErodeBrush1=7, dilateErodeBrush2=3) {
+                             dilateErodeBrush1=7,
+                             dilateErodeBrush2=3) {
   
   # Ensure that the greatest pixel value is 1. Some EBImage functions
   # break if pixels greater than 1 are encountered
@@ -64,7 +69,7 @@ solid_labelPhase <- function(image, minColonySize=50,
   # counterintuitive since we just removed bright regions, but an equalized
   # image brightens everything to an extreme, even "sort of" bright areas.
   # It turns out that the actual brightest areas (in this case defined as
-  # greater than 80% intensity) tend to be the centers of bacterial groups,
+  # greater than brightThreshold) tend to be the centers of bacterial groups,
   # so we want to add those back in.
   imageEdit[image > brightThreshold] <- 1
   
@@ -85,8 +90,8 @@ solid_labelPhase <- function(image, minColonySize=50,
   # value, which we'll later use to identify and track the blobs.
   imageEdit <- EBImage::bwlabel(imageEdit)
   
-  # Now remove slightly bigger blobs as a precaution.
-  expandedColonySize <- minColonySize * 1.2
+  # Now remove larger than a slightly expanded size as a precaution.
+  expandedColonySize <- minColonySize * minSizeExpansion
   imageEdit <- removeBlobs(imageEdit, expandedColonySize, label=FALSE)
   
   # For checking results during development
@@ -97,11 +102,3 @@ solid_labelPhase <- function(image, minColonySize=50,
   return(imageEdit)
   
 }
-# 
-# expandEdges <- function(im, width, val) {
-#   im[1:width,10:(dim(im)[2]-10)] <- val
-#   im[10:(dim(im)[1]-10),1:width] <- val
-#   im[(dim(im)[1]-width):(dim(im)[1]),10:(dim(im)[2]-10)] <- val
-#   im[10:(dim(im)[1]),(dim(im)[2]-width):(dim(im)[2])] <- val
-#   return(im)
-# }
