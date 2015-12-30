@@ -95,12 +95,61 @@ srun --mem-per-cpu=15626 -n2 -N1 --pty --preserve-env ./flow_exec.R \
 --distanceScale=0.21 \
 --verbose &
   
+################################################################################
 # Post processing
+#
+# Options:
+# 	--inputDir=INPUTDIR
+# 		Absolute path of the input directory [default ""]
+# 
+# 	--phaseCsv=PHASECSV
+# 		Name of the 'phase' CSV file to process [default ""]
+# 
+# 	--outputDir=OUTPUTDIR
+# 		Absolute path of the output directory [default "CURRENT_DIRECTORY"]
+# 
+# 	--minExpFitHour=MINEXPFITHOUR
+# 		Hour of first datapoint to include in doubling time exponential fit [default "0"]
+# 
+# 	--maxExpFitHour=MAXEXPFITHOUR
+# 		Hour of last datapoint to include in doubling time exponential fit [default "1e+09"]
+# 
+# 	--minDoublingTime=MINDOUBLINGTIME
+# 		Colonies with doubling times smaller than this many hours are removed [default "0"]
+# 
+# 	--maxDoublingTime=MAXDOUBLINGTIME
+# 		Colonies with doubling times larger than this many hours are removed [default "1e+09"]
+# 
+# 	--removeOutliers=REMOVEOUTLIERS
+# 		Flag indicating whether to remove colonies with doubling time outliers [default "TRUE"]
+# 
+# 	--maxStartHour=MAXSTARTHOUR
+# 		Colonies not identified by this hour are removed  [default "60"]
+# 
+# 	-h, --help
+# 		Show this help message and exit
+# 
+################################################################################
+
 ./analysis_exec.r \
---inputDir="/Volumes/sherman-ngs/JC_Results/TEST_solid.0.1.17.13/xy01/" \
+--inputDir="/Volumes/sherman-ngs/JC_Results/TEST_flow.0.2.2/xy01/" \
 --phaseCsv="phase_xy01.csv" \
 --minExpFitHour=24 \
 --maxExpFitHour=60 \
 --minDoublingTime=0.1 \
 --maxDoublingTime=60 \
+--removeOutliers=TRUE \
 --maxStartHour=60
+
+
+./analysis_exec.r \
+--inputDir="/Volumes/sherman-ngs/JC_Results/TEST_solid.0.2.2/xy01/" \
+--phaseCsv="phase_xy01.csv" \
+--minExpFitHour=24 \
+--maxExpFitHour=60 \
+--minDoublingTime=0.1 \
+--maxDoublingTime=60 \
+--removeOutliers=TRUE \
+--maxStartHour=60
+
+
