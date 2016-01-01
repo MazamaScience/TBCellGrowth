@@ -313,7 +313,7 @@ for (chamber in opt$chambers) {
   # Generate filenames from timestamps (assuming hours < 1000)
   # NOTE:  Timestep names are assigned during loadImages().
   hours <- opt$startTime + as.integer(names(imageList[['phase']])) * opt$timestep
-  filenames <- stringr::str_sub(paste0('000',hours),-3)
+  filenames <- sprintf("%06.2f",hours)
   
   # Apply timesteps to row names of timeseries
   rownames(timeseriesList$timeseries) <- filenames

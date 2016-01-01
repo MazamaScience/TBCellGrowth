@@ -217,7 +217,7 @@ for (chamber in opt$chambers) {
   for (channel in names(imageList)[-1]) { # TODO:  Improve this logic
     if (getRunOptions('verbose')) cat(paste0("\tFinding ",channel, " overlap ...\n"))
     dyeOverlap[[channel]] <- findDyeOverlap(labeledImageList[[channel]], timeseriesList)
-    profilePoint('overlap','seconds to findn dye overlaps')   
+    profilePoint('overlap','seconds to find dye overlaps')   
   }
   
   profilePoint('non_phase','seconds to find dye image overlaps')   
@@ -240,9 +240,9 @@ for (chamber in opt$chambers) {
   if (getRunOptions('verbose')) cat('\tCreating output csv and images ...\n')
   
   # Generate filenames from timestamps
-  # Assuming hours < 1000
+  # NOTE:  Filenames assume hours < 1000 AND timestep > 0.01 hours
   hours <- opt$startTime + ((0:(length(imageList[[1]])-1))*opt$timestep)
-  filenames <- stringr::str_sub(paste0('000',hours),-3)
+  filenames <- sprintf("%06.2f",hours)
   
   # Apply timesteps to row names of timeseries
   rownames(timeseriesList$timeseries) <- filenames
