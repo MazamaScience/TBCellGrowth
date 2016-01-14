@@ -65,7 +65,7 @@ analysis_winnowColonies <- function(timeseries, minExpFitHour=0, maxExpFitHour=1
   # Alwaus remove negative doubling times
   negativeDTMask <- (doublingTime < 0)
 
-  # Find colonies with doubling times above a threshold
+  # Find colonies with doubling times above maxDoublingTime
   overMaxDTMask <- rep(FALSE,ncol(timeseries))[-1] # remove timestep column to match other masks
   if (!is.null(maxDoublingTime)) {
     overMaxDTMask <- (doublingTime > maxDoublingTime)
@@ -73,6 +73,12 @@ analysis_winnowColonies <- function(timeseries, minExpFitHour=0, maxExpFitHour=1
   
   # Combine the above to create a "noGrowth" mask
   noGrowthMask <- negativeDTMask | overMaxDTMask
+ 
+  # Find colonies with doubling times below minDoublingTime
+  underMinDTMask <- rep(FALSE,ncol(timeseries))[-1] # remove timestep column to match other masks
+  if (!is.null(minDoublingTime)) {
+    underMinDTMask <- (doublingTime < minDoublingTime)
+  }
   
   # Find outliers in the non-negative doubling times
   outlierDTMask <- rep(TRUE,ncol(timeseries))[-1] # remove timestep column to match other masks
@@ -92,7 +98,7 @@ analysis_winnowColonies <- function(timeseries, minExpFitHour=0, maxExpFitHour=1
   }
   
   # Create the retained and removed dataframes (adding an initial TRUE to keep the timestep column)
-  removedMask <- (missingDTMask | noGrowthMask | outlierDTMask | !earlyMask)
+  removedMask <- (missingDTMask | underMinDTMask | noGrowthMask | outlierDTMask | !earlyMask)
   retained <- timeseries[,c(TRUE,!removedMask)]
   removed <- timeseries[,c(TRUE,removedMask)]
   

@@ -1,6 +1,6 @@
 Type: Package
 Package: TBCellGrowth
-Version: 0.2.3
+Version: 0.2.4
 Title: Cell Microscopy Feature Extraction and Growth Tracking
 Authors@R: c(
     person("Will", "Leahy", email="procterw@gmail.com", role=c("aut","cre")),
